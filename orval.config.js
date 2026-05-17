@@ -2,7 +2,7 @@ import { defineConfig } from "orval";
 
 export default defineConfig({
 	pipebomb: {
-		input: "./spec.json",
+		input: "./openapi/spec.json",
 		output: {
 			target: "./src/api",
 			schemas: "./src/api/model",
