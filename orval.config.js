@@ -16,6 +16,9 @@ export default defineConfig({
 					path: "./src/api-client.ts",
 					name: "customFetch",
 				},
+				query: {
+					version: 5,
+				},
 			},
 			indexFiles: true,
 		},
