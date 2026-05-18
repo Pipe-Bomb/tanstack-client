@@ -8,7 +8,8 @@
 	"scripts": {
 		"generate": "rimraf src/api && orval",
 		"build": "rimraf dist && tsc",
-		"prepare": "tsc"
+		"prepare": "tsc",
+		"dev": "node scripts/dev"
 	},
 	"keywords": [],
 	"author": "",
