@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - "openapi/**"
 
 permissions:
   contents: write
