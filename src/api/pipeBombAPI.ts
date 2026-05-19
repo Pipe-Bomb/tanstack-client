@@ -2562,12 +2562,19 @@ export type getTrackResponse200 = {
   status: 200
 }
 
+export type getTrackResponse404 = {
+  data: void
+  status: 404
+}
+
 export type getTrackResponseSuccess = (getTrackResponse200) & {
   headers: Headers;
 };
-;
+export type getTrackResponseError = (getTrackResponse404) & {
+  headers: Headers;
+};
 
-export type getTrackResponse = (getTrackResponseSuccess)
+export type getTrackResponse = (getTrackResponseSuccess | getTrackResponseError)
 
 export const getGetTrackUrl = (pluginId: string,
     libraryId: string,
@@ -2605,7 +2612,7 @@ export const getGetTrackQueryKey = (pluginId: string,
     }
 
 
-export const getGetTrackQueryOptions = <TData = Awaited<ReturnType<typeof getTrack>>, TError = unknown>(pluginId: string,
+export const getGetTrackQueryOptions = <TData = Awaited<ReturnType<typeof getTrack>>, TError = void>(pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
@@ -2626,10 +2633,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetTrackQueryResult = NonNullable<Awaited<ReturnType<typeof getTrack>>>
-export type GetTrackQueryError = unknown
+export type GetTrackQueryError = void
 
 
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = unknown>(
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>> & Pick<
@@ -2641,7 +2648,7 @@ export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = unknown>(
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>> & Pick<
@@ -2653,14 +2660,14 @@ export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = unknown>(
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = unknown>(
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
@@ -2685,12 +2692,19 @@ export type getTrackIdentitiesResponse200 = {
   status: 200
 }
 
+export type getTrackIdentitiesResponse404 = {
+  data: void
+  status: 404
+}
+
 export type getTrackIdentitiesResponseSuccess = (getTrackIdentitiesResponse200) & {
   headers: Headers;
 };
-;
+export type getTrackIdentitiesResponseError = (getTrackIdentitiesResponse404) & {
+  headers: Headers;
+};
 
-export type getTrackIdentitiesResponse = (getTrackIdentitiesResponseSuccess)
+export type getTrackIdentitiesResponse = (getTrackIdentitiesResponseSuccess | getTrackIdentitiesResponseError)
 
 export const getGetTrackIdentitiesUrl = (pluginId: string,
     libraryId: string,
@@ -2728,7 +2742,7 @@ export const getGetTrackIdentitiesQueryKey = (pluginId: string,
     }
 
 
-export const getGetTrackIdentitiesQueryOptions = <TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = unknown>(pluginId: string,
+export const getGetTrackIdentitiesQueryOptions = <TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = void>(pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
@@ -2749,10 +2763,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetTrackIdentitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getTrackIdentities>>>
-export type GetTrackIdentitiesQueryError = unknown
+export type GetTrackIdentitiesQueryError = void
 
 
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = unknown>(
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>> & Pick<
@@ -2764,7 +2778,7 @@ export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrack
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = unknown>(
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>> & Pick<
@@ -2776,14 +2790,14 @@ export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrack
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = unknown>(
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = unknown>(
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
@@ -2808,12 +2822,19 @@ export type createTrackAudioSessionResponse200 = {
   status: 200
 }
 
+export type createTrackAudioSessionResponse404 = {
+  data: void
+  status: 404
+}
+
 export type createTrackAudioSessionResponseSuccess = (createTrackAudioSessionResponse200) & {
   headers: Headers;
 };
-;
+export type createTrackAudioSessionResponseError = (createTrackAudioSessionResponse404) & {
+  headers: Headers;
+};
 
-export type createTrackAudioSessionResponse = (createTrackAudioSessionResponseSuccess)
+export type createTrackAudioSessionResponse = (createTrackAudioSessionResponseSuccess | createTrackAudioSessionResponseError)
 
 export const getCreateTrackAudioSessionUrl = (pluginId: string,
     libraryId: string,
@@ -2851,7 +2872,7 @@ export const getCreateTrackAudioSessionQueryKey = (pluginId: string,
     }
 
 
-export const getCreateTrackAudioSessionQueryOptions = <TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = unknown>(pluginId: string,
+export const getCreateTrackAudioSessionQueryOptions = <TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = void>(pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
@@ -2872,10 +2893,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type CreateTrackAudioSessionQueryResult = NonNullable<Awaited<ReturnType<typeof createTrackAudioSession>>>
-export type CreateTrackAudioSessionQueryError = unknown
+export type CreateTrackAudioSessionQueryError = void
 
 
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = unknown>(
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>> & Pick<
@@ -2887,7 +2908,7 @@ export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof cre
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = unknown>(
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>> & Pick<
@@ -2899,14 +2920,14 @@ export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof cre
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = unknown>(
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = unknown>(
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = void>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
@@ -2914,6 +2935,136 @@ export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof cre
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getCreateTrackAudioSessionQueryOptions(pluginId,libraryId,trackId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getTrackExternalUrlsResponse200 = {
+  data: ExternalUrl[]
+  status: 200
+}
+
+export type getTrackExternalUrlsResponse404 = {
+  data: void
+  status: 404
+}
+
+export type getTrackExternalUrlsResponseSuccess = (getTrackExternalUrlsResponse200) & {
+  headers: Headers;
+};
+export type getTrackExternalUrlsResponseError = (getTrackExternalUrlsResponse404) & {
+  headers: Headers;
+};
+
+export type getTrackExternalUrlsResponse = (getTrackExternalUrlsResponseSuccess | getTrackExternalUrlsResponseError)
+
+export const getGetTrackExternalUrlsUrl = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+
+
+
+
+  return `/tracks/${pluginId}/${libraryId}/${trackId}/urls`
+}
+
+export const getTrackExternalUrls = async (pluginId: string,
+    libraryId: string,
+    trackId: string, options?: RequestInit): Promise<getTrackExternalUrlsResponse> => {
+
+  return customFetch<getTrackExternalUrlsResponse>(getGetTrackExternalUrlsUrl(pluginId,libraryId,trackId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrackExternalUrlsQueryKey = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+    return [
+    `/tracks/${pluginId}/${libraryId}/${trackId}/urls`
+    ] as const;
+    }
+
+
+export const getGetTrackExternalUrlsQueryOptions = <TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = void>(pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrackExternalUrlsQueryKey(pluginId,libraryId,trackId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrackExternalUrls>>> = ({ signal }) => getTrackExternalUrls(pluginId,libraryId,trackId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && libraryId !== null && libraryId !== undefined && trackId !== null && trackId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrackExternalUrlsQueryResult = NonNullable<Awaited<ReturnType<typeof getTrackExternalUrls>>>
+export type GetTrackExternalUrlsQueryError = void
+
+
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = void>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrackExternalUrls>>,
+          TError,
+          Awaited<ReturnType<typeof getTrackExternalUrls>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = void>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrackExternalUrls>>,
+          TError,
+          Awaited<ReturnType<typeof getTrackExternalUrls>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = void>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = void>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrackExternalUrlsQueryOptions(pluginId,libraryId,trackId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
