@@ -43,6 +43,8 @@ export * from './pluginConfigUpdateDto';
 export * from './pluginConfigUpdateDtoValues';
 export * from './pluginLibrary';
 export * from './resource';
+export * from './searchDto';
+export * from './searchResults';
 export * from './sectionConfigNode';
 export * from './sectionConfigNodeType';
 export * from './streamInstance';

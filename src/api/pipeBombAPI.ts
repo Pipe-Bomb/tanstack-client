@@ -43,6 +43,8 @@ import type {
   PluginConfigUpdateDto,
   PluginConfigs,
   PluginLibrary,
+  SearchDto,
+  SearchResults,
   StreamInstance,
   Track
 } from './model';
@@ -3183,4 +3185,80 @@ export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError =
 
 
 
+
+export type searchResponse200 = {
+  data: SearchResults
+  status: 200
+}
+
+export type searchResponseSuccess = (searchResponse200) & {
+  headers: Headers;
+};
+;
+
+export type searchResponse = (searchResponseSuccess)
+
+export const getSearchUrl = () => {
+
+
+
+
+  return `/search`
+}
+
+export const search = async (searchDto: SearchDto, options?: RequestInit): Promise<searchResponse> => {
+
+  return customFetch<searchResponse>(getSearchUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(searchDto)
+  }
+);}
+
+
+
+
+export const getSearchMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext> => {
+
+const mutationKey = ['search'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof search>>, {data: SearchDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  search(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SearchMutationResult = NonNullable<Awaited<ReturnType<typeof search>>>
+    export type SearchMutationBody = SearchDto
+    export type SearchMutationError = unknown
+
+    export const useSearch = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof search>>,
+        TError,
+        {data: SearchDto},
+        TContext
+      > => {
+      return useMutation(getSearchMutationOptions(options), queryClient);
+    }
 
