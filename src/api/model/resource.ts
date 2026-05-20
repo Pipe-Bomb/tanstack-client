@@ -4,10 +4,12 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.0.2
  */
+import type { ResourceSha256 } from './resourceSha256';
 
 export interface Resource {
   uuid: string;
   url: string;
   extension: string;
-  sha256: string;
+  /** @nullable */
+  sha256: ResourceSha256;
 }

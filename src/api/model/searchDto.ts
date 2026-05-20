@@ -9,5 +9,6 @@ export interface SearchDto {
   withTracks: boolean;
   withAlbums: boolean;
   withArtists: boolean;
-  query?: string;
+  /** @nullable */
+  query: string | null;
 }

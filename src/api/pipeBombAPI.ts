@@ -33,6 +33,9 @@ import type {
   ArtistsSearchResponse,
   AttributeSource,
   AttributeSourceOrderDto,
+  EphemeralSearchDto,
+  EphemeralSearchResults,
+  EphemeralSource,
   ExternalUrl,
   Identifier,
   Identity,
@@ -2558,6 +2561,296 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUpdatePluginConfigMutationOptions(options), queryClient);
     }
+
+export type getAllEphemeralSourcesResponse200 = {
+  data: EphemeralSource[]
+  status: 200
+}
+
+export type getAllEphemeralSourcesResponseSuccess = (getAllEphemeralSourcesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getAllEphemeralSourcesResponse = (getAllEphemeralSourcesResponseSuccess)
+
+export const getGetAllEphemeralSourcesUrl = () => {
+
+
+
+
+  return `/ephemeral`
+}
+
+export const getAllEphemeralSources = async ( options?: RequestInit): Promise<getAllEphemeralSourcesResponse> => {
+
+  return customFetch<getAllEphemeralSourcesResponse>(getGetAllEphemeralSourcesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAllEphemeralSourcesQueryKey = () => {
+    return [
+    `/ephemeral`
+    ] as const;
+    }
+
+
+export const getGetAllEphemeralSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAllEphemeralSourcesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllEphemeralSources>>> = ({ signal }) => getAllEphemeralSources({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAllEphemeralSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllEphemeralSources>>>
+export type GetAllEphemeralSourcesQueryError = unknown
+
+
+export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllEphemeralSources>>,
+          TError,
+          Awaited<ReturnType<typeof getAllEphemeralSources>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllEphemeralSources>>,
+          TError,
+          Awaited<ReturnType<typeof getAllEphemeralSources>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAllEphemeralSourcesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type searchEphemeralSourceResponse200 = {
+  data: EphemeralSearchResults
+  status: 200
+}
+
+export type searchEphemeralSourceResponseSuccess = (searchEphemeralSourceResponse200) & {
+  headers: Headers;
+};
+;
+
+export type searchEphemeralSourceResponse = (searchEphemeralSourceResponseSuccess)
+
+export const getSearchEphemeralSourceUrl = () => {
+
+
+
+
+  return `/ephemeral/search`
+}
+
+export const searchEphemeralSource = async (ephemeralSearchDto: EphemeralSearchDto, options?: RequestInit): Promise<searchEphemeralSourceResponse> => {
+
+  return customFetch<searchEphemeralSourceResponse>(getSearchEphemeralSourceUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(ephemeralSearchDto)
+  }
+);}
+
+
+
+
+export const getSearchEphemeralSourceMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchEphemeralSource>>, TError,{data: EphemeralSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof searchEphemeralSource>>, TError,{data: EphemeralSearchDto}, TContext> => {
+
+const mutationKey = ['searchEphemeralSource'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof searchEphemeralSource>>, {data: EphemeralSearchDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  searchEphemeralSource(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SearchEphemeralSourceMutationResult = NonNullable<Awaited<ReturnType<typeof searchEphemeralSource>>>
+    export type SearchEphemeralSourceMutationBody = EphemeralSearchDto
+    export type SearchEphemeralSourceMutationError = unknown
+
+    export const useSearchEphemeralSource = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchEphemeralSource>>, TError,{data: EphemeralSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof searchEphemeralSource>>,
+        TError,
+        {data: EphemeralSearchDto},
+        TContext
+      > => {
+      return useMutation(getSearchEphemeralSourceMutationOptions(options), queryClient);
+    }
+
+export type getAttributeBufferResponse200 = {
+  data: void
+  status: 200
+}
+
+export type getAttributeBufferResponseSuccess = (getAttributeBufferResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getAttributeBufferResponse = (getAttributeBufferResponseSuccess)
+
+export const getGetAttributeBufferUrl = (file: string,) => {
+
+
+
+
+  return `/ephemeral/attribute-buffer/${file}`
+}
+
+export const getAttributeBuffer = async (file: string, options?: RequestInit): Promise<getAttributeBufferResponse> => {
+
+  return customFetch<getAttributeBufferResponse>(getGetAttributeBufferUrl(file),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAttributeBufferQueryKey = (file: string,) => {
+    return [
+    `/ephemeral/attribute-buffer/${file}`
+    ] as const;
+    }
+
+
+export const getGetAttributeBufferQueryOptions = <TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAttributeBufferQueryKey(file);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAttributeBuffer>>> = ({ signal }) => getAttributeBuffer(file, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: file !== null && file !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAttributeBufferQueryResult = NonNullable<Awaited<ReturnType<typeof getAttributeBuffer>>>
+export type GetAttributeBufferQueryError = unknown
+
+
+export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
+ file: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAttributeBuffer>>,
+          TError,
+          Awaited<ReturnType<typeof getAttributeBuffer>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
+ file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAttributeBuffer>>,
+          TError,
+          Awaited<ReturnType<typeof getAttributeBuffer>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
+ file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
+ file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAttributeBufferQueryOptions(file,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export type getTrackResponse200 = {
   data: Track
