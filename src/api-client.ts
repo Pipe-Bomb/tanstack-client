@@ -32,10 +32,9 @@ export async function customFetch<T extends ResponseSuccess>(
 		method,
 		headers: finalHeaders,
 		body,
-		// credentials: "include",
+		credentials: "include",
 	});
 
-	// Parse body safely
 	let parsedBody: any;
 
 	if (responseType === "blob") {
