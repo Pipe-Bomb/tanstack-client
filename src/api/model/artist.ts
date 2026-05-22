@@ -10,7 +10,8 @@ import type { Identity } from './identity';
 import type { Track } from './track';
 
 export interface Artist {
-  uuid: string;
+  /** @nullable */
+  uuid: string | null;
   attributes: AttributeMap | null;
   /** @nullable */
   identities: Identity[] | null;

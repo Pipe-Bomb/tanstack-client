@@ -5,9 +5,7 @@
  * OpenAPI spec version: 0.0.2
  */
 
-export interface Identity {
+export interface EphemeralSourceDto {
   pluginId: string;
-  identityId: string;
-  value: string;
-  ordinal: number;
+  sourceId: string;
 }

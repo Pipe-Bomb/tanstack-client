@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.0.2
  */
 import type { AttributeMap } from './attributeMap';
+import type { TrackArtist } from './trackArtist';
 
 export interface EphemeralTrack {
   id: string;
@@ -12,4 +13,6 @@ export interface EphemeralTrack {
   libraryId: string;
   title: string;
   attributes: AttributeMap | null;
+  /** @nullable */
+  artists: TrackArtist[] | null;
 }
