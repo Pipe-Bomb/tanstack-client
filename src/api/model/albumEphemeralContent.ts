@@ -4,12 +4,10 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.0.2
  */
-import type { Album } from './album';
-import type { Artist } from './artist';
+import type { EphemeralSource } from './ephemeralSource';
 import type { EphemeralTrack } from './ephemeralTrack';
 
-export interface EphemeralSearchResults {
+export interface AlbumEphemeralContent {
+  source: EphemeralSource;
   tracks: EphemeralTrack[];
-  artists: Artist[];
-  albums: Album[];
 }

@@ -7,6 +7,7 @@
 
 export * from './album';
 export * from './albumArtist';
+export * from './albumEphemeralContent';
 export * from './albumsSearchDto';
 export * from './albumsSearchResponse';
 export * from './allTasksResponse';
