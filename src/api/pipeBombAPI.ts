@@ -2990,6 +2990,89 @@ export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TErr
 
 
 
+export type updateArtistMetadataResponse200 = {
+  data: Artist
+  status: 200
+}
+
+export type updateArtistMetadataResponse404 = {
+  data: void
+  status: 404
+}
+
+export type updateArtistMetadataResponseSuccess = (updateArtistMetadataResponse200) & {
+  headers: Headers;
+};
+export type updateArtistMetadataResponseError = (updateArtistMetadataResponse404) & {
+  headers: Headers;
+};
+
+export type updateArtistMetadataResponse = (updateArtistMetadataResponseSuccess | updateArtistMetadataResponseError)
+
+export const getUpdateArtistMetadataUrl = (artistUuid: string,) => {
+
+
+
+
+  return `/artists/${artistUuid}`
+}
+
+export const updateArtistMetadata = async (artistUuid: string, options?: RequestInit): Promise<updateArtistMetadataResponse> => {
+
+  return customFetch<updateArtistMetadataResponse>(getUpdateArtistMetadataUrl(artistUuid),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getUpdateArtistMetadataMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArtistMetadata>>, TError,{artistUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateArtistMetadata>>, TError,{artistUuid: string}, TContext> => {
+
+const mutationKey = ['updateArtistMetadata'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateArtistMetadata>>, {artistUuid: string}> = (props) => {
+          const {artistUuid} = props ?? {};
+
+          return  updateArtistMetadata(artistUuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateArtistMetadataMutationResult = NonNullable<Awaited<ReturnType<typeof updateArtistMetadata>>>
+
+    export type UpdateArtistMetadataMutationError = void
+
+    export const useUpdateArtistMetadata = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArtistMetadata>>, TError,{artistUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateArtistMetadata>>,
+        TError,
+        {artistUuid: string},
+        TContext
+      > => {
+      return useMutation(getUpdateArtistMetadataMutationOptions(options), queryClient);
+    }
+
 export type getArtistByIdentityResponse200 = {
   data: Artist
   status: 200
