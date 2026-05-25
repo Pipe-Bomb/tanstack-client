@@ -40,6 +40,8 @@ import type {
   EphemeralSource,
   EphemeralSourceDto,
   ExternalUrl,
+  GetAttributeBufferParams,
+  GetParams,
   Identifier,
   Identity,
   LanguageMap,
@@ -885,18 +887,27 @@ export type getResponseSuccess = (getResponse200) & {
 export type getResponse = (getResponseSuccess)
 
 export const getGetUrl = (dir: string,
-    file: string,) => {
+    file: string,
+    params?: GetParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/resources/${dir}/${file}`
+  return stringifiedParams.length > 0 ? `/resources/${dir}/${file}?${stringifiedParams}` : `/resources/${dir}/${file}`
 }
 
 export const get = async (dir: string,
-    file: string, options?: RequestInit): Promise<getResponse> => {
+    file: string,
+    params?: GetParams, options?: RequestInit): Promise<getResponse> => {
 
-  return customFetch<getResponse>(getGetUrl(dir,file),
+  return customFetch<getResponse>(getGetUrl(dir,file,params),
   {
     ...options,
     method: 'GET'
@@ -910,24 +921,26 @@ export const get = async (dir: string,
 
 
 export const getGetQueryKey = (dir: string,
-    file: string,) => {
+    file: string,
+    params?: GetParams,) => {
     return [
-    `/resources/${dir}/${file}`
+    `/resources/${dir}/${file}`, ...(params ? [params] : [])
     ] as const;
     }
 
 
 export const getGetQueryOptions = <TData = Awaited<ReturnType<typeof get>>, TError = unknown>(dir: string,
-    file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+    file: string,
+    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetQueryKey(dir,file);
+  const queryKey =  queryOptions?.queryKey ?? getGetQueryKey(dir,file,params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof get>>> = ({ signal }) => get(dir,file, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof get>>> = ({ signal }) => get(dir,file,params, { signal, ...requestOptions });
 
 
 
@@ -942,7 +955,8 @@ export type GetQueryError = unknown
 
 export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
  dir: string,
-    file: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>> & Pick<
+    file: string,
+    params: undefined |  GetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof get>>,
           TError,
@@ -953,7 +967,8 @@ export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
  dir: string,
-    file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>> & Pick<
+    file: string,
+    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof get>>,
           TError,
@@ -964,17 +979,19 @@ export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
  dir: string,
-    file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+    file: string,
+    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
  dir: string,
-    file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+    file: string,
+    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetQueryOptions(dir,file,options)
+  const queryOptions = getGetQueryOptions(dir,file,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -2154,17 +2171,26 @@ export type getAttributeBufferResponseSuccess = (getAttributeBufferResponse200) 
 
 export type getAttributeBufferResponse = (getAttributeBufferResponseSuccess)
 
-export const getGetAttributeBufferUrl = (file: string,) => {
+export const getGetAttributeBufferUrl = (file: string,
+    params?: GetAttributeBufferParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/ephemeral/attribute-buffer/${file}`
+  return stringifiedParams.length > 0 ? `/ephemeral/attribute-buffer/${file}?${stringifiedParams}` : `/ephemeral/attribute-buffer/${file}`
 }
 
-export const getAttributeBuffer = async (file: string, options?: RequestInit): Promise<getAttributeBufferResponse> => {
+export const getAttributeBuffer = async (file: string,
+    params?: GetAttributeBufferParams, options?: RequestInit): Promise<getAttributeBufferResponse> => {
 
-  return customFetch<getAttributeBufferResponse>(getGetAttributeBufferUrl(file),
+  return customFetch<getAttributeBufferResponse>(getGetAttributeBufferUrl(file,params),
   {
     ...options,
     method: 'GET'
@@ -2177,23 +2203,25 @@ export const getAttributeBuffer = async (file: string, options?: RequestInit): P
 
 
 
-export const getGetAttributeBufferQueryKey = (file: string,) => {
+export const getGetAttributeBufferQueryKey = (file: string,
+    params?: GetAttributeBufferParams,) => {
     return [
-    `/ephemeral/attribute-buffer/${file}`
+    `/ephemeral/attribute-buffer/${file}`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetAttributeBufferQueryOptions = <TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAttributeBufferQueryOptions = <TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(file: string,
+    params?: GetAttributeBufferParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetAttributeBufferQueryKey(file);
+  const queryKey =  queryOptions?.queryKey ?? getGetAttributeBufferQueryKey(file,params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAttributeBuffer>>> = ({ signal }) => getAttributeBuffer(file, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAttributeBuffer>>> = ({ signal }) => getAttributeBuffer(file,params, { signal, ...requestOptions });
 
 
 
@@ -2207,7 +2235,8 @@ export type GetAttributeBufferQueryError = unknown
 
 
 export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
- file: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>> & Pick<
+ file: string,
+    params: undefined |  GetAttributeBufferParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAttributeBuffer>>,
           TError,
@@ -2217,7 +2246,8 @@ export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttri
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
- file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>> & Pick<
+ file: string,
+    params?: GetAttributeBufferParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAttributeBuffer>>,
           TError,
@@ -2227,16 +2257,18 @@ export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttri
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
- file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ file: string,
+    params?: GetAttributeBufferParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
- file: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ file: string,
+    params?: GetAttributeBufferParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetAttributeBufferQueryOptions(file,options)
+  const queryOptions = getGetAttributeBufferQueryOptions(file,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

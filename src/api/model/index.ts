@@ -30,6 +30,8 @@ export * from './ephemeralSource';
 export * from './ephemeralSourceDto';
 export * from './ephemeralTrack';
 export * from './externalUrl';
+export * from './getAttributeBufferParams';
+export * from './getParams';
 export * from './headingConfigNode';
 export * from './headingConfigNodeSize';
 export * from './headingConfigNodeType';
