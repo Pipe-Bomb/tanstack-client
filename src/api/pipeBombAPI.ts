@@ -28,6 +28,7 @@ import type {
   AlbumEphemeralContent,
   AlbumsSearchDto,
   AlbumsSearchResponse,
+  AllAttributes,
   AllTasksResponse,
   Artist,
   ArtistEphemeralContent,
@@ -380,6 +381,113 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getSearchLibraryMutationOptions(options), queryClient);
     }
+
+export type getAllAttributesResponse200 = {
+  data: AllAttributes
+  status: 200
+}
+
+export type getAllAttributesResponseSuccess = (getAllAttributesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getAllAttributesResponse = (getAllAttributesResponseSuccess)
+
+export const getGetAllAttributesUrl = () => {
+
+
+
+
+  return `/attributes`
+}
+
+export const getAllAttributes = async ( options?: RequestInit): Promise<getAllAttributesResponse> => {
+
+  return customFetch<getAllAttributesResponse>(getGetAllAttributesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAllAttributesQueryKey = () => {
+    return [
+    `/attributes`
+    ] as const;
+    }
+
+
+export const getGetAllAttributesQueryOptions = <TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAllAttributesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllAttributes>>> = ({ signal }) => getAllAttributes({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAllAttributesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllAttributes>>>
+export type GetAllAttributesQueryError = unknown
+
+
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllAttributes>>,
+          TError,
+          Awaited<ReturnType<typeof getAllAttributes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllAttributes>>,
+          TError,
+          Awaited<ReturnType<typeof getAllAttributes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAllAttributesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export type getTasksResponse200 = {
   data: AllTasksResponse
