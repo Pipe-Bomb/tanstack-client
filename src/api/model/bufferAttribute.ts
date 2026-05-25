@@ -11,5 +11,7 @@ export interface BufferAttribute {
   type: BufferAttributeType;
   pluginId: string;
   sourceId: string;
+  /** @nullable */
+  formatted: string[] | null;
   values: Resource[];
 }

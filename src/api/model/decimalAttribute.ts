@@ -10,5 +10,7 @@ export interface DecimalAttribute {
   type: DecimalAttributeType;
   pluginId: string;
   sourceId: string;
+  /** @nullable */
+  formatted: string[] | null;
   values: number[];
 }

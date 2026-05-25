@@ -10,5 +10,7 @@ export interface StringAttribute {
   type: StringAttributeType;
   pluginId: string;
   sourceId: string;
+  /** @nullable */
+  formatted: string[] | null;
   values: string[];
 }
