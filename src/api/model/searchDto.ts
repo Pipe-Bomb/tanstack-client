@@ -4,11 +4,16 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.0.2
  */
+import type { BooleanSearchAttributeDto } from './booleanSearchAttributeDto';
+import type { BufferSearchAttributeDto } from './bufferSearchAttributeDto';
+import type { DecimalSearchAttributeDto } from './decimalSearchAttributeDto';
+import type { IntegerSearchAttributeDto } from './integerSearchAttributeDto';
+import type { StringSearchAttributeDto } from './stringSearchAttributeDto';
 
 export interface SearchDto {
   withTracks: boolean;
   withAlbums: boolean;
   withArtists: boolean;
   /** @nullable */
-  query: string | null;
+  attributes: (StringSearchAttributeDto | BooleanSearchAttributeDto | IntegerSearchAttributeDto | DecimalSearchAttributeDto | BufferSearchAttributeDto)[] | null;
 }
