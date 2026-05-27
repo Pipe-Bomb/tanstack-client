@@ -24,6 +24,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AddPlaylistTracksDto,
   Album,
   AlbumEphemeralContent,
   AlbumsSearchDto,
@@ -36,6 +37,7 @@ import type {
   ArtistsSearchResponse,
   AttributeSource,
   AttributeSourceOrderDto,
+  CreatePlaylistDto,
   EphemeralSearchDto,
   EphemeralSearchResults,
   EphemeralSource,
@@ -49,6 +51,7 @@ import type {
   LibraryFindResponse,
   LibrarySearchDto,
   LoginDto,
+  Playlist,
   PluginConfig,
   PluginConfigUpdateDto,
   PluginConfigs,
@@ -57,6 +60,7 @@ import type {
   SearchResults,
   StreamInstance,
   Track,
+  UploadAttributeBufferBody,
   User
 } from './model';
 
@@ -488,6 +492,104 @@ export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttr
 
 
 
+
+export type uploadAttributeBufferResponse204 = {
+  data: void
+  status: 204
+}
+
+export type uploadAttributeBufferResponse401 = {
+  data: void
+  status: 401
+}
+
+export type uploadAttributeBufferResponse403 = {
+  data: void
+  status: 403
+}
+
+export type uploadAttributeBufferResponse404 = {
+  data: void
+  status: 404
+}
+
+export type uploadAttributeBufferResponseSuccess = (uploadAttributeBufferResponse204) & {
+  headers: Headers;
+};
+export type uploadAttributeBufferResponseError = (uploadAttributeBufferResponse401 | uploadAttributeBufferResponse403 | uploadAttributeBufferResponse404) & {
+  headers: Headers;
+};
+
+export type uploadAttributeBufferResponse = (uploadAttributeBufferResponseSuccess | uploadAttributeBufferResponseError)
+
+export const getUploadAttributeBufferUrl = (uuid: string,) => {
+
+
+
+
+  return `/attributes/buffer/${uuid}`
+}
+
+export const uploadAttributeBuffer = async (uuid: string,
+    uploadAttributeBufferBody: UploadAttributeBufferBody, options?: RequestInit): Promise<uploadAttributeBufferResponse> => {
+    const formData = new FormData();
+if(uploadAttributeBufferBody.file !== undefined) {
+ formData.append(`file`, uploadAttributeBufferBody.file);
+ }
+
+  return customFetch<uploadAttributeBufferResponse>(getUploadAttributeBufferUrl(uuid),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+export const getUploadAttributeBufferMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext> => {
+
+const mutationKey = ['uploadAttributeBuffer'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadAttributeBuffer>>, {uuid: string;data: UploadAttributeBufferBody}> = (props) => {
+          const {uuid,data} = props ?? {};
+
+          return  uploadAttributeBuffer(uuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadAttributeBufferMutationResult = NonNullable<Awaited<ReturnType<typeof uploadAttributeBuffer>>>
+    export type UploadAttributeBufferMutationBody = UploadAttributeBufferBody
+    export type UploadAttributeBufferMutationError = void
+
+    export const useUploadAttributeBuffer = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof uploadAttributeBuffer>>,
+        TError,
+        {uuid: string;data: UploadAttributeBufferBody},
+        TContext
+      > => {
+      return useMutation(getUploadAttributeBufferMutationOptions(options), queryClient);
+    }
 
 export type getTasksResponse200 = {
   data: AllTasksResponse
@@ -1111,6 +1213,369 @@ export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown
 
 
 
+
+export type loginUserResponse200 = {
+  data: User
+  status: 200
+}
+
+export type loginUserResponse401 = {
+  data: void
+  status: 401
+}
+
+export type loginUserResponseSuccess = (loginUserResponse200) & {
+  headers: Headers;
+};
+export type loginUserResponseError = (loginUserResponse401) & {
+  headers: Headers;
+};
+
+export type loginUserResponse = (loginUserResponseSuccess | loginUserResponseError)
+
+export const getLoginUserUrl = () => {
+
+
+
+
+  return `/users/login`
+}
+
+export const loginUser = async (loginDto: LoginDto, options?: RequestInit): Promise<loginUserResponse> => {
+
+  return customFetch<loginUserResponse>(getLoginUserUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(loginDto)
+  }
+);}
+
+
+
+
+export const getLoginUserMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof loginUser>>, TError,{data: LoginDto}, TContext> => {
+
+const mutationKey = ['loginUser'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginUser>>, {data: LoginDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  loginUser(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LoginUserMutationResult = NonNullable<Awaited<ReturnType<typeof loginUser>>>
+    export type LoginUserMutationBody = LoginDto
+    export type LoginUserMutationError = void
+
+    export const useLoginUser = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof loginUser>>,
+        TError,
+        {data: LoginDto},
+        TContext
+      > => {
+      return useMutation(getLoginUserMutationOptions(options), queryClient);
+    }
+
+export type createUserResponse201 = {
+  data: User
+  status: 201
+}
+
+export type createUserResponse409 = {
+  data: void
+  status: 409
+}
+
+export type createUserResponseSuccess = (createUserResponse201) & {
+  headers: Headers;
+};
+export type createUserResponseError = (createUserResponse409) & {
+  headers: Headers;
+};
+
+export type createUserResponse = (createUserResponseSuccess | createUserResponseError)
+
+export const getCreateUserUrl = () => {
+
+
+
+
+  return `/users/signup`
+}
+
+export const createUser = async (loginDto: LoginDto, options?: RequestInit): Promise<createUserResponse> => {
+
+  return customFetch<createUserResponse>(getCreateUserUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(loginDto)
+  }
+);}
+
+
+
+
+export const getCreateUserMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: LoginDto}, TContext> => {
+
+const mutationKey = ['createUser'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUser>>, {data: LoginDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createUser(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>
+    export type CreateUserMutationBody = LoginDto
+    export type CreateUserMutationError = void
+
+    export const useCreateUser = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createUser>>,
+        TError,
+        {data: LoginDto},
+        TContext
+      > => {
+      return useMutation(getCreateUserMutationOptions(options), queryClient);
+    }
+
+export type getSelfResponse200 = {
+  data: User
+  status: 200
+}
+
+export type getSelfResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getSelfResponseSuccess = (getSelfResponse200) & {
+  headers: Headers;
+};
+export type getSelfResponseError = (getSelfResponse401) & {
+  headers: Headers;
+};
+
+export type getSelfResponse = (getSelfResponseSuccess | getSelfResponseError)
+
+export const getGetSelfUrl = () => {
+
+
+
+
+  return `/users/me`
+}
+
+export const getSelf = async ( options?: RequestInit): Promise<getSelfResponse> => {
+
+  return customFetch<getSelfResponse>(getGetSelfUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSelfQueryKey = () => {
+    return [
+    `/users/me`
+    ] as const;
+    }
+
+
+export const getGetSelfQueryOptions = <TData = Awaited<ReturnType<typeof getSelf>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSelfQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSelf>>> = ({ signal }) => getSelf({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSelfQueryResult = NonNullable<Awaited<ReturnType<typeof getSelf>>>
+export type GetSelfQueryError = void
+
+
+export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSelf>>,
+          TError,
+          Awaited<ReturnType<typeof getSelf>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSelf>>,
+          TError,
+          Awaited<ReturnType<typeof getSelf>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSelfQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type logoutUserResponse204 = {
+  data: void
+  status: 204
+}
+
+export type logoutUserResponse401 = {
+  data: void
+  status: 401
+}
+
+export type logoutUserResponseSuccess = (logoutUserResponse204) & {
+  headers: Headers;
+};
+export type logoutUserResponseError = (logoutUserResponse401) & {
+  headers: Headers;
+};
+
+export type logoutUserResponse = (logoutUserResponseSuccess | logoutUserResponseError)
+
+export const getLogoutUserUrl = () => {
+
+
+
+
+  return `/users/logout`
+}
+
+export const logoutUser = async ( options?: RequestInit): Promise<logoutUserResponse> => {
+
+  return customFetch<logoutUserResponse>(getLogoutUserUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getLogoutUserMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutUser>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof logoutUser>>, TError,void, TContext> => {
+
+const mutationKey = ['logoutUser'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logoutUser>>, void> = () => {
+
+
+          return  logoutUser(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type LogoutUserMutationResult = NonNullable<Awaited<ReturnType<typeof logoutUser>>>
+
+    export type LogoutUserMutationError = void
+
+    export const useLogoutUser = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutUser>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof logoutUser>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getLogoutUserMutationOptions(options), queryClient);
+    }
 
 export type getAllIdentifiersResponse200 = {
   data: Identifier[]
@@ -4623,52 +5088,52 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getSearchMutationOptions(options), queryClient);
     }
 
-export type loginUserResponse200 = {
-  data: User
+export type createPlaylistResponse200 = {
+  data: Playlist
   status: 200
 }
 
-export type loginUserResponse401 = {
+export type createPlaylistResponse401 = {
   data: void
   status: 401
 }
 
-export type loginUserResponseSuccess = (loginUserResponse200) & {
+export type createPlaylistResponseSuccess = (createPlaylistResponse200) & {
   headers: Headers;
 };
-export type loginUserResponseError = (loginUserResponse401) & {
+export type createPlaylistResponseError = (createPlaylistResponse401) & {
   headers: Headers;
 };
 
-export type loginUserResponse = (loginUserResponseSuccess | loginUserResponseError)
+export type createPlaylistResponse = (createPlaylistResponseSuccess | createPlaylistResponseError)
 
-export const getLoginUserUrl = () => {
-
-
+export const getCreatePlaylistUrl = () => {
 
 
-  return `/users/login`
+
+
+  return `/playlists`
 }
 
-export const loginUser = async (loginDto: LoginDto, options?: RequestInit): Promise<loginUserResponse> => {
+export const createPlaylist = async (createPlaylistDto: CreatePlaylistDto, options?: RequestInit): Promise<createPlaylistResponse> => {
 
-  return customFetch<loginUserResponse>(getLoginUserUrl(),
+  return customFetch<createPlaylistResponse>(getCreatePlaylistUrl(),
   {
     ...options,
-    method: 'POST',
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(loginDto)
+    body: JSON.stringify(createPlaylistDto)
   }
 );}
 
 
 
 
-export const getLoginUserMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof loginUser>>, TError,{data: LoginDto}, TContext> => {
+export const getCreatePlaylistMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext> => {
 
-const mutationKey = ['loginUser'];
+const mutationKey = ['createPlaylist'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -4678,10 +5143,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof loginUser>>, {data: LoginDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createPlaylist>>, {data: CreatePlaylistDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  loginUser(data,requestOptions)
+          return  createPlaylist(data,requestOptions)
         }
 
 
@@ -4691,134 +5156,51 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type LoginUserMutationResult = NonNullable<Awaited<ReturnType<typeof loginUser>>>
-    export type LoginUserMutationBody = LoginDto
-    export type LoginUserMutationError = void
+    export type CreatePlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof createPlaylist>>>
+    export type CreatePlaylistMutationBody = CreatePlaylistDto
+    export type CreatePlaylistMutationError = void
 
-    export const useLoginUser = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+    export const useCreatePlaylist = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof loginUser>>,
+        Awaited<ReturnType<typeof createPlaylist>>,
         TError,
-        {data: LoginDto},
+        {data: CreatePlaylistDto},
         TContext
       > => {
-      return useMutation(getLoginUserMutationOptions(options), queryClient);
+      return useMutation(getCreatePlaylistMutationOptions(options), queryClient);
     }
 
-export type createUserResponse201 = {
-  data: User
-  status: 201
-}
-
-export type createUserResponse409 = {
-  data: void
-  status: 409
-}
-
-export type createUserResponseSuccess = (createUserResponse201) & {
-  headers: Headers;
-};
-export type createUserResponseError = (createUserResponse409) & {
-  headers: Headers;
-};
-
-export type createUserResponse = (createUserResponseSuccess | createUserResponseError)
-
-export const getCreateUserUrl = () => {
-
-
-
-
-  return `/users/signup`
-}
-
-export const createUser = async (loginDto: LoginDto, options?: RequestInit): Promise<createUserResponse> => {
-
-  return customFetch<createUserResponse>(getCreateUserUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(loginDto)
-  }
-);}
-
-
-
-
-export const getCreateUserMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: LoginDto}, TContext> => {
-
-const mutationKey = ['createUser'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createUser>>, {data: LoginDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createUser(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>
-    export type CreateUserMutationBody = LoginDto
-    export type CreateUserMutationError = void
-
-    export const useCreateUser = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createUser>>,
-        TError,
-        {data: LoginDto},
-        TContext
-      > => {
-      return useMutation(getCreateUserMutationOptions(options), queryClient);
-    }
-
-export type getSelfResponse200 = {
-  data: User
+export type getOwnPlaylistsResponse200 = {
+  data: Playlist[]
   status: 200
 }
 
-export type getSelfResponse401 = {
+export type getOwnPlaylistsResponse401 = {
   data: void
   status: 401
 }
 
-export type getSelfResponseSuccess = (getSelfResponse200) & {
+export type getOwnPlaylistsResponseSuccess = (getOwnPlaylistsResponse200) & {
   headers: Headers;
 };
-export type getSelfResponseError = (getSelfResponse401) & {
+export type getOwnPlaylistsResponseError = (getOwnPlaylistsResponse401) & {
   headers: Headers;
 };
 
-export type getSelfResponse = (getSelfResponseSuccess | getSelfResponseError)
+export type getOwnPlaylistsResponse = (getOwnPlaylistsResponseSuccess | getOwnPlaylistsResponseError)
 
-export const getGetSelfUrl = () => {
-
-
+export const getGetOwnPlaylistsUrl = () => {
 
 
-  return `/users/me`
+
+
+  return `/playlists`
 }
 
-export const getSelf = async ( options?: RequestInit): Promise<getSelfResponse> => {
+export const getOwnPlaylists = async ( options?: RequestInit): Promise<getOwnPlaylistsResponse> => {
 
-  return customFetch<getSelfResponse>(getGetSelfUrl(),
+  return customFetch<getOwnPlaylistsResponse>(getGetOwnPlaylistsUrl(),
   {
     ...options,
     method: 'GET'
@@ -4831,66 +5213,66 @@ export const getSelf = async ( options?: RequestInit): Promise<getSelfResponse> 
 
 
 
-export const getGetSelfQueryKey = () => {
+export const getGetOwnPlaylistsQueryKey = () => {
     return [
-    `/users/me`
+    `/playlists`
     ] as const;
     }
 
 
-export const getGetSelfQueryOptions = <TData = Awaited<ReturnType<typeof getSelf>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetOwnPlaylistsQueryOptions = <TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetSelfQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetOwnPlaylistsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSelf>>> = ({ signal }) => getSelf({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOwnPlaylists>>> = ({ signal }) => getOwnPlaylists({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetSelfQueryResult = NonNullable<Awaited<ReturnType<typeof getSelf>>>
-export type GetSelfQueryError = void
+export type GetOwnPlaylistsQueryResult = NonNullable<Awaited<ReturnType<typeof getOwnPlaylists>>>
+export type GetOwnPlaylistsQueryError = void
 
 
-export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>> & Pick<
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getSelf>>,
+          Awaited<ReturnType<typeof getOwnPlaylists>>,
           TError,
-          Awaited<ReturnType<typeof getSelf>>
+          Awaited<ReturnType<typeof getOwnPlaylists>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>> & Pick<
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getSelf>>,
+          Awaited<ReturnType<typeof getOwnPlaylists>>,
           TError,
-          Awaited<ReturnType<typeof getSelf>>
+          Awaited<ReturnType<typeof getOwnPlaylists>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetSelfQueryOptions(options)
+  const queryOptions = getGetOwnPlaylistsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -4903,39 +5285,44 @@ export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError =
 
 
 
-export type logoutUserResponse204 = {
-  data: void
-  status: 204
+export type getPlaylistResponse200 = {
+  data: Playlist
+  status: 200
 }
 
-export type logoutUserResponse401 = {
+export type getPlaylistResponse401 = {
   data: void
   status: 401
 }
 
-export type logoutUserResponseSuccess = (logoutUserResponse204) & {
-  headers: Headers;
-};
-export type logoutUserResponseError = (logoutUserResponse401) & {
-  headers: Headers;
-};
-
-export type logoutUserResponse = (logoutUserResponseSuccess | logoutUserResponseError)
-
-export const getLogoutUserUrl = () => {
-
-
-
-
-  return `/users/logout`
+export type getPlaylistResponse403 = {
+  data: void
+  status: 403
 }
 
-export const logoutUser = async ( options?: RequestInit): Promise<logoutUserResponse> => {
+export type getPlaylistResponseSuccess = (getPlaylistResponse200) & {
+  headers: Headers;
+};
+export type getPlaylistResponseError = (getPlaylistResponse401 | getPlaylistResponse403) & {
+  headers: Headers;
+};
 
-  return customFetch<logoutUserResponse>(getLogoutUserUrl(),
+export type getPlaylistResponse = (getPlaylistResponseSuccess | getPlaylistResponseError)
+
+export const getGetPlaylistUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}`
+}
+
+export const getPlaylist = async (uuid: string, options?: RequestInit): Promise<getPlaylistResponse> => {
+
+  return customFetch<getPlaylistResponse>(getGetPlaylistUrl(uuid),
   {
     ...options,
-    method: 'POST'
+    method: 'GET'
 
 
   }
@@ -4944,11 +5331,135 @@ export const logoutUser = async ( options?: RequestInit): Promise<logoutUserResp
 
 
 
-export const getLogoutUserMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutUser>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof logoutUser>>, TError,void, TContext> => {
 
-const mutationKey = ['logoutUser'];
+export const getGetPlaylistQueryKey = (uuid: string,) => {
+    return [
+    `/playlists/${uuid}`
+    ] as const;
+    }
+
+
+export const getGetPlaylistQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPlaylistQueryKey(uuid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlaylist>>> = ({ signal }) => getPlaylist(uuid, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: uuid !== null && uuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPlaylistQueryResult = NonNullable<Awaited<ReturnType<typeof getPlaylist>>>
+export type GetPlaylistQueryError = void
+
+
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+ uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlaylist>>,
+          TError,
+          Awaited<ReturnType<typeof getPlaylist>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlaylist>>,
+          TError,
+          Awaited<ReturnType<typeof getPlaylist>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPlaylistQueryOptions(uuid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type deletePlaylistResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deletePlaylistResponse401 = {
+  data: void
+  status: 401
+}
+
+export type deletePlaylistResponse403 = {
+  data: void
+  status: 403
+}
+
+export type deletePlaylistResponse404 = {
+  data: void
+  status: 404
+}
+
+export type deletePlaylistResponseSuccess = (deletePlaylistResponse204) & {
+  headers: Headers;
+};
+export type deletePlaylistResponseError = (deletePlaylistResponse401 | deletePlaylistResponse403 | deletePlaylistResponse404) & {
+  headers: Headers;
+};
+
+export type deletePlaylistResponse = (deletePlaylistResponseSuccess | deletePlaylistResponseError)
+
+export const getDeletePlaylistUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}`
+}
+
+export const deletePlaylist = async (uuid: string, options?: RequestInit): Promise<deletePlaylistResponse> => {
+
+  return customFetch<deletePlaylistResponse>(getDeletePlaylistUrl(uuid),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeletePlaylistMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext> => {
+
+const mutationKey = ['deletePlaylist'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -4958,10 +5469,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof logoutUser>>, void> = () => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePlaylist>>, {uuid: string}> = (props) => {
+          const {uuid} = props ?? {};
 
-
-          return  logoutUser(requestOptions)
+          return  deletePlaylist(uuid,requestOptions)
         }
 
 
@@ -4971,18 +5482,112 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type LogoutUserMutationResult = NonNullable<Awaited<ReturnType<typeof logoutUser>>>
+    export type DeletePlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof deletePlaylist>>>
 
-    export type LogoutUserMutationError = void
+    export type DeletePlaylistMutationError = void
 
-    export const useLogoutUser = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutUser>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+    export const useDeletePlaylist = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof logoutUser>>,
+        Awaited<ReturnType<typeof deletePlaylist>>,
         TError,
-        void,
+        {uuid: string},
         TContext
       > => {
-      return useMutation(getLogoutUserMutationOptions(options), queryClient);
+      return useMutation(getDeletePlaylistMutationOptions(options), queryClient);
+    }
+
+export type addTracksToPlaylistResponse200 = {
+  data: Playlist
+  status: 200
+}
+
+export type addTracksToPlaylistResponse401 = {
+  data: void
+  status: 401
+}
+
+export type addTracksToPlaylistResponse403 = {
+  data: void
+  status: 403
+}
+
+export type addTracksToPlaylistResponse404 = {
+  data: void
+  status: 404
+}
+
+export type addTracksToPlaylistResponseSuccess = (addTracksToPlaylistResponse200) & {
+  headers: Headers;
+};
+export type addTracksToPlaylistResponseError = (addTracksToPlaylistResponse401 | addTracksToPlaylistResponse403 | addTracksToPlaylistResponse404) & {
+  headers: Headers;
+};
+
+export type addTracksToPlaylistResponse = (addTracksToPlaylistResponseSuccess | addTracksToPlaylistResponseError)
+
+export const getAddTracksToPlaylistUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/add`
+}
+
+export const addTracksToPlaylist = async (uuid: string,
+    addPlaylistTracksDto: AddPlaylistTracksDto, options?: RequestInit): Promise<addTracksToPlaylistResponse> => {
+
+  return customFetch<addTracksToPlaylistResponse>(getAddTracksToPlaylistUrl(uuid),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(addPlaylistTracksDto)
+  }
+);}
+
+
+
+
+export const getAddTracksToPlaylistMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext> => {
+
+const mutationKey = ['addTracksToPlaylist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addTracksToPlaylist>>, {uuid: string;data: AddPlaylistTracksDto}> = (props) => {
+          const {uuid,data} = props ?? {};
+
+          return  addTracksToPlaylist(uuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddTracksToPlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof addTracksToPlaylist>>>
+    export type AddTracksToPlaylistMutationBody = AddPlaylistTracksDto
+    export type AddTracksToPlaylistMutationError = void
+
+    export const useAddTracksToPlaylist = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof addTracksToPlaylist>>,
+        TError,
+        {uuid: string;data: AddPlaylistTracksDto},
+        TContext
+      > => {
+      return useMutation(getAddTracksToPlaylistMutationOptions(options), queryClient);
     }
 

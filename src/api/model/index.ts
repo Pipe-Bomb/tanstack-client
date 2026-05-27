@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.0.2
  */
 
+export * from './addPlaylistTracksDto';
 export * from './album';
 export * from './albumArtist';
 export * from './albumEphemeralContent';
@@ -29,6 +30,17 @@ export * from './bufferAttributeType';
 export * from './bufferSearchAttributeDto';
 export * from './bufferSearchAttributeDtoEntityType';
 export * from './bufferSearchAttributeDtoType';
+export * from './createPlaylistDto';
+export * from './customBooleanAttributeDto';
+export * from './customBooleanAttributeDtoType';
+export * from './customBufferAttributeDto';
+export * from './customBufferAttributeDtoType';
+export * from './customDecimalAttributeDto';
+export * from './customDecimalAttributeDtoType';
+export * from './customIntegerAttributeDto';
+export * from './customIntegerAttributeDtoType';
+export * from './customStringAttributeDto';
+export * from './customStringAttributeDtoType';
 export * from './decimalAttribute';
 export * from './decimalAttributeType';
 export * from './decimalSearchAttributeDto';
@@ -60,7 +72,10 @@ export * from './librarySearchDto';
 export * from './loadedAttribute';
 export * from './loadedAttributeType';
 export * from './loginDto';
+export * from './newPlaylistTrackDto';
 export * from './orderedAttributeSourceDto';
+export * from './playlist';
+export * from './playlistTrack';
 export * from './pluginConfig';
 export * from './pluginConfigs';
 export * from './pluginConfigStub';
@@ -86,4 +101,5 @@ export * from './textConfigNode';
 export * from './textConfigNodeType';
 export * from './track';
 export * from './trackArtist';
+export * from './uploadAttributeBufferBody';
 export * from './user';
