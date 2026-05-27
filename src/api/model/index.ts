@@ -101,5 +101,6 @@ export * from './textConfigNode';
 export * from './textConfigNodeType';
 export * from './track';
 export * from './trackArtist';
+export * from './trackCreationSession';
 export * from './uploadAttributeBufferBody';
 export * from './user';

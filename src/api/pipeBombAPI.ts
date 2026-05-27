@@ -60,6 +60,7 @@ import type {
   SearchResults,
   StreamInstance,
   Track,
+  TrackCreationSession,
   UploadAttributeBufferBody,
   User
 } from './model';
@@ -5590,4 +5591,128 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getAddTracksToPlaylistMutationOptions(options), queryClient);
     }
+
+export type getPlaylistUpdateProgressResponse200 = {
+  data: TrackCreationSession[]
+  status: 200
+}
+
+export type getPlaylistUpdateProgressResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getPlaylistUpdateProgressResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getPlaylistUpdateProgressResponse404 = {
+  data: void
+  status: 404
+}
+
+export type getPlaylistUpdateProgressResponseSuccess = (getPlaylistUpdateProgressResponse200) & {
+  headers: Headers;
+};
+export type getPlaylistUpdateProgressResponseError = (getPlaylistUpdateProgressResponse401 | getPlaylistUpdateProgressResponse403 | getPlaylistUpdateProgressResponse404) & {
+  headers: Headers;
+};
+
+export type getPlaylistUpdateProgressResponse = (getPlaylistUpdateProgressResponseSuccess | getPlaylistUpdateProgressResponseError)
+
+export const getGetPlaylistUpdateProgressUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/pending`
+}
+
+export const getPlaylistUpdateProgress = async (uuid: string, options?: RequestInit): Promise<getPlaylistUpdateProgressResponse> => {
+
+  return customFetch<getPlaylistUpdateProgressResponse>(getGetPlaylistUpdateProgressUrl(uuid),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPlaylistUpdateProgressQueryKey = (uuid: string,) => {
+    return [
+    `/playlists/${uuid}/pending`
+    ] as const;
+    }
+
+
+export const getGetPlaylistUpdateProgressQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPlaylistUpdateProgressQueryKey(uuid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>> = ({ signal }) => getPlaylistUpdateProgress(uuid, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: uuid !== null && uuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPlaylistUpdateProgressQueryResult = NonNullable<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>>
+export type GetPlaylistUpdateProgressQueryError = void
+
+
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+ uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>,
+          TError,
+          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>,
+          TError,
+          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPlaylistUpdateProgressQueryOptions(uuid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
