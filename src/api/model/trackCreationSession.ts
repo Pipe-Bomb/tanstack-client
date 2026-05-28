@@ -8,5 +8,10 @@
 export interface TrackCreationSession {
   uuid: string;
   dateStarted: Date;
-  percent: number;
+  /**
+     * @minimum 0
+     * @maximum 100
+     * @nullable
+     */
+  percent: number | null;
 }
