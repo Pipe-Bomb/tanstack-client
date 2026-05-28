@@ -4,8 +4,12 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.0.2
  */
+import type { NewPlaylistAlbumDto } from './newPlaylistAlbumDto';
 import type { NewPlaylistTrackDto } from './newPlaylistTrackDto';
 
 export interface AddPlaylistTracksDto {
-  tracks: NewPlaylistTrackDto[];
+  /** @nullable */
+  tracks: NewPlaylistTrackDto[] | null;
+  /** @nullable */
+  albums: NewPlaylistAlbumDto[] | null;
 }

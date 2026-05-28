@@ -72,6 +72,7 @@ export * from './librarySearchDto';
 export * from './loadedAttribute';
 export * from './loadedAttributeType';
 export * from './loginDto';
+export * from './newPlaylistAlbumDto';
 export * from './newPlaylistTrackDto';
 export * from './orderedAttributeSourceDto';
 export * from './playlist';
