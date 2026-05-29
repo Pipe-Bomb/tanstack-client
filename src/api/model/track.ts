@@ -10,7 +10,7 @@ import type { Identity } from './identity';
 import type { TrackArtist } from './trackArtist';
 
 export interface Track {
-  id: string;
+  trackId: string;
   pluginId: string;
   libraryId: string;
   title: string;

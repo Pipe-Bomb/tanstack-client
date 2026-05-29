@@ -5,11 +5,11 @@
  * OpenAPI spec version: 0.0.2
  */
 import type { NewPlaylistAlbumDto } from './newPlaylistAlbumDto';
-import type { NewPlaylistTrackDto } from './newPlaylistTrackDto';
+import type { TrackIdDto } from './trackIdDto';
 
 export interface AddPlaylistTracksDto {
   /** @nullable */
-  tracks: NewPlaylistTrackDto[] | null;
+  tracks: TrackIdDto[] | null;
   /** @nullable */
   albums: NewPlaylistAlbumDto[] | null;
 }

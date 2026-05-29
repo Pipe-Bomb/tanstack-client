@@ -15,4 +15,6 @@ export interface Playlist {
   attributes: AttributeMap | null;
   /** @nullable */
   tracks: PlaylistTrack[] | null;
+  /** @nullable */
+  trackCount: number | null;
 }

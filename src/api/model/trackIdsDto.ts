@@ -4,9 +4,8 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.0.2
  */
+import type { TrackIdDto } from './trackIdDto';
 
-export interface NewPlaylistTrackDto {
-  pluginId: string;
-  libraryId: string;
-  trackId: string;
+export interface TrackIdsDto {
+  tracks: TrackIdDto[];
 }
