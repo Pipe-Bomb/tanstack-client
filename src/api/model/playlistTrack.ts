@@ -10,7 +10,6 @@ import type { User } from './user';
 export interface PlaylistTrack {
   track: Track;
   dateAdded: Date;
-  /** @nullable */
-  addedBySystem: boolean | null;
+  addedBySystem: boolean;
   addedBy: User | null;
 }
