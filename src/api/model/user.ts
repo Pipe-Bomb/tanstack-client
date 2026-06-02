@@ -4,8 +4,11 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.0.2
  */
+import type { Playlist } from './playlist';
 
 export interface User {
   uuid: string;
   username: string;
+  /** @nullable */
+  playlists: Playlist[] | null;
 }
