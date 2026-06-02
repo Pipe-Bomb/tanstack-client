@@ -4,14 +4,13 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.0.2
  */
-import type { PlaylistTrackAddedBy } from './playlistTrackAddedBy';
 import type { Track } from './track';
+import type { User } from './user';
 
 export interface PlaylistTrack {
   track: Track;
   dateAdded: Date;
   /** @nullable */
   addedBySystem: boolean | null;
-  /** @nullable */
-  addedBy: PlaylistTrackAddedBy;
+  addedBy: User | null;
 }

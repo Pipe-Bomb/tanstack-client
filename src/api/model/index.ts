@@ -76,7 +76,6 @@ export * from './newPlaylistAlbumDto';
 export * from './orderedAttributeSourceDto';
 export * from './playlist';
 export * from './playlistTrack';
-export * from './playlistTrackAddedBy';
 export * from './playlistTracksQuery';
 export * from './pluginConfig';
 export * from './pluginConfigs';
