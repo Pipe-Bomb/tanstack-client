@@ -1,4 +1,7 @@
-# TanStack Query Pipe BombAPI Client
+<h1>
+    <img src="https://raw.githubusercontent.com/Pipe-Bomb/.github/refs/heads/master/assets/logos/Pipe%20Bomb%20no%20background%20w%20outline.png" width="40" />
+    TanStack Query Pipe BombAPI Client
+</h1>
 
 This library is largely automatically generated from Pipe Bomb's [OpenAPI schema](https://github.com/Pipe-Bomb/openapi-spec) using [Orval](https://orval.dev).
 
