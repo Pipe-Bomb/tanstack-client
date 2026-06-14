@@ -10,6 +10,5 @@ export interface Resource {
   uuid: string;
   url: string;
   extension: string;
-  /** @nullable */
   sha256: ResourceSha256;
 }

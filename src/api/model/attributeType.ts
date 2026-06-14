@@ -5,10 +5,10 @@
  * OpenAPI spec version: 0.0.2
  */
 
-export type LoadedAttributeType = typeof LoadedAttributeType[keyof typeof LoadedAttributeType];
+export type AttributeType = typeof AttributeType[keyof typeof AttributeType];
 
 
-export const LoadedAttributeType = {
+export const AttributeType = {
   string: 'string',
   integer: 'integer',
   decimal: 'decimal',

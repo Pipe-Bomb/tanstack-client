@@ -10,7 +10,6 @@ export interface IntegerAttribute {
   type: IntegerAttributeType;
   pluginId: string;
   sourceId: string;
-  /** @nullable */
   formatted: string[] | null;
   values: number[];
 }

@@ -11,6 +11,5 @@ export interface TextConfigNode {
   id: string;
   name: string;
   value: string;
-  /** @nullable */
   placeholder?: string | null;
 }

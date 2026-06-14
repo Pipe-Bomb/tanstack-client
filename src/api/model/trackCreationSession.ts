@@ -11,7 +11,6 @@ export interface TrackCreationSession {
   /**
      * @minimum 0
      * @maximum 100
-     * @nullable
      */
   percent: number | null;
 }

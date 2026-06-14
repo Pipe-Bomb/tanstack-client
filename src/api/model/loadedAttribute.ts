@@ -4,12 +4,12 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.0.2
  */
-import type { LoadedAttributeType } from './loadedAttributeType';
+import type { AttributeType } from './attributeType';
 
 export interface LoadedAttribute {
   pluginId: string;
   sourceId: string;
   key: string;
-  type: LoadedAttributeType;
+  type: AttributeType;
   supportsMultiple: boolean;
 }

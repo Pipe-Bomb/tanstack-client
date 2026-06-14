@@ -9,6 +9,5 @@ import type { Artist } from './artist';
 export interface TrackArtist {
   artistUuid: string;
   artist: Artist;
-  /** @nullable */
   joinPhrase: string | null;
 }

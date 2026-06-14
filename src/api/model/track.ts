@@ -14,11 +14,8 @@ export interface Track {
   pluginId: string;
   libraryId: string;
   title: string;
-  /** @nullable */
   artists: TrackArtist[] | null;
-  /** @nullable */
   albums: Album[] | null;
   attributes: AttributeMap | null;
-  /** @nullable */
   identities: Identity[] | null;
 }

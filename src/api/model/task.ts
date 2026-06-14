@@ -8,14 +8,12 @@ import type { TaskStatus } from './taskStatus';
 
 export interface Task {
   uuid: string;
-  /** @nullable */
   pluginId: string | null;
   taskId: string;
   status: TaskStatus;
   /**
      * @minimum 0
      * @maximum 100
-     * @nullable
      */
   percent: number | null;
   resumable: boolean;

@@ -10,7 +10,6 @@ export interface BooleanAttribute {
   type: BooleanAttributeType;
   pluginId: string;
   sourceId: string;
-  /** @nullable */
   formatted: string[] | null;
   values: boolean[];
 }

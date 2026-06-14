@@ -13,6 +13,5 @@ export interface EphemeralTrack {
   libraryId: string;
   title: string;
   attributes: AttributeMap | null;
-  /** @nullable */
   artists: TrackArtist[] | null;
 }

@@ -6,6 +6,7 @@
  */
 import type { AttributeMap } from './attributeMap';
 import type { PlaylistTrack } from './playlistTrack';
+import type { SmartPlaylistFilterGroup } from './smartPlaylistFilterGroup';
 import type { User } from './user';
 
 export interface Playlist {
@@ -13,8 +14,7 @@ export interface Playlist {
   ownerUuid: string;
   owner: User | null;
   attributes: AttributeMap | null;
-  /** @nullable */
+  filterGroups: SmartPlaylistFilterGroup[] | null;
   tracks: PlaylistTrack[] | null;
-  /** @nullable */
   trackCount: number | null;
 }

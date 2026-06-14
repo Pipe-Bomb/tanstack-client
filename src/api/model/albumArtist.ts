@@ -7,9 +7,7 @@
 import type { Artist } from './artist';
 
 export interface AlbumArtist {
-  /** @nullable */
   artistUuid: string | null;
   artist: Artist;
-  /** @nullable */
   joinPhrase: string | null;
 }

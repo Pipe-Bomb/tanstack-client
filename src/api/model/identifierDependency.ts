@@ -6,7 +6,6 @@
  */
 
 export interface IdentifierDependency {
-  /** @nullable */
   pluginId: string | null;
   sourceId: string;
 }

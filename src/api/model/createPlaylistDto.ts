@@ -10,6 +10,5 @@ import type { CustomIntegerAttributeDto } from './customIntegerAttributeDto';
 import type { CustomStringAttributeDto } from './customStringAttributeDto';
 
 export interface CreatePlaylistDto {
-  /** @nullable */
   attributes: (CustomStringAttributeDto | CustomBooleanAttributeDto | CustomIntegerAttributeDto | CustomDecimalAttributeDto)[] | null;
 }

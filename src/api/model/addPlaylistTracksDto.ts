@@ -8,8 +8,6 @@ import type { NewPlaylistAlbumDto } from './newPlaylistAlbumDto';
 import type { TrackIdDto } from './trackIdDto';
 
 export interface AddPlaylistTracksDto {
-  /** @nullable */
   tracks: TrackIdDto[] | null;
-  /** @nullable */
   albums: NewPlaylistAlbumDto[] | null;
 }

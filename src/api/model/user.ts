@@ -9,6 +9,5 @@ import type { Playlist } from './playlist';
 export interface User {
   uuid: string;
   username: string;
-  /** @nullable */
   playlists: Playlist[] | null;
 }

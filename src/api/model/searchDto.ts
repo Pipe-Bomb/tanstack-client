@@ -14,6 +14,5 @@ export interface SearchDto {
   withTracks: boolean;
   withAlbums: boolean;
   withArtists: boolean;
-  /** @nullable */
   attributes: (StringSearchAttributeDto | BooleanSearchAttributeDto | IntegerSearchAttributeDto | DecimalSearchAttributeDto | BufferSearchAttributeDto)[] | null;
 }

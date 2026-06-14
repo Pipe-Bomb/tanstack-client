@@ -38,6 +38,7 @@ import type {
   AttributeSource,
   AttributeSourceOrderDto,
   CreatePlaylistDto,
+  CreateSmartFilterGroupDto,
   EphemeralSearchDto,
   EphemeralSearchResults,
   EphemeralSource,
@@ -6126,4 +6127,382 @@ export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof g
 
 
 
+
+export type addPlaylistSmartFilterGroupResponse204 = {
+  data: void
+  status: 204
+}
+
+export type addPlaylistSmartFilterGroupResponse401 = {
+  data: void
+  status: 401
+}
+
+export type addPlaylistSmartFilterGroupResponse403 = {
+  data: void
+  status: 403
+}
+
+export type addPlaylistSmartFilterGroupResponse404 = {
+  data: void
+  status: 404
+}
+
+export type addPlaylistSmartFilterGroupResponseSuccess = (addPlaylistSmartFilterGroupResponse204) & {
+  headers: Headers;
+};
+export type addPlaylistSmartFilterGroupResponseError = (addPlaylistSmartFilterGroupResponse401 | addPlaylistSmartFilterGroupResponse403 | addPlaylistSmartFilterGroupResponse404) & {
+  headers: Headers;
+};
+
+export type addPlaylistSmartFilterGroupResponse = (addPlaylistSmartFilterGroupResponseSuccess | addPlaylistSmartFilterGroupResponseError)
+
+export const getAddPlaylistSmartFilterGroupUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/filters`
+}
+
+export const addPlaylistSmartFilterGroup = async (uuid: string,
+    createSmartFilterGroupDto: CreateSmartFilterGroupDto, options?: RequestInit): Promise<addPlaylistSmartFilterGroupResponse> => {
+
+  return customFetch<addPlaylistSmartFilterGroupResponse>(getAddPlaylistSmartFilterGroupUrl(uuid),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createSmartFilterGroupDto)
+  }
+);}
+
+
+
+
+export const getAddPlaylistSmartFilterGroupMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext> => {
+
+const mutationKey = ['addPlaylistSmartFilterGroup'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, {uuid: string;data: CreateSmartFilterGroupDto}> = (props) => {
+          const {uuid,data} = props ?? {};
+
+          return  addPlaylistSmartFilterGroup(uuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddPlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>>
+    export type AddPlaylistSmartFilterGroupMutationBody = CreateSmartFilterGroupDto
+    export type AddPlaylistSmartFilterGroupMutationError = void
+
+    export const useAddPlaylistSmartFilterGroup = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>,
+        TError,
+        {uuid: string;data: CreateSmartFilterGroupDto},
+        TContext
+      > => {
+      return useMutation(getAddPlaylistSmartFilterGroupMutationOptions(options), queryClient);
+    }
+
+export type runPlaylistSmartFiltersResponse204 = {
+  data: void
+  status: 204
+}
+
+export type runPlaylistSmartFiltersResponse401 = {
+  data: void
+  status: 401
+}
+
+export type runPlaylistSmartFiltersResponse403 = {
+  data: void
+  status: 403
+}
+
+export type runPlaylistSmartFiltersResponse404 = {
+  data: void
+  status: 404
+}
+
+export type runPlaylistSmartFiltersResponseSuccess = (runPlaylistSmartFiltersResponse204) & {
+  headers: Headers;
+};
+export type runPlaylistSmartFiltersResponseError = (runPlaylistSmartFiltersResponse401 | runPlaylistSmartFiltersResponse403 | runPlaylistSmartFiltersResponse404) & {
+  headers: Headers;
+};
+
+export type runPlaylistSmartFiltersResponse = (runPlaylistSmartFiltersResponseSuccess | runPlaylistSmartFiltersResponseError)
+
+export const getRunPlaylistSmartFiltersUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/filters`
+}
+
+export const runPlaylistSmartFilters = async (uuid: string, options?: RequestInit): Promise<runPlaylistSmartFiltersResponse> => {
+
+  return customFetch<runPlaylistSmartFiltersResponse>(getRunPlaylistSmartFiltersUrl(uuid),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getRunPlaylistSmartFiltersMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext> => {
+
+const mutationKey = ['runPlaylistSmartFilters'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, {uuid: string}> = (props) => {
+          const {uuid} = props ?? {};
+
+          return  runPlaylistSmartFilters(uuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RunPlaylistSmartFiltersMutationResult = NonNullable<Awaited<ReturnType<typeof runPlaylistSmartFilters>>>
+
+    export type RunPlaylistSmartFiltersMutationError = void
+
+    export const useRunPlaylistSmartFilters = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof runPlaylistSmartFilters>>,
+        TError,
+        {uuid: string},
+        TContext
+      > => {
+      return useMutation(getRunPlaylistSmartFiltersMutationOptions(options), queryClient);
+    }
+
+export type updatePlaylistSmartFilterGroupResponse204 = {
+  data: void
+  status: 204
+}
+
+export type updatePlaylistSmartFilterGroupResponse401 = {
+  data: void
+  status: 401
+}
+
+export type updatePlaylistSmartFilterGroupResponse403 = {
+  data: void
+  status: 403
+}
+
+export type updatePlaylistSmartFilterGroupResponse404 = {
+  data: void
+  status: 404
+}
+
+export type updatePlaylistSmartFilterGroupResponseSuccess = (updatePlaylistSmartFilterGroupResponse204) & {
+  headers: Headers;
+};
+export type updatePlaylistSmartFilterGroupResponseError = (updatePlaylistSmartFilterGroupResponse401 | updatePlaylistSmartFilterGroupResponse403 | updatePlaylistSmartFilterGroupResponse404) & {
+  headers: Headers;
+};
+
+export type updatePlaylistSmartFilterGroupResponse = (updatePlaylistSmartFilterGroupResponseSuccess | updatePlaylistSmartFilterGroupResponseError)
+
+export const getUpdatePlaylistSmartFilterGroupUrl = (playlistUuid: string,
+    filterGroupUuid: string,) => {
+
+
+
+
+  return `/playlists/${playlistUuid}/filters/${filterGroupUuid}`
+}
+
+export const updatePlaylistSmartFilterGroup = async (playlistUuid: string,
+    filterGroupUuid: string,
+    createSmartFilterGroupDto: CreateSmartFilterGroupDto, options?: RequestInit): Promise<updatePlaylistSmartFilterGroupResponse> => {
+
+  return customFetch<updatePlaylistSmartFilterGroupResponse>(getUpdatePlaylistSmartFilterGroupUrl(playlistUuid,filterGroupUuid),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createSmartFilterGroupDto)
+  }
+);}
+
+
+
+
+export const getUpdatePlaylistSmartFilterGroupMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext> => {
+
+const mutationKey = ['updatePlaylistSmartFilterGroup'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, {playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}> = (props) => {
+          const {playlistUuid,filterGroupUuid,data} = props ?? {};
+
+          return  updatePlaylistSmartFilterGroup(playlistUuid,filterGroupUuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdatePlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>>
+    export type UpdatePlaylistSmartFilterGroupMutationBody = CreateSmartFilterGroupDto
+    export type UpdatePlaylistSmartFilterGroupMutationError = void
+
+    export const useUpdatePlaylistSmartFilterGroup = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>,
+        TError,
+        {playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto},
+        TContext
+      > => {
+      return useMutation(getUpdatePlaylistSmartFilterGroupMutationOptions(options), queryClient);
+    }
+
+export type deletePlaylistSmartFilterGroupResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deletePlaylistSmartFilterGroupResponse401 = {
+  data: void
+  status: 401
+}
+
+export type deletePlaylistSmartFilterGroupResponse403 = {
+  data: void
+  status: 403
+}
+
+export type deletePlaylistSmartFilterGroupResponse404 = {
+  data: void
+  status: 404
+}
+
+export type deletePlaylistSmartFilterGroupResponseSuccess = (deletePlaylistSmartFilterGroupResponse204) & {
+  headers: Headers;
+};
+export type deletePlaylistSmartFilterGroupResponseError = (deletePlaylistSmartFilterGroupResponse401 | deletePlaylistSmartFilterGroupResponse403 | deletePlaylistSmartFilterGroupResponse404) & {
+  headers: Headers;
+};
+
+export type deletePlaylistSmartFilterGroupResponse = (deletePlaylistSmartFilterGroupResponseSuccess | deletePlaylistSmartFilterGroupResponseError)
+
+export const getDeletePlaylistSmartFilterGroupUrl = (playlistUuid: string,
+    filterGroupUuid: string,) => {
+
+
+
+
+  return `/playlists/${playlistUuid}/filters/${filterGroupUuid}`
+}
+
+export const deletePlaylistSmartFilterGroup = async (playlistUuid: string,
+    filterGroupUuid: string, options?: RequestInit): Promise<deletePlaylistSmartFilterGroupResponse> => {
+
+  return customFetch<deletePlaylistSmartFilterGroupResponse>(getDeletePlaylistSmartFilterGroupUrl(playlistUuid,filterGroupUuid),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeletePlaylistSmartFilterGroupMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext> => {
+
+const mutationKey = ['deletePlaylistSmartFilterGroup'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, {playlistUuid: string;filterGroupUuid: string}> = (props) => {
+          const {playlistUuid,filterGroupUuid} = props ?? {};
+
+          return  deletePlaylistSmartFilterGroup(playlistUuid,filterGroupUuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeletePlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>>
+
+    export type DeletePlaylistSmartFilterGroupMutationError = void
+
+    export const useDeletePlaylistSmartFilterGroup = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>,
+        TError,
+        {playlistUuid: string;filterGroupUuid: string},
+        TContext
+      > => {
+      return useMutation(getDeletePlaylistSmartFilterGroupMutationOptions(options), queryClient);
+    }
 
