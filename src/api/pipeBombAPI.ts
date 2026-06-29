@@ -2973,6 +2973,1229 @@ export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttri
 
 
 
+export type createPlaylistResponse200 = {
+  data: Playlist
+  status: 200
+}
+
+export type createPlaylistResponse401 = {
+  data: void
+  status: 401
+}
+
+export type createPlaylistResponseSuccess = (createPlaylistResponse200) & {
+  headers: Headers;
+};
+export type createPlaylistResponseError = (createPlaylistResponse401) & {
+  headers: Headers;
+};
+
+export type createPlaylistResponse = (createPlaylistResponseSuccess | createPlaylistResponseError)
+
+export const getCreatePlaylistUrl = () => {
+
+
+
+
+  return `/playlists`
+}
+
+export const createPlaylist = async (createPlaylistDto: CreatePlaylistDto, options?: RequestInit): Promise<createPlaylistResponse> => {
+
+  return customFetch<createPlaylistResponse>(getCreatePlaylistUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createPlaylistDto)
+  }
+);}
+
+
+
+
+export const getCreatePlaylistMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext> => {
+
+const mutationKey = ['createPlaylist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createPlaylist>>, {data: CreatePlaylistDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  createPlaylist(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreatePlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof createPlaylist>>>
+    export type CreatePlaylistMutationBody = CreatePlaylistDto
+    export type CreatePlaylistMutationError = void
+
+    export const useCreatePlaylist = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof createPlaylist>>,
+        TError,
+        {data: CreatePlaylistDto},
+        TContext
+      > => {
+      return useMutation(getCreatePlaylistMutationOptions(options), queryClient);
+    }
+
+export type getOwnPlaylistsResponse200 = {
+  data: Playlist[]
+  status: 200
+}
+
+export type getOwnPlaylistsResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getOwnPlaylistsResponseSuccess = (getOwnPlaylistsResponse200) & {
+  headers: Headers;
+};
+export type getOwnPlaylistsResponseError = (getOwnPlaylistsResponse401) & {
+  headers: Headers;
+};
+
+export type getOwnPlaylistsResponse = (getOwnPlaylistsResponseSuccess | getOwnPlaylistsResponseError)
+
+export const getGetOwnPlaylistsUrl = () => {
+
+
+
+
+  return `/playlists`
+}
+
+export const getOwnPlaylists = async ( options?: RequestInit): Promise<getOwnPlaylistsResponse> => {
+
+  return customFetch<getOwnPlaylistsResponse>(getGetOwnPlaylistsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetOwnPlaylistsQueryKey = () => {
+    return [
+    `/playlists`
+    ] as const;
+    }
+
+
+export const getGetOwnPlaylistsQueryOptions = <TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOwnPlaylistsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOwnPlaylists>>> = ({ signal }) => getOwnPlaylists({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetOwnPlaylistsQueryResult = NonNullable<Awaited<ReturnType<typeof getOwnPlaylists>>>
+export type GetOwnPlaylistsQueryError = void
+
+
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnPlaylists>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnPlaylists>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnPlaylists>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnPlaylists>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetOwnPlaylistsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getPlaylistResponse200 = {
+  data: Playlist
+  status: 200
+}
+
+export type getPlaylistResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getPlaylistResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getPlaylistResponseSuccess = (getPlaylistResponse200) & {
+  headers: Headers;
+};
+export type getPlaylistResponseError = (getPlaylistResponse401 | getPlaylistResponse403) & {
+  headers: Headers;
+};
+
+export type getPlaylistResponse = (getPlaylistResponseSuccess | getPlaylistResponseError)
+
+export const getGetPlaylistUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}`
+}
+
+export const getPlaylist = async (uuid: string, options?: RequestInit): Promise<getPlaylistResponse> => {
+
+  return customFetch<getPlaylistResponse>(getGetPlaylistUrl(uuid),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPlaylistQueryKey = (uuid: string,) => {
+    return [
+    `/playlists/${uuid}`
+    ] as const;
+    }
+
+
+export const getGetPlaylistQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPlaylistQueryKey(uuid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlaylist>>> = ({ signal }) => getPlaylist(uuid, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: uuid !== null && uuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPlaylistQueryResult = NonNullable<Awaited<ReturnType<typeof getPlaylist>>>
+export type GetPlaylistQueryError = void
+
+
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+ uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlaylist>>,
+          TError,
+          Awaited<ReturnType<typeof getPlaylist>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlaylist>>,
+          TError,
+          Awaited<ReturnType<typeof getPlaylist>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPlaylistQueryOptions(uuid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getPlaylistTracksResponse200 = {
+  data: PlaylistTrack[]
+  status: 200
+}
+
+export type getPlaylistTracksResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getPlaylistTracksResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getPlaylistTracksResponse404 = {
+  data: void
+  status: 404
+}
+
+export type getPlaylistTracksResponseSuccess = (getPlaylistTracksResponse200) & {
+  headers: Headers;
+};
+export type getPlaylistTracksResponseError = (getPlaylistTracksResponse401 | getPlaylistTracksResponse403 | getPlaylistTracksResponse404) & {
+  headers: Headers;
+};
+
+export type getPlaylistTracksResponse = (getPlaylistTracksResponseSuccess | getPlaylistTracksResponseError)
+
+export const getGetPlaylistTracksUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}`
+}
+
+export const getPlaylistTracks = async (uuid: string,
+    playlistTracksQuery: PlaylistTracksQuery, options?: RequestInit): Promise<getPlaylistTracksResponse> => {
+
+  return customFetch<getPlaylistTracksResponse>(getGetPlaylistTracksUrl(uuid),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(playlistTracksQuery)
+  }
+);}
+
+
+
+
+export const getGetPlaylistTracksMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPlaylistTracks>>, TError,{uuid: string;data: PlaylistTracksQuery}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof getPlaylistTracks>>, TError,{uuid: string;data: PlaylistTracksQuery}, TContext> => {
+
+const mutationKey = ['getPlaylistTracks'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getPlaylistTracks>>, {uuid: string;data: PlaylistTracksQuery}> = (props) => {
+          const {uuid,data} = props ?? {};
+
+          return  getPlaylistTracks(uuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GetPlaylistTracksMutationResult = NonNullable<Awaited<ReturnType<typeof getPlaylistTracks>>>
+    export type GetPlaylistTracksMutationBody = PlaylistTracksQuery
+    export type GetPlaylistTracksMutationError = void
+
+    export const useGetPlaylistTracks = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPlaylistTracks>>, TError,{uuid: string;data: PlaylistTracksQuery}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof getPlaylistTracks>>,
+        TError,
+        {uuid: string;data: PlaylistTracksQuery},
+        TContext
+      > => {
+      return useMutation(getGetPlaylistTracksMutationOptions(options), queryClient);
+    }
+
+export type deletePlaylistResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deletePlaylistResponse401 = {
+  data: void
+  status: 401
+}
+
+export type deletePlaylistResponse403 = {
+  data: void
+  status: 403
+}
+
+export type deletePlaylistResponse404 = {
+  data: void
+  status: 404
+}
+
+export type deletePlaylistResponseSuccess = (deletePlaylistResponse204) & {
+  headers: Headers;
+};
+export type deletePlaylistResponseError = (deletePlaylistResponse401 | deletePlaylistResponse403 | deletePlaylistResponse404) & {
+  headers: Headers;
+};
+
+export type deletePlaylistResponse = (deletePlaylistResponseSuccess | deletePlaylistResponseError)
+
+export const getDeletePlaylistUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}`
+}
+
+export const deletePlaylist = async (uuid: string, options?: RequestInit): Promise<deletePlaylistResponse> => {
+
+  return customFetch<deletePlaylistResponse>(getDeletePlaylistUrl(uuid),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeletePlaylistMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext> => {
+
+const mutationKey = ['deletePlaylist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePlaylist>>, {uuid: string}> = (props) => {
+          const {uuid} = props ?? {};
+
+          return  deletePlaylist(uuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeletePlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof deletePlaylist>>>
+
+    export type DeletePlaylistMutationError = void
+
+    export const useDeletePlaylist = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deletePlaylist>>,
+        TError,
+        {uuid: string},
+        TContext
+      > => {
+      return useMutation(getDeletePlaylistMutationOptions(options), queryClient);
+    }
+
+export type getAllPlaylistTrackIdsResponse200 = {
+  data: PlaylistTrack[]
+  status: 200
+}
+
+export type getAllPlaylistTrackIdsResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getAllPlaylistTrackIdsResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getAllPlaylistTrackIdsResponse404 = {
+  data: void
+  status: 404
+}
+
+export type getAllPlaylistTrackIdsResponseSuccess = (getAllPlaylistTrackIdsResponse200) & {
+  headers: Headers;
+};
+export type getAllPlaylistTrackIdsResponseError = (getAllPlaylistTrackIdsResponse401 | getAllPlaylistTrackIdsResponse403 | getAllPlaylistTrackIdsResponse404) & {
+  headers: Headers;
+};
+
+export type getAllPlaylistTrackIdsResponse = (getAllPlaylistTrackIdsResponseSuccess | getAllPlaylistTrackIdsResponseError)
+
+export const getGetAllPlaylistTrackIdsUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/all`
+}
+
+export const getAllPlaylistTrackIds = async (uuid: string, options?: RequestInit): Promise<getAllPlaylistTrackIdsResponse> => {
+
+  return customFetch<getAllPlaylistTrackIdsResponse>(getGetAllPlaylistTrackIdsUrl(uuid),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAllPlaylistTrackIdsQueryKey = (uuid: string,) => {
+    return [
+    `/playlists/${uuid}/all`
+    ] as const;
+    }
+
+
+export const getGetAllPlaylistTrackIdsQueryOptions = <TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAllPlaylistTrackIdsQueryKey(uuid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>> = ({ signal }) => getAllPlaylistTrackIds(uuid, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: uuid !== null && uuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAllPlaylistTrackIdsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>>
+export type GetAllPlaylistTrackIdsQueryError = void
+
+
+export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
+ uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllPlaylistTrackIds>>,
+          TError,
+          Awaited<ReturnType<typeof getAllPlaylistTrackIds>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllPlaylistTrackIds>>,
+          TError,
+          Awaited<ReturnType<typeof getAllPlaylistTrackIds>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAllPlaylistTrackIdsQueryOptions(uuid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type addTracksToPlaylistResponse200 = {
+  data: Playlist
+  status: 200
+}
+
+export type addTracksToPlaylistResponse401 = {
+  data: void
+  status: 401
+}
+
+export type addTracksToPlaylistResponse403 = {
+  data: void
+  status: 403
+}
+
+export type addTracksToPlaylistResponse404 = {
+  data: void
+  status: 404
+}
+
+export type addTracksToPlaylistResponseSuccess = (addTracksToPlaylistResponse200) & {
+  headers: Headers;
+};
+export type addTracksToPlaylistResponseError = (addTracksToPlaylistResponse401 | addTracksToPlaylistResponse403 | addTracksToPlaylistResponse404) & {
+  headers: Headers;
+};
+
+export type addTracksToPlaylistResponse = (addTracksToPlaylistResponseSuccess | addTracksToPlaylistResponseError)
+
+export const getAddTracksToPlaylistUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/add`
+}
+
+export const addTracksToPlaylist = async (uuid: string,
+    addPlaylistTracksDto: AddPlaylistTracksDto, options?: RequestInit): Promise<addTracksToPlaylistResponse> => {
+
+  return customFetch<addTracksToPlaylistResponse>(getAddTracksToPlaylistUrl(uuid),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(addPlaylistTracksDto)
+  }
+);}
+
+
+
+
+export const getAddTracksToPlaylistMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext> => {
+
+const mutationKey = ['addTracksToPlaylist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addTracksToPlaylist>>, {uuid: string;data: AddPlaylistTracksDto}> = (props) => {
+          const {uuid,data} = props ?? {};
+
+          return  addTracksToPlaylist(uuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddTracksToPlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof addTracksToPlaylist>>>
+    export type AddTracksToPlaylistMutationBody = AddPlaylistTracksDto
+    export type AddTracksToPlaylistMutationError = void
+
+    export const useAddTracksToPlaylist = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof addTracksToPlaylist>>,
+        TError,
+        {uuid: string;data: AddPlaylistTracksDto},
+        TContext
+      > => {
+      return useMutation(getAddTracksToPlaylistMutationOptions(options), queryClient);
+    }
+
+export type getPlaylistUpdateProgressResponse200 = {
+  data: TrackCreationSession[]
+  status: 200
+}
+
+export type getPlaylistUpdateProgressResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getPlaylistUpdateProgressResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getPlaylistUpdateProgressResponse404 = {
+  data: void
+  status: 404
+}
+
+export type getPlaylistUpdateProgressResponseSuccess = (getPlaylistUpdateProgressResponse200) & {
+  headers: Headers;
+};
+export type getPlaylistUpdateProgressResponseError = (getPlaylistUpdateProgressResponse401 | getPlaylistUpdateProgressResponse403 | getPlaylistUpdateProgressResponse404) & {
+  headers: Headers;
+};
+
+export type getPlaylistUpdateProgressResponse = (getPlaylistUpdateProgressResponseSuccess | getPlaylistUpdateProgressResponseError)
+
+export const getGetPlaylistUpdateProgressUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/pending`
+}
+
+export const getPlaylistUpdateProgress = async (uuid: string, options?: RequestInit): Promise<getPlaylistUpdateProgressResponse> => {
+
+  return customFetch<getPlaylistUpdateProgressResponse>(getGetPlaylistUpdateProgressUrl(uuid),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPlaylistUpdateProgressQueryKey = (uuid: string,) => {
+    return [
+    `/playlists/${uuid}/pending`
+    ] as const;
+    }
+
+
+export const getGetPlaylistUpdateProgressQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPlaylistUpdateProgressQueryKey(uuid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>> = ({ signal }) => getPlaylistUpdateProgress(uuid, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: uuid !== null && uuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPlaylistUpdateProgressQueryResult = NonNullable<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>>
+export type GetPlaylistUpdateProgressQueryError = void
+
+
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+ uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>,
+          TError,
+          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>,
+          TError,
+          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPlaylistUpdateProgressQueryOptions(uuid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type addPlaylistSmartFilterGroupResponse204 = {
+  data: void
+  status: 204
+}
+
+export type addPlaylistSmartFilterGroupResponse401 = {
+  data: void
+  status: 401
+}
+
+export type addPlaylistSmartFilterGroupResponse403 = {
+  data: void
+  status: 403
+}
+
+export type addPlaylistSmartFilterGroupResponse404 = {
+  data: void
+  status: 404
+}
+
+export type addPlaylistSmartFilterGroupResponseSuccess = (addPlaylistSmartFilterGroupResponse204) & {
+  headers: Headers;
+};
+export type addPlaylistSmartFilterGroupResponseError = (addPlaylistSmartFilterGroupResponse401 | addPlaylistSmartFilterGroupResponse403 | addPlaylistSmartFilterGroupResponse404) & {
+  headers: Headers;
+};
+
+export type addPlaylistSmartFilterGroupResponse = (addPlaylistSmartFilterGroupResponseSuccess | addPlaylistSmartFilterGroupResponseError)
+
+export const getAddPlaylistSmartFilterGroupUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/filters`
+}
+
+export const addPlaylistSmartFilterGroup = async (uuid: string,
+    createSmartFilterGroupDto: CreateSmartFilterGroupDto, options?: RequestInit): Promise<addPlaylistSmartFilterGroupResponse> => {
+
+  return customFetch<addPlaylistSmartFilterGroupResponse>(getAddPlaylistSmartFilterGroupUrl(uuid),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createSmartFilterGroupDto)
+  }
+);}
+
+
+
+
+export const getAddPlaylistSmartFilterGroupMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext> => {
+
+const mutationKey = ['addPlaylistSmartFilterGroup'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, {uuid: string;data: CreateSmartFilterGroupDto}> = (props) => {
+          const {uuid,data} = props ?? {};
+
+          return  addPlaylistSmartFilterGroup(uuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddPlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>>
+    export type AddPlaylistSmartFilterGroupMutationBody = CreateSmartFilterGroupDto
+    export type AddPlaylistSmartFilterGroupMutationError = void
+
+    export const useAddPlaylistSmartFilterGroup = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>,
+        TError,
+        {uuid: string;data: CreateSmartFilterGroupDto},
+        TContext
+      > => {
+      return useMutation(getAddPlaylistSmartFilterGroupMutationOptions(options), queryClient);
+    }
+
+export type runPlaylistSmartFiltersResponse204 = {
+  data: void
+  status: 204
+}
+
+export type runPlaylistSmartFiltersResponse401 = {
+  data: void
+  status: 401
+}
+
+export type runPlaylistSmartFiltersResponse403 = {
+  data: void
+  status: 403
+}
+
+export type runPlaylistSmartFiltersResponse404 = {
+  data: void
+  status: 404
+}
+
+export type runPlaylistSmartFiltersResponseSuccess = (runPlaylistSmartFiltersResponse204) & {
+  headers: Headers;
+};
+export type runPlaylistSmartFiltersResponseError = (runPlaylistSmartFiltersResponse401 | runPlaylistSmartFiltersResponse403 | runPlaylistSmartFiltersResponse404) & {
+  headers: Headers;
+};
+
+export type runPlaylistSmartFiltersResponse = (runPlaylistSmartFiltersResponseSuccess | runPlaylistSmartFiltersResponseError)
+
+export const getRunPlaylistSmartFiltersUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/filters`
+}
+
+export const runPlaylistSmartFilters = async (uuid: string, options?: RequestInit): Promise<runPlaylistSmartFiltersResponse> => {
+
+  return customFetch<runPlaylistSmartFiltersResponse>(getRunPlaylistSmartFiltersUrl(uuid),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getRunPlaylistSmartFiltersMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext> => {
+
+const mutationKey = ['runPlaylistSmartFilters'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, {uuid: string}> = (props) => {
+          const {uuid} = props ?? {};
+
+          return  runPlaylistSmartFilters(uuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RunPlaylistSmartFiltersMutationResult = NonNullable<Awaited<ReturnType<typeof runPlaylistSmartFilters>>>
+
+    export type RunPlaylistSmartFiltersMutationError = void
+
+    export const useRunPlaylistSmartFilters = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof runPlaylistSmartFilters>>,
+        TError,
+        {uuid: string},
+        TContext
+      > => {
+      return useMutation(getRunPlaylistSmartFiltersMutationOptions(options), queryClient);
+    }
+
+export type updatePlaylistSmartFilterGroupResponse204 = {
+  data: void
+  status: 204
+}
+
+export type updatePlaylistSmartFilterGroupResponse401 = {
+  data: void
+  status: 401
+}
+
+export type updatePlaylistSmartFilterGroupResponse403 = {
+  data: void
+  status: 403
+}
+
+export type updatePlaylistSmartFilterGroupResponse404 = {
+  data: void
+  status: 404
+}
+
+export type updatePlaylistSmartFilterGroupResponseSuccess = (updatePlaylistSmartFilterGroupResponse204) & {
+  headers: Headers;
+};
+export type updatePlaylistSmartFilterGroupResponseError = (updatePlaylistSmartFilterGroupResponse401 | updatePlaylistSmartFilterGroupResponse403 | updatePlaylistSmartFilterGroupResponse404) & {
+  headers: Headers;
+};
+
+export type updatePlaylistSmartFilterGroupResponse = (updatePlaylistSmartFilterGroupResponseSuccess | updatePlaylistSmartFilterGroupResponseError)
+
+export const getUpdatePlaylistSmartFilterGroupUrl = (playlistUuid: string,
+    filterGroupUuid: string,) => {
+
+
+
+
+  return `/playlists/${playlistUuid}/filters/${filterGroupUuid}`
+}
+
+export const updatePlaylistSmartFilterGroup = async (playlistUuid: string,
+    filterGroupUuid: string,
+    createSmartFilterGroupDto: CreateSmartFilterGroupDto, options?: RequestInit): Promise<updatePlaylistSmartFilterGroupResponse> => {
+
+  return customFetch<updatePlaylistSmartFilterGroupResponse>(getUpdatePlaylistSmartFilterGroupUrl(playlistUuid,filterGroupUuid),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(createSmartFilterGroupDto)
+  }
+);}
+
+
+
+
+export const getUpdatePlaylistSmartFilterGroupMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext> => {
+
+const mutationKey = ['updatePlaylistSmartFilterGroup'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, {playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}> = (props) => {
+          const {playlistUuid,filterGroupUuid,data} = props ?? {};
+
+          return  updatePlaylistSmartFilterGroup(playlistUuid,filterGroupUuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdatePlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>>
+    export type UpdatePlaylistSmartFilterGroupMutationBody = CreateSmartFilterGroupDto
+    export type UpdatePlaylistSmartFilterGroupMutationError = void
+
+    export const useUpdatePlaylistSmartFilterGroup = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>,
+        TError,
+        {playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto},
+        TContext
+      > => {
+      return useMutation(getUpdatePlaylistSmartFilterGroupMutationOptions(options), queryClient);
+    }
+
+export type deletePlaylistSmartFilterGroupResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deletePlaylistSmartFilterGroupResponse401 = {
+  data: void
+  status: 401
+}
+
+export type deletePlaylistSmartFilterGroupResponse403 = {
+  data: void
+  status: 403
+}
+
+export type deletePlaylistSmartFilterGroupResponse404 = {
+  data: void
+  status: 404
+}
+
+export type deletePlaylistSmartFilterGroupResponseSuccess = (deletePlaylistSmartFilterGroupResponse204) & {
+  headers: Headers;
+};
+export type deletePlaylistSmartFilterGroupResponseError = (deletePlaylistSmartFilterGroupResponse401 | deletePlaylistSmartFilterGroupResponse403 | deletePlaylistSmartFilterGroupResponse404) & {
+  headers: Headers;
+};
+
+export type deletePlaylistSmartFilterGroupResponse = (deletePlaylistSmartFilterGroupResponseSuccess | deletePlaylistSmartFilterGroupResponseError)
+
+export const getDeletePlaylistSmartFilterGroupUrl = (playlistUuid: string,
+    filterGroupUuid: string,) => {
+
+
+
+
+  return `/playlists/${playlistUuid}/filters/${filterGroupUuid}`
+}
+
+export const deletePlaylistSmartFilterGroup = async (playlistUuid: string,
+    filterGroupUuid: string, options?: RequestInit): Promise<deletePlaylistSmartFilterGroupResponse> => {
+
+  return customFetch<deletePlaylistSmartFilterGroupResponse>(getDeletePlaylistSmartFilterGroupUrl(playlistUuid,filterGroupUuid),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeletePlaylistSmartFilterGroupMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext> => {
+
+const mutationKey = ['deletePlaylistSmartFilterGroup'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, {playlistUuid: string;filterGroupUuid: string}> = (props) => {
+          const {playlistUuid,filterGroupUuid} = props ?? {};
+
+          return  deletePlaylistSmartFilterGroup(playlistUuid,filterGroupUuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeletePlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>>
+
+    export type DeletePlaylistSmartFilterGroupMutationError = void
+
+    export const useDeletePlaylistSmartFilterGroup = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>,
+        TError,
+        {playlistUuid: string;filterGroupUuid: string},
+        TContext
+      > => {
+      return useMutation(getDeletePlaylistSmartFilterGroupMutationOptions(options), queryClient);
+    }
+
 export type getTrackResponse200 = {
   data: Track
   status: 200
@@ -5281,1228 +6504,5 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getSearchMutationOptions(options), queryClient);
-    }
-
-export type createPlaylistResponse200 = {
-  data: Playlist
-  status: 200
-}
-
-export type createPlaylistResponse401 = {
-  data: void
-  status: 401
-}
-
-export type createPlaylistResponseSuccess = (createPlaylistResponse200) & {
-  headers: Headers;
-};
-export type createPlaylistResponseError = (createPlaylistResponse401) & {
-  headers: Headers;
-};
-
-export type createPlaylistResponse = (createPlaylistResponseSuccess | createPlaylistResponseError)
-
-export const getCreatePlaylistUrl = () => {
-
-
-
-
-  return `/playlists`
-}
-
-export const createPlaylist = async (createPlaylistDto: CreatePlaylistDto, options?: RequestInit): Promise<createPlaylistResponse> => {
-
-  return customFetch<createPlaylistResponse>(getCreatePlaylistUrl(),
-  {
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createPlaylistDto)
-  }
-);}
-
-
-
-
-export const getCreatePlaylistMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext> => {
-
-const mutationKey = ['createPlaylist'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createPlaylist>>, {data: CreatePlaylistDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  createPlaylist(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type CreatePlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof createPlaylist>>>
-    export type CreatePlaylistMutationBody = CreatePlaylistDto
-    export type CreatePlaylistMutationError = void
-
-    export const useCreatePlaylist = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof createPlaylist>>,
-        TError,
-        {data: CreatePlaylistDto},
-        TContext
-      > => {
-      return useMutation(getCreatePlaylistMutationOptions(options), queryClient);
-    }
-
-export type getOwnPlaylistsResponse200 = {
-  data: Playlist[]
-  status: 200
-}
-
-export type getOwnPlaylistsResponse401 = {
-  data: void
-  status: 401
-}
-
-export type getOwnPlaylistsResponseSuccess = (getOwnPlaylistsResponse200) & {
-  headers: Headers;
-};
-export type getOwnPlaylistsResponseError = (getOwnPlaylistsResponse401) & {
-  headers: Headers;
-};
-
-export type getOwnPlaylistsResponse = (getOwnPlaylistsResponseSuccess | getOwnPlaylistsResponseError)
-
-export const getGetOwnPlaylistsUrl = () => {
-
-
-
-
-  return `/playlists`
-}
-
-export const getOwnPlaylists = async ( options?: RequestInit): Promise<getOwnPlaylistsResponse> => {
-
-  return customFetch<getOwnPlaylistsResponse>(getGetOwnPlaylistsUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetOwnPlaylistsQueryKey = () => {
-    return [
-    `/playlists`
-    ] as const;
-    }
-
-
-export const getGetOwnPlaylistsQueryOptions = <TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetOwnPlaylistsQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOwnPlaylists>>> = ({ signal }) => getOwnPlaylists({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetOwnPlaylistsQueryResult = NonNullable<Awaited<ReturnType<typeof getOwnPlaylists>>>
-export type GetOwnPlaylistsQueryError = void
-
-
-export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getOwnPlaylists>>,
-          TError,
-          Awaited<ReturnType<typeof getOwnPlaylists>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getOwnPlaylists>>,
-          TError,
-          Awaited<ReturnType<typeof getOwnPlaylists>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetOwnPlaylistsQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type getPlaylistResponse200 = {
-  data: Playlist
-  status: 200
-}
-
-export type getPlaylistResponse401 = {
-  data: void
-  status: 401
-}
-
-export type getPlaylistResponse403 = {
-  data: void
-  status: 403
-}
-
-export type getPlaylistResponseSuccess = (getPlaylistResponse200) & {
-  headers: Headers;
-};
-export type getPlaylistResponseError = (getPlaylistResponse401 | getPlaylistResponse403) & {
-  headers: Headers;
-};
-
-export type getPlaylistResponse = (getPlaylistResponseSuccess | getPlaylistResponseError)
-
-export const getGetPlaylistUrl = (uuid: string,) => {
-
-
-
-
-  return `/playlists/${uuid}`
-}
-
-export const getPlaylist = async (uuid: string, options?: RequestInit): Promise<getPlaylistResponse> => {
-
-  return customFetch<getPlaylistResponse>(getGetPlaylistUrl(uuid),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetPlaylistQueryKey = (uuid: string,) => {
-    return [
-    `/playlists/${uuid}`
-    ] as const;
-    }
-
-
-export const getGetPlaylistQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetPlaylistQueryKey(uuid);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlaylist>>> = ({ signal }) => getPlaylist(uuid, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: uuid !== null && uuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetPlaylistQueryResult = NonNullable<Awaited<ReturnType<typeof getPlaylist>>>
-export type GetPlaylistQueryError = void
-
-
-export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
- uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getPlaylist>>,
-          TError,
-          Awaited<ReturnType<typeof getPlaylist>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getPlaylist>>,
-          TError,
-          Awaited<ReturnType<typeof getPlaylist>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetPlaylistQueryOptions(uuid,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type getPlaylistTracksResponse200 = {
-  data: PlaylistTrack[]
-  status: 200
-}
-
-export type getPlaylistTracksResponse401 = {
-  data: void
-  status: 401
-}
-
-export type getPlaylistTracksResponse403 = {
-  data: void
-  status: 403
-}
-
-export type getPlaylistTracksResponse404 = {
-  data: void
-  status: 404
-}
-
-export type getPlaylistTracksResponseSuccess = (getPlaylistTracksResponse200) & {
-  headers: Headers;
-};
-export type getPlaylistTracksResponseError = (getPlaylistTracksResponse401 | getPlaylistTracksResponse403 | getPlaylistTracksResponse404) & {
-  headers: Headers;
-};
-
-export type getPlaylistTracksResponse = (getPlaylistTracksResponseSuccess | getPlaylistTracksResponseError)
-
-export const getGetPlaylistTracksUrl = (uuid: string,) => {
-
-
-
-
-  return `/playlists/${uuid}`
-}
-
-export const getPlaylistTracks = async (uuid: string,
-    playlistTracksQuery: PlaylistTracksQuery, options?: RequestInit): Promise<getPlaylistTracksResponse> => {
-
-  return customFetch<getPlaylistTracksResponse>(getGetPlaylistTracksUrl(uuid),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(playlistTracksQuery)
-  }
-);}
-
-
-
-
-export const getGetPlaylistTracksMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPlaylistTracks>>, TError,{uuid: string;data: PlaylistTracksQuery}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof getPlaylistTracks>>, TError,{uuid: string;data: PlaylistTracksQuery}, TContext> => {
-
-const mutationKey = ['getPlaylistTracks'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getPlaylistTracks>>, {uuid: string;data: PlaylistTracksQuery}> = (props) => {
-          const {uuid,data} = props ?? {};
-
-          return  getPlaylistTracks(uuid,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type GetPlaylistTracksMutationResult = NonNullable<Awaited<ReturnType<typeof getPlaylistTracks>>>
-    export type GetPlaylistTracksMutationBody = PlaylistTracksQuery
-    export type GetPlaylistTracksMutationError = void
-
-    export const useGetPlaylistTracks = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPlaylistTracks>>, TError,{uuid: string;data: PlaylistTracksQuery}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof getPlaylistTracks>>,
-        TError,
-        {uuid: string;data: PlaylistTracksQuery},
-        TContext
-      > => {
-      return useMutation(getGetPlaylistTracksMutationOptions(options), queryClient);
-    }
-
-export type deletePlaylistResponse204 = {
-  data: void
-  status: 204
-}
-
-export type deletePlaylistResponse401 = {
-  data: void
-  status: 401
-}
-
-export type deletePlaylistResponse403 = {
-  data: void
-  status: 403
-}
-
-export type deletePlaylistResponse404 = {
-  data: void
-  status: 404
-}
-
-export type deletePlaylistResponseSuccess = (deletePlaylistResponse204) & {
-  headers: Headers;
-};
-export type deletePlaylistResponseError = (deletePlaylistResponse401 | deletePlaylistResponse403 | deletePlaylistResponse404) & {
-  headers: Headers;
-};
-
-export type deletePlaylistResponse = (deletePlaylistResponseSuccess | deletePlaylistResponseError)
-
-export const getDeletePlaylistUrl = (uuid: string,) => {
-
-
-
-
-  return `/playlists/${uuid}`
-}
-
-export const deletePlaylist = async (uuid: string, options?: RequestInit): Promise<deletePlaylistResponse> => {
-
-  return customFetch<deletePlaylistResponse>(getDeletePlaylistUrl(uuid),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
-
-
-
-export const getDeletePlaylistMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext> => {
-
-const mutationKey = ['deletePlaylist'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePlaylist>>, {uuid: string}> = (props) => {
-          const {uuid} = props ?? {};
-
-          return  deletePlaylist(uuid,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeletePlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof deletePlaylist>>>
-
-    export type DeletePlaylistMutationError = void
-
-    export const useDeletePlaylist = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deletePlaylist>>,
-        TError,
-        {uuid: string},
-        TContext
-      > => {
-      return useMutation(getDeletePlaylistMutationOptions(options), queryClient);
-    }
-
-export type getAllPlaylistTrackIdsResponse200 = {
-  data: PlaylistTrack[]
-  status: 200
-}
-
-export type getAllPlaylistTrackIdsResponse401 = {
-  data: void
-  status: 401
-}
-
-export type getAllPlaylistTrackIdsResponse403 = {
-  data: void
-  status: 403
-}
-
-export type getAllPlaylistTrackIdsResponse404 = {
-  data: void
-  status: 404
-}
-
-export type getAllPlaylistTrackIdsResponseSuccess = (getAllPlaylistTrackIdsResponse200) & {
-  headers: Headers;
-};
-export type getAllPlaylistTrackIdsResponseError = (getAllPlaylistTrackIdsResponse401 | getAllPlaylistTrackIdsResponse403 | getAllPlaylistTrackIdsResponse404) & {
-  headers: Headers;
-};
-
-export type getAllPlaylistTrackIdsResponse = (getAllPlaylistTrackIdsResponseSuccess | getAllPlaylistTrackIdsResponseError)
-
-export const getGetAllPlaylistTrackIdsUrl = (uuid: string,) => {
-
-
-
-
-  return `/playlists/${uuid}/all`
-}
-
-export const getAllPlaylistTrackIds = async (uuid: string, options?: RequestInit): Promise<getAllPlaylistTrackIdsResponse> => {
-
-  return customFetch<getAllPlaylistTrackIdsResponse>(getGetAllPlaylistTrackIdsUrl(uuid),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetAllPlaylistTrackIdsQueryKey = (uuid: string,) => {
-    return [
-    `/playlists/${uuid}/all`
-    ] as const;
-    }
-
-
-export const getGetAllPlaylistTrackIdsQueryOptions = <TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetAllPlaylistTrackIdsQueryKey(uuid);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>> = ({ signal }) => getAllPlaylistTrackIds(uuid, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: uuid !== null && uuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetAllPlaylistTrackIdsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>>
-export type GetAllPlaylistTrackIdsQueryError = void
-
-
-export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
- uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAllPlaylistTrackIds>>,
-          TError,
-          Awaited<ReturnType<typeof getAllPlaylistTrackIds>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAllPlaylistTrackIds>>,
-          TError,
-          Awaited<ReturnType<typeof getAllPlaylistTrackIds>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetAllPlaylistTrackIdsQueryOptions(uuid,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type addTracksToPlaylistResponse200 = {
-  data: Playlist
-  status: 200
-}
-
-export type addTracksToPlaylistResponse401 = {
-  data: void
-  status: 401
-}
-
-export type addTracksToPlaylistResponse403 = {
-  data: void
-  status: 403
-}
-
-export type addTracksToPlaylistResponse404 = {
-  data: void
-  status: 404
-}
-
-export type addTracksToPlaylistResponseSuccess = (addTracksToPlaylistResponse200) & {
-  headers: Headers;
-};
-export type addTracksToPlaylistResponseError = (addTracksToPlaylistResponse401 | addTracksToPlaylistResponse403 | addTracksToPlaylistResponse404) & {
-  headers: Headers;
-};
-
-export type addTracksToPlaylistResponse = (addTracksToPlaylistResponseSuccess | addTracksToPlaylistResponseError)
-
-export const getAddTracksToPlaylistUrl = (uuid: string,) => {
-
-
-
-
-  return `/playlists/${uuid}/add`
-}
-
-export const addTracksToPlaylist = async (uuid: string,
-    addPlaylistTracksDto: AddPlaylistTracksDto, options?: RequestInit): Promise<addTracksToPlaylistResponse> => {
-
-  return customFetch<addTracksToPlaylistResponse>(getAddTracksToPlaylistUrl(uuid),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(addPlaylistTracksDto)
-  }
-);}
-
-
-
-
-export const getAddTracksToPlaylistMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext> => {
-
-const mutationKey = ['addTracksToPlaylist'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addTracksToPlaylist>>, {uuid: string;data: AddPlaylistTracksDto}> = (props) => {
-          const {uuid,data} = props ?? {};
-
-          return  addTracksToPlaylist(uuid,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AddTracksToPlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof addTracksToPlaylist>>>
-    export type AddTracksToPlaylistMutationBody = AddPlaylistTracksDto
-    export type AddTracksToPlaylistMutationError = void
-
-    export const useAddTracksToPlaylist = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof addTracksToPlaylist>>,
-        TError,
-        {uuid: string;data: AddPlaylistTracksDto},
-        TContext
-      > => {
-      return useMutation(getAddTracksToPlaylistMutationOptions(options), queryClient);
-    }
-
-export type getPlaylistUpdateProgressResponse200 = {
-  data: TrackCreationSession[]
-  status: 200
-}
-
-export type getPlaylistUpdateProgressResponse401 = {
-  data: void
-  status: 401
-}
-
-export type getPlaylistUpdateProgressResponse403 = {
-  data: void
-  status: 403
-}
-
-export type getPlaylistUpdateProgressResponse404 = {
-  data: void
-  status: 404
-}
-
-export type getPlaylistUpdateProgressResponseSuccess = (getPlaylistUpdateProgressResponse200) & {
-  headers: Headers;
-};
-export type getPlaylistUpdateProgressResponseError = (getPlaylistUpdateProgressResponse401 | getPlaylistUpdateProgressResponse403 | getPlaylistUpdateProgressResponse404) & {
-  headers: Headers;
-};
-
-export type getPlaylistUpdateProgressResponse = (getPlaylistUpdateProgressResponseSuccess | getPlaylistUpdateProgressResponseError)
-
-export const getGetPlaylistUpdateProgressUrl = (uuid: string,) => {
-
-
-
-
-  return `/playlists/${uuid}/pending`
-}
-
-export const getPlaylistUpdateProgress = async (uuid: string, options?: RequestInit): Promise<getPlaylistUpdateProgressResponse> => {
-
-  return customFetch<getPlaylistUpdateProgressResponse>(getGetPlaylistUpdateProgressUrl(uuid),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetPlaylistUpdateProgressQueryKey = (uuid: string,) => {
-    return [
-    `/playlists/${uuid}/pending`
-    ] as const;
-    }
-
-
-export const getGetPlaylistUpdateProgressQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetPlaylistUpdateProgressQueryKey(uuid);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>> = ({ signal }) => getPlaylistUpdateProgress(uuid, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: uuid !== null && uuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetPlaylistUpdateProgressQueryResult = NonNullable<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>>
-export type GetPlaylistUpdateProgressQueryError = void
-
-
-export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
- uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>,
-          TError,
-          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>,
-          TError,
-          Awaited<ReturnType<typeof getPlaylistUpdateProgress>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetPlaylistUpdateProgressQueryOptions(uuid,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type addPlaylistSmartFilterGroupResponse204 = {
-  data: void
-  status: 204
-}
-
-export type addPlaylistSmartFilterGroupResponse401 = {
-  data: void
-  status: 401
-}
-
-export type addPlaylistSmartFilterGroupResponse403 = {
-  data: void
-  status: 403
-}
-
-export type addPlaylistSmartFilterGroupResponse404 = {
-  data: void
-  status: 404
-}
-
-export type addPlaylistSmartFilterGroupResponseSuccess = (addPlaylistSmartFilterGroupResponse204) & {
-  headers: Headers;
-};
-export type addPlaylistSmartFilterGroupResponseError = (addPlaylistSmartFilterGroupResponse401 | addPlaylistSmartFilterGroupResponse403 | addPlaylistSmartFilterGroupResponse404) & {
-  headers: Headers;
-};
-
-export type addPlaylistSmartFilterGroupResponse = (addPlaylistSmartFilterGroupResponseSuccess | addPlaylistSmartFilterGroupResponseError)
-
-export const getAddPlaylistSmartFilterGroupUrl = (uuid: string,) => {
-
-
-
-
-  return `/playlists/${uuid}/filters`
-}
-
-export const addPlaylistSmartFilterGroup = async (uuid: string,
-    createSmartFilterGroupDto: CreateSmartFilterGroupDto, options?: RequestInit): Promise<addPlaylistSmartFilterGroupResponse> => {
-
-  return customFetch<addPlaylistSmartFilterGroupResponse>(getAddPlaylistSmartFilterGroupUrl(uuid),
-  {
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createSmartFilterGroupDto)
-  }
-);}
-
-
-
-
-export const getAddPlaylistSmartFilterGroupMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext> => {
-
-const mutationKey = ['addPlaylistSmartFilterGroup'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, {uuid: string;data: CreateSmartFilterGroupDto}> = (props) => {
-          const {uuid,data} = props ?? {};
-
-          return  addPlaylistSmartFilterGroup(uuid,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AddPlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>>
-    export type AddPlaylistSmartFilterGroupMutationBody = CreateSmartFilterGroupDto
-    export type AddPlaylistSmartFilterGroupMutationError = void
-
-    export const useAddPlaylistSmartFilterGroup = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>,
-        TError,
-        {uuid: string;data: CreateSmartFilterGroupDto},
-        TContext
-      > => {
-      return useMutation(getAddPlaylistSmartFilterGroupMutationOptions(options), queryClient);
-    }
-
-export type runPlaylistSmartFiltersResponse204 = {
-  data: void
-  status: 204
-}
-
-export type runPlaylistSmartFiltersResponse401 = {
-  data: void
-  status: 401
-}
-
-export type runPlaylistSmartFiltersResponse403 = {
-  data: void
-  status: 403
-}
-
-export type runPlaylistSmartFiltersResponse404 = {
-  data: void
-  status: 404
-}
-
-export type runPlaylistSmartFiltersResponseSuccess = (runPlaylistSmartFiltersResponse204) & {
-  headers: Headers;
-};
-export type runPlaylistSmartFiltersResponseError = (runPlaylistSmartFiltersResponse401 | runPlaylistSmartFiltersResponse403 | runPlaylistSmartFiltersResponse404) & {
-  headers: Headers;
-};
-
-export type runPlaylistSmartFiltersResponse = (runPlaylistSmartFiltersResponseSuccess | runPlaylistSmartFiltersResponseError)
-
-export const getRunPlaylistSmartFiltersUrl = (uuid: string,) => {
-
-
-
-
-  return `/playlists/${uuid}/filters`
-}
-
-export const runPlaylistSmartFilters = async (uuid: string, options?: RequestInit): Promise<runPlaylistSmartFiltersResponse> => {
-
-  return customFetch<runPlaylistSmartFiltersResponse>(getRunPlaylistSmartFiltersUrl(uuid),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-
-
-export const getRunPlaylistSmartFiltersMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext> => {
-
-const mutationKey = ['runPlaylistSmartFilters'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, {uuid: string}> = (props) => {
-          const {uuid} = props ?? {};
-
-          return  runPlaylistSmartFilters(uuid,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type RunPlaylistSmartFiltersMutationResult = NonNullable<Awaited<ReturnType<typeof runPlaylistSmartFilters>>>
-
-    export type RunPlaylistSmartFiltersMutationError = void
-
-    export const useRunPlaylistSmartFilters = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof runPlaylistSmartFilters>>,
-        TError,
-        {uuid: string},
-        TContext
-      > => {
-      return useMutation(getRunPlaylistSmartFiltersMutationOptions(options), queryClient);
-    }
-
-export type updatePlaylistSmartFilterGroupResponse204 = {
-  data: void
-  status: 204
-}
-
-export type updatePlaylistSmartFilterGroupResponse401 = {
-  data: void
-  status: 401
-}
-
-export type updatePlaylistSmartFilterGroupResponse403 = {
-  data: void
-  status: 403
-}
-
-export type updatePlaylistSmartFilterGroupResponse404 = {
-  data: void
-  status: 404
-}
-
-export type updatePlaylistSmartFilterGroupResponseSuccess = (updatePlaylistSmartFilterGroupResponse204) & {
-  headers: Headers;
-};
-export type updatePlaylistSmartFilterGroupResponseError = (updatePlaylistSmartFilterGroupResponse401 | updatePlaylistSmartFilterGroupResponse403 | updatePlaylistSmartFilterGroupResponse404) & {
-  headers: Headers;
-};
-
-export type updatePlaylistSmartFilterGroupResponse = (updatePlaylistSmartFilterGroupResponseSuccess | updatePlaylistSmartFilterGroupResponseError)
-
-export const getUpdatePlaylistSmartFilterGroupUrl = (playlistUuid: string,
-    filterGroupUuid: string,) => {
-
-
-
-
-  return `/playlists/${playlistUuid}/filters/${filterGroupUuid}`
-}
-
-export const updatePlaylistSmartFilterGroup = async (playlistUuid: string,
-    filterGroupUuid: string,
-    createSmartFilterGroupDto: CreateSmartFilterGroupDto, options?: RequestInit): Promise<updatePlaylistSmartFilterGroupResponse> => {
-
-  return customFetch<updatePlaylistSmartFilterGroupResponse>(getUpdatePlaylistSmartFilterGroupUrl(playlistUuid,filterGroupUuid),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(createSmartFilterGroupDto)
-  }
-);}
-
-
-
-
-export const getUpdatePlaylistSmartFilterGroupMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext> => {
-
-const mutationKey = ['updatePlaylistSmartFilterGroup'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, {playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}> = (props) => {
-          const {playlistUuid,filterGroupUuid,data} = props ?? {};
-
-          return  updatePlaylistSmartFilterGroup(playlistUuid,filterGroupUuid,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdatePlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>>
-    export type UpdatePlaylistSmartFilterGroupMutationBody = CreateSmartFilterGroupDto
-    export type UpdatePlaylistSmartFilterGroupMutationError = void
-
-    export const useUpdatePlaylistSmartFilterGroup = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>,
-        TError,
-        {playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto},
-        TContext
-      > => {
-      return useMutation(getUpdatePlaylistSmartFilterGroupMutationOptions(options), queryClient);
-    }
-
-export type deletePlaylistSmartFilterGroupResponse204 = {
-  data: void
-  status: 204
-}
-
-export type deletePlaylistSmartFilterGroupResponse401 = {
-  data: void
-  status: 401
-}
-
-export type deletePlaylistSmartFilterGroupResponse403 = {
-  data: void
-  status: 403
-}
-
-export type deletePlaylistSmartFilterGroupResponse404 = {
-  data: void
-  status: 404
-}
-
-export type deletePlaylistSmartFilterGroupResponseSuccess = (deletePlaylistSmartFilterGroupResponse204) & {
-  headers: Headers;
-};
-export type deletePlaylistSmartFilterGroupResponseError = (deletePlaylistSmartFilterGroupResponse401 | deletePlaylistSmartFilterGroupResponse403 | deletePlaylistSmartFilterGroupResponse404) & {
-  headers: Headers;
-};
-
-export type deletePlaylistSmartFilterGroupResponse = (deletePlaylistSmartFilterGroupResponseSuccess | deletePlaylistSmartFilterGroupResponseError)
-
-export const getDeletePlaylistSmartFilterGroupUrl = (playlistUuid: string,
-    filterGroupUuid: string,) => {
-
-
-
-
-  return `/playlists/${playlistUuid}/filters/${filterGroupUuid}`
-}
-
-export const deletePlaylistSmartFilterGroup = async (playlistUuid: string,
-    filterGroupUuid: string, options?: RequestInit): Promise<deletePlaylistSmartFilterGroupResponse> => {
-
-  return customFetch<deletePlaylistSmartFilterGroupResponse>(getDeletePlaylistSmartFilterGroupUrl(playlistUuid,filterGroupUuid),
-  {
-    ...options,
-    method: 'DELETE'
-
-
-  }
-);}
-
-
-
-
-export const getDeletePlaylistSmartFilterGroupMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext> => {
-
-const mutationKey = ['deletePlaylistSmartFilterGroup'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, {playlistUuid: string;filterGroupUuid: string}> = (props) => {
-          const {playlistUuid,filterGroupUuid} = props ?? {};
-
-          return  deletePlaylistSmartFilterGroup(playlistUuid,filterGroupUuid,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type DeletePlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>>
-
-    export type DeletePlaylistSmartFilterGroupMutationError = void
-
-    export const useDeletePlaylistSmartFilterGroup = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>,
-        TError,
-        {playlistUuid: string;filterGroupUuid: string},
-        TContext
-      > => {
-      return useMutation(getDeletePlaylistSmartFilterGroupMutationOptions(options), queryClient);
     }
 
