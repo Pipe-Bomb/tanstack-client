@@ -24,7 +24,6 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AddPlaylistTracksDto,
   Album,
   AlbumEphemeralContent,
   AlbumsSearchDto,
@@ -37,6 +36,7 @@ import type {
   ArtistsSearchResponse,
   AttributeSource,
   AttributeSourceOrderDto,
+  AttributeUploadSessionResponse,
   CreatePlaylistDto,
   CreateSmartFilterGroupDto,
   EphemeralSearchDto,
@@ -65,6 +65,8 @@ import type {
   Track,
   TrackCreationSession,
   TrackIdsDto,
+  UpdatePlaylistAttributesDto,
+  UpdatePlaylistTracksDto,
   UploadAttributeBufferBody,
   User
 } from './model';
@@ -3600,63 +3602,63 @@ export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getA
 
 
 
-export type addTracksToPlaylistResponse200 = {
+export type updatePlaylistTracksResponse200 = {
   data: Playlist
   status: 200
 }
 
-export type addTracksToPlaylistResponse401 = {
+export type updatePlaylistTracksResponse401 = {
   data: void
   status: 401
 }
 
-export type addTracksToPlaylistResponse403 = {
+export type updatePlaylistTracksResponse403 = {
   data: void
   status: 403
 }
 
-export type addTracksToPlaylistResponse404 = {
+export type updatePlaylistTracksResponse404 = {
   data: void
   status: 404
 }
 
-export type addTracksToPlaylistResponseSuccess = (addTracksToPlaylistResponse200) & {
+export type updatePlaylistTracksResponseSuccess = (updatePlaylistTracksResponse200) & {
   headers: Headers;
 };
-export type addTracksToPlaylistResponseError = (addTracksToPlaylistResponse401 | addTracksToPlaylistResponse403 | addTracksToPlaylistResponse404) & {
+export type updatePlaylistTracksResponseError = (updatePlaylistTracksResponse401 | updatePlaylistTracksResponse403 | updatePlaylistTracksResponse404) & {
   headers: Headers;
 };
 
-export type addTracksToPlaylistResponse = (addTracksToPlaylistResponseSuccess | addTracksToPlaylistResponseError)
+export type updatePlaylistTracksResponse = (updatePlaylistTracksResponseSuccess | updatePlaylistTracksResponseError)
 
-export const getAddTracksToPlaylistUrl = (uuid: string,) => {
-
-
+export const getUpdatePlaylistTracksUrl = (uuid: string,) => {
 
 
-  return `/playlists/${uuid}/add`
+
+
+  return `/playlists/${uuid}/tracks`
 }
 
-export const addTracksToPlaylist = async (uuid: string,
-    addPlaylistTracksDto: AddPlaylistTracksDto, options?: RequestInit): Promise<addTracksToPlaylistResponse> => {
+export const updatePlaylistTracks = async (uuid: string,
+    updatePlaylistTracksDto: UpdatePlaylistTracksDto, options?: RequestInit): Promise<updatePlaylistTracksResponse> => {
 
-  return customFetch<addTracksToPlaylistResponse>(getAddTracksToPlaylistUrl(uuid),
+  return customFetch<updatePlaylistTracksResponse>(getUpdatePlaylistTracksUrl(uuid),
   {
     ...options,
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(addPlaylistTracksDto)
+    body: JSON.stringify(updatePlaylistTracksDto)
   }
 );}
 
 
 
 
-export const getAddTracksToPlaylistMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext> => {
+export const getUpdatePlaylistTracksMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistTracks>>, TError,{uuid: string;data: UpdatePlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistTracks>>, TError,{uuid: string;data: UpdatePlaylistTracksDto}, TContext> => {
 
-const mutationKey = ['addTracksToPlaylist'];
+const mutationKey = ['updatePlaylistTracks'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -3666,10 +3668,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addTracksToPlaylist>>, {uuid: string;data: AddPlaylistTracksDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePlaylistTracks>>, {uuid: string;data: UpdatePlaylistTracksDto}> = (props) => {
           const {uuid,data} = props ?? {};
 
-          return  addTracksToPlaylist(uuid,data,requestOptions)
+          return  updatePlaylistTracks(uuid,data,requestOptions)
         }
 
 
@@ -3679,19 +3681,113 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type AddTracksToPlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof addTracksToPlaylist>>>
-    export type AddTracksToPlaylistMutationBody = AddPlaylistTracksDto
-    export type AddTracksToPlaylistMutationError = void
+    export type UpdatePlaylistTracksMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlaylistTracks>>>
+    export type UpdatePlaylistTracksMutationBody = UpdatePlaylistTracksDto
+    export type UpdatePlaylistTracksMutationError = void
 
-    export const useAddTracksToPlaylist = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addTracksToPlaylist>>, TError,{uuid: string;data: AddPlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+    export const useUpdatePlaylistTracks = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistTracks>>, TError,{uuid: string;data: UpdatePlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof addTracksToPlaylist>>,
+        Awaited<ReturnType<typeof updatePlaylistTracks>>,
         TError,
-        {uuid: string;data: AddPlaylistTracksDto},
+        {uuid: string;data: UpdatePlaylistTracksDto},
         TContext
       > => {
-      return useMutation(getAddTracksToPlaylistMutationOptions(options), queryClient);
+      return useMutation(getUpdatePlaylistTracksMutationOptions(options), queryClient);
+    }
+
+export type updatePlaylistAttributesResponse200 = {
+  data: AttributeUploadSessionResponse[]
+  status: 200
+}
+
+export type updatePlaylistAttributesResponse401 = {
+  data: void
+  status: 401
+}
+
+export type updatePlaylistAttributesResponse403 = {
+  data: void
+  status: 403
+}
+
+export type updatePlaylistAttributesResponse404 = {
+  data: void
+  status: 404
+}
+
+export type updatePlaylistAttributesResponseSuccess = (updatePlaylistAttributesResponse200) & {
+  headers: Headers;
+};
+export type updatePlaylistAttributesResponseError = (updatePlaylistAttributesResponse401 | updatePlaylistAttributesResponse403 | updatePlaylistAttributesResponse404) & {
+  headers: Headers;
+};
+
+export type updatePlaylistAttributesResponse = (updatePlaylistAttributesResponseSuccess | updatePlaylistAttributesResponseError)
+
+export const getUpdatePlaylistAttributesUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/attributes`
+}
+
+export const updatePlaylistAttributes = async (uuid: string,
+    updatePlaylistAttributesDto: UpdatePlaylistAttributesDto, options?: RequestInit): Promise<updatePlaylistAttributesResponse> => {
+
+  return customFetch<updatePlaylistAttributesResponse>(getUpdatePlaylistAttributesUrl(uuid),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updatePlaylistAttributesDto)
+  }
+);}
+
+
+
+
+export const getUpdatePlaylistAttributesMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistAttributes>>, TError,{uuid: string;data: UpdatePlaylistAttributesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistAttributes>>, TError,{uuid: string;data: UpdatePlaylistAttributesDto}, TContext> => {
+
+const mutationKey = ['updatePlaylistAttributes'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePlaylistAttributes>>, {uuid: string;data: UpdatePlaylistAttributesDto}> = (props) => {
+          const {uuid,data} = props ?? {};
+
+          return  updatePlaylistAttributes(uuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdatePlaylistAttributesMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlaylistAttributes>>>
+    export type UpdatePlaylistAttributesMutationBody = UpdatePlaylistAttributesDto
+    export type UpdatePlaylistAttributesMutationError = void
+
+    export const useUpdatePlaylistAttributes = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistAttributes>>, TError,{uuid: string;data: UpdatePlaylistAttributesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updatePlaylistAttributes>>,
+        TError,
+        {uuid: string;data: UpdatePlaylistAttributesDto},
+        TContext
+      > => {
+      return useMutation(getUpdatePlaylistAttributesMutationOptions(options), queryClient);
     }
 
 export type getPlaylistUpdateProgressResponse200 = {

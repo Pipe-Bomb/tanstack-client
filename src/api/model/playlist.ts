@@ -13,6 +13,8 @@ export interface Playlist {
   uuid: string;
   ownerUuid: string;
   owner: User | null;
+  dateCreated: Date;
+  dateModified: Date;
   attributes: AttributeMap | null;
   filterGroups: SmartPlaylistFilterGroup[] | null;
   tracks: PlaylistTrack[] | null;
