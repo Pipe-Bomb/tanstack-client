@@ -24,7 +24,7 @@ export async function customFetch<T extends ResponseSuccess>(
 	const fullUrl = new URL(baseUrl + url);
 
 	const finalHeaders = new Headers(headers);
-	if (!finalHeaders.has("Content-Type")) {
+	if (!finalHeaders.has("Content-Type") && !(body instanceof FormData)) {
 		finalHeaders.set("Content-Type", "application/json");
 	}
 
