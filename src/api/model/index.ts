@@ -133,3 +133,5 @@ export * from './updatePlaylistAttributesDto';
 export * from './updatePlaylistTracksDto';
 export * from './uploadAttributeBufferBody';
 export * from './user';
+export * from './userConfigs';
+export * from './userConfigStub';
