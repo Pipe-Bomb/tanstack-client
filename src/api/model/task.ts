@@ -10,6 +10,7 @@ export interface Task {
   uuid: string;
   pluginId: string | null;
   taskId: string;
+  subTasks: string[] | null;
   status: TaskStatus;
   /**
      * @minimum 0

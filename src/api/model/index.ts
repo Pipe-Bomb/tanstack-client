@@ -109,6 +109,7 @@ export * from './searchResults';
 export * from './sectionConfigNode';
 export * from './sectionConfigNodeType';
 export * from './smartPlaylistFilterGroup';
+export * from './startTaskDto';
 export * from './streamInstance';
 export * from './streamInstanceType';
 export * from './stringAttribute';

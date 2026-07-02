@@ -61,6 +61,7 @@ import type {
   PluginLibrary,
   SearchDto,
   SearchResults,
+  StartTaskDto,
   StreamInstance,
   Track,
   TrackCreationSession,
@@ -738,14 +739,15 @@ export const getStartTaskUrl = (taskUuid: string,) => {
   return `/tasks/${taskUuid}/start`
 }
 
-export const startTask = async (taskUuid: string, options?: RequestInit): Promise<startTaskResponse> => {
+export const startTask = async (taskUuid: string,
+    startTaskDto: StartTaskDto, options?: RequestInit): Promise<startTaskResponse> => {
 
   return customFetch<startTaskResponse>(getStartTaskUrl(taskUuid),
   {
     ...options,
-    method: 'POST'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(startTaskDto)
   }
 );}
 
@@ -753,8 +755,8 @@ export const startTask = async (taskUuid: string, options?: RequestInit): Promis
 
 
 export const getStartTaskMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string}, TContext> => {
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext> => {
 
 const mutationKey = ['startTask'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
@@ -766,10 +768,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startTask>>, {taskUuid: string}> = (props) => {
-          const {taskUuid} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startTask>>, {taskUuid: string;data: StartTaskDto}> = (props) => {
+          const {taskUuid,data} = props ?? {};
 
-          return  startTask(taskUuid,requestOptions)
+          return  startTask(taskUuid,data,requestOptions)
         }
 
 
@@ -780,15 +782,15 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
   return  { mutationFn, ...mutationOptions }}
 
     export type StartTaskMutationResult = NonNullable<Awaited<ReturnType<typeof startTask>>>
-
+    export type StartTaskMutationBody = StartTaskDto
     export type StartTaskMutationError = void
 
     export const useStartTask = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof startTask>>,
         TError,
-        {taskUuid: string},
+        {taskUuid: string;data: StartTaskDto},
         TContext
       > => {
       return useMutation(getStartTaskMutationOptions(options), queryClient);
