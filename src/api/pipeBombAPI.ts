@@ -55,6 +55,7 @@ import type {
   Playlist,
   PlaylistTrack,
   PlaylistTracksQuery,
+  PlaylistVisibilityDto,
   PluginConfig,
   PluginConfigUpdateDto,
   PluginConfigs,
@@ -4118,6 +4119,83 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getUpdatePlaylistAttributesMutationOptions(options), queryClient);
     }
 
+export type updatePlaylistVisibilityResponse200 = {
+  data: Playlist
+  status: 200
+}
+
+export type updatePlaylistVisibilityResponseSuccess = (updatePlaylistVisibilityResponse200) & {
+  headers: Headers;
+};
+;
+
+export type updatePlaylistVisibilityResponse = (updatePlaylistVisibilityResponseSuccess)
+
+export const getUpdatePlaylistVisibilityUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/visibility`
+}
+
+export const updatePlaylistVisibility = async (uuid: string,
+    playlistVisibilityDto: PlaylistVisibilityDto, options?: RequestInit): Promise<updatePlaylistVisibilityResponse> => {
+
+  return customFetch<updatePlaylistVisibilityResponse>(getUpdatePlaylistVisibilityUrl(uuid),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(playlistVisibilityDto)
+  }
+);}
+
+
+
+
+export const getUpdatePlaylistVisibilityMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistVisibility>>, TError,{uuid: string;data: PlaylistVisibilityDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistVisibility>>, TError,{uuid: string;data: PlaylistVisibilityDto}, TContext> => {
+
+const mutationKey = ['updatePlaylistVisibility'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePlaylistVisibility>>, {uuid: string;data: PlaylistVisibilityDto}> = (props) => {
+          const {uuid,data} = props ?? {};
+
+          return  updatePlaylistVisibility(uuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdatePlaylistVisibilityMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlaylistVisibility>>>
+    export type UpdatePlaylistVisibilityMutationBody = PlaylistVisibilityDto
+    export type UpdatePlaylistVisibilityMutationError = unknown
+
+    export const useUpdatePlaylistVisibility = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistVisibility>>, TError,{uuid: string;data: PlaylistVisibilityDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updatePlaylistVisibility>>,
+        TError,
+        {uuid: string;data: PlaylistVisibilityDto},
+        TContext
+      > => {
+      return useMutation(getUpdatePlaylistVisibilityMutationOptions(options), queryClient);
+    }
+
 export type getPlaylistUpdateProgressResponse200 = {
   data: TrackCreationSession[]
   status: 200
@@ -4961,6 +5039,16 @@ export type createTrackAudioSessionResponse200 = {
   status: 200
 }
 
+export type createTrackAudioSessionResponse401 = {
+  data: void
+  status: 401
+}
+
+export type createTrackAudioSessionResponse403 = {
+  data: void
+  status: 403
+}
+
 export type createTrackAudioSessionResponse404 = {
   data: void
   status: 404
@@ -4969,7 +5057,7 @@ export type createTrackAudioSessionResponse404 = {
 export type createTrackAudioSessionResponseSuccess = (createTrackAudioSessionResponse200) & {
   headers: Headers;
 };
-export type createTrackAudioSessionResponseError = (createTrackAudioSessionResponse404) & {
+export type createTrackAudioSessionResponseError = (createTrackAudioSessionResponse401 | createTrackAudioSessionResponse403 | createTrackAudioSessionResponse404) & {
   headers: Headers;
 };
 

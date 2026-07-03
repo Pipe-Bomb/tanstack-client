@@ -96,6 +96,8 @@ export * from './orderedAttributeSourceDto';
 export * from './playlist';
 export * from './playlistTrack';
 export * from './playlistTracksQuery';
+export * from './playlistVisibility';
+export * from './playlistVisibilityDto';
 export * from './pluginConfig';
 export * from './pluginConfigs';
 export * from './pluginConfigStub';
