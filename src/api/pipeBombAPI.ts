@@ -46,6 +46,7 @@ import type {
   ExternalUrl,
   GetAttributeBufferParams,
   GetParams,
+  GetPlaylistParams,
   Identifier,
   Identity,
   LanguageMap,
@@ -3525,17 +3526,26 @@ export type getPlaylistResponseError = (getPlaylistResponse401 | getPlaylistResp
 
 export type getPlaylistResponse = (getPlaylistResponseSuccess | getPlaylistResponseError)
 
-export const getGetPlaylistUrl = (uuid: string,) => {
+export const getGetPlaylistUrl = (uuid: string,
+    params?: GetPlaylistParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/playlists/${uuid}`
+  return stringifiedParams.length > 0 ? `/playlists/${uuid}?${stringifiedParams}` : `/playlists/${uuid}`
 }
 
-export const getPlaylist = async (uuid: string, options?: RequestInit): Promise<getPlaylistResponse> => {
+export const getPlaylist = async (uuid: string,
+    params?: GetPlaylistParams, options?: RequestInit): Promise<getPlaylistResponse> => {
 
-  return customFetch<getPlaylistResponse>(getGetPlaylistUrl(uuid),
+  return customFetch<getPlaylistResponse>(getGetPlaylistUrl(uuid,params),
   {
     ...options,
     method: 'GET'
@@ -3548,23 +3558,25 @@ export const getPlaylist = async (uuid: string, options?: RequestInit): Promise<
 
 
 
-export const getGetPlaylistQueryKey = (uuid: string,) => {
+export const getGetPlaylistQueryKey = (uuid: string,
+    params?: GetPlaylistParams,) => {
     return [
-    `/playlists/${uuid}`
+    `/playlists/${uuid}`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetPlaylistQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetPlaylistQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(uuid: string,
+    params?: GetPlaylistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetPlaylistQueryKey(uuid);
+  const queryKey =  queryOptions?.queryKey ?? getGetPlaylistQueryKey(uuid,params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlaylist>>> = ({ signal }) => getPlaylist(uuid, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlaylist>>> = ({ signal }) => getPlaylist(uuid,params, { signal, ...requestOptions });
 
 
 
@@ -3578,7 +3590,8 @@ export type GetPlaylistQueryError = void
 
 
 export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
- uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
+ uuid: string,
+    params: undefined |  GetPlaylistParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getPlaylist>>,
           TError,
@@ -3588,7 +3601,8 @@ export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, 
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
+ uuid: string,
+    params?: GetPlaylistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getPlaylist>>,
           TError,
@@ -3598,16 +3612,18 @@ export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, 
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ uuid: string,
+    params?: GetPlaylistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
 export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
- uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ uuid: string,
+    params?: GetPlaylistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetPlaylistQueryOptions(uuid,options)
+  const queryOptions = getGetPlaylistQueryOptions(uuid,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
