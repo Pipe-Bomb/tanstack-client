@@ -24,6 +24,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AddWorkflowStepDto,
   Album,
   AlbumEphemeralContent,
   AlbumsSearchDto,
@@ -39,6 +40,7 @@ import type {
   AttributeUploadSessionResponse,
   CreatePlaylistDto,
   CreateSmartFilterGroupDto,
+  CreateWorkflowDto,
   EphemeralSearchDto,
   EphemeralSearchResults,
   EphemeralSource,
@@ -70,9 +72,12 @@ import type {
   TrackIdsDto,
   UpdatePlaylistAttributesDto,
   UpdatePlaylistTracksDto,
+  UpdateWorkflowStepOptionsDto,
   UploadAttributeBufferBody,
   User,
-  UserConfigs
+  UserConfigs,
+  Workflow,
+  WorkflowStepDefinition
 } from './model';
 
 import { customFetch } from '../api-client';
@@ -798,31 +803,41 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getStartTaskMutationOptions(options), queryClient);
     }
 
-export type getIconResponse200 = {
+export type getAllWorkflowsResponse200 = {
+  data: Workflow[]
+  status: 200
+}
+
+export type getAllWorkflowsResponse401 = {
   data: void
-  status: 200
+  status: 401
 }
 
-export type getIconResponseSuccess = (getIconResponse200) & {
+export type getAllWorkflowsResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getAllWorkflowsResponseSuccess = (getAllWorkflowsResponse200) & {
   headers: Headers;
 };
-;
+export type getAllWorkflowsResponseError = (getAllWorkflowsResponse401 | getAllWorkflowsResponse403) & {
+  headers: Headers;
+};
 
-export type getIconResponse = (getIconResponseSuccess)
+export type getAllWorkflowsResponse = (getAllWorkflowsResponseSuccess | getAllWorkflowsResponseError)
 
-export const getGetIconUrl = (pluginId: string,
-    iconId: string,) => {
-
+export const getGetAllWorkflowsUrl = () => {
 
 
 
-  return `/icons/${pluginId}/${iconId}`
+
+  return `/workflows`
 }
 
-export const getIcon = async (pluginId: string,
-    iconId: string, options?: RequestInit): Promise<getIconResponse> => {
+export const getAllWorkflows = async ( options?: RequestInit): Promise<getAllWorkflowsResponse> => {
 
-  return customFetch<getIconResponse>(getGetIconUrl(pluginId,iconId),
+  return customFetch<getAllWorkflowsResponse>(getGetAllWorkflowsUrl(),
   {
     ...options,
     method: 'GET'
@@ -835,72 +850,66 @@ export const getIcon = async (pluginId: string,
 
 
 
-export const getGetIconQueryKey = (pluginId: string,
-    iconId: string,) => {
+export const getGetAllWorkflowsQueryKey = () => {
     return [
-    `/icons/${pluginId}/${iconId}`
+    `/workflows`
     ] as const;
     }
 
 
-export const getGetIconQueryOptions = <TData = Awaited<ReturnType<typeof getIcon>>, TError = unknown>(pluginId: string,
-    iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllWorkflowsQueryOptions = <TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetIconQueryKey(pluginId,iconId);
+  const queryKey =  queryOptions?.queryKey ?? getGetAllWorkflowsQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIcon>>> = ({ signal }) => getIcon(pluginId,iconId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllWorkflows>>> = ({ signal }) => getAllWorkflows({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && iconId !== null && iconId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetIconQueryResult = NonNullable<Awaited<ReturnType<typeof getIcon>>>
-export type GetIconQueryError = unknown
+export type GetAllWorkflowsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllWorkflows>>>
+export type GetAllWorkflowsQueryError = void
 
 
-export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = unknown>(
- pluginId: string,
-    iconId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>> & Pick<
+export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = void>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getIcon>>,
+          Awaited<ReturnType<typeof getAllWorkflows>>,
           TError,
-          Awaited<ReturnType<typeof getIcon>>
+          Awaited<ReturnType<typeof getAllWorkflows>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = unknown>(
- pluginId: string,
-    iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>> & Pick<
+export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getIcon>>,
+          Awaited<ReturnType<typeof getAllWorkflows>>,
           TError,
-          Awaited<ReturnType<typeof getIcon>>
+          Awaited<ReturnType<typeof getAllWorkflows>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = unknown>(
- pluginId: string,
-    iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = unknown>(
- pluginId: string,
-    iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetIconQueryOptions(pluginId,iconId,options)
+  const queryOptions = getGetAllWorkflowsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -913,152 +922,57 @@ export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError =
 
 
 
-export type getAllAttributeSourcesResponse200 = {
-  data: AttributeSource[]
+export type createWorkflowResponse200 = {
+  data: Workflow
   status: 200
 }
 
-export type getAllAttributeSourcesResponseSuccess = (getAllAttributeSourcesResponse200) & {
+export type createWorkflowResponse401 = {
+  data: void
+  status: 401
+}
+
+export type createWorkflowResponse403 = {
+  data: void
+  status: 403
+}
+
+export type createWorkflowResponseSuccess = (createWorkflowResponse200) & {
   headers: Headers;
 };
-;
-
-export type getAllAttributeSourcesResponse = (getAllAttributeSourcesResponseSuccess)
-
-export const getGetAllAttributeSourcesUrl = () => {
-
-
-
-
-  return `/attribute-sources`
-}
-
-export const getAllAttributeSources = async ( options?: RequestInit): Promise<getAllAttributeSourcesResponse> => {
-
-  return customFetch<getAllAttributeSourcesResponse>(getGetAllAttributeSourcesUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetAllAttributeSourcesQueryKey = () => {
-    return [
-    `/attribute-sources`
-    ] as const;
-    }
-
-
-export const getGetAllAttributeSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetAllAttributeSourcesQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllAttributeSources>>> = ({ signal }) => getAllAttributeSources({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetAllAttributeSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllAttributeSources>>>
-export type GetAllAttributeSourcesQueryError = unknown
-
-
-export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAllAttributeSources>>,
-          TError,
-          Awaited<ReturnType<typeof getAllAttributeSources>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAllAttributeSources>>,
-          TError,
-          Awaited<ReturnType<typeof getAllAttributeSources>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetAllAttributeSourcesQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type setAttributeSourceOrderResponse200 = {
-  data: AttributeSource[]
-  status: 200
-}
-
-export type setAttributeSourceOrderResponseSuccess = (setAttributeSourceOrderResponse200) & {
+export type createWorkflowResponseError = (createWorkflowResponse401 | createWorkflowResponse403) & {
   headers: Headers;
 };
-;
 
-export type setAttributeSourceOrderResponse = (setAttributeSourceOrderResponseSuccess)
+export type createWorkflowResponse = (createWorkflowResponseSuccess | createWorkflowResponseError)
 
-export const getSetAttributeSourceOrderUrl = () => {
-
+export const getCreateWorkflowUrl = () => {
 
 
 
-  return `/attribute-sources/order`
+
+  return `/workflows`
 }
 
-export const setAttributeSourceOrder = async (attributeSourceOrderDto: AttributeSourceOrderDto, options?: RequestInit): Promise<setAttributeSourceOrderResponse> => {
+export const createWorkflow = async (createWorkflowDto: CreateWorkflowDto, options?: RequestInit): Promise<createWorkflowResponse> => {
 
-  return customFetch<setAttributeSourceOrderResponse>(getSetAttributeSourceOrderUrl(),
+  return customFetch<createWorkflowResponse>(getCreateWorkflowUrl(),
   {
     ...options,
-    method: 'POST',
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(attributeSourceOrderDto)
+    body: JSON.stringify(createWorkflowDto)
   }
 );}
 
 
 
 
-export const getSetAttributeSourceOrderMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setAttributeSourceOrder>>, TError,{data: AttributeSourceOrderDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof setAttributeSourceOrder>>, TError,{data: AttributeSourceOrderDto}, TContext> => {
+export const getCreateWorkflowMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{data: CreateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{data: CreateWorkflowDto}, TContext> => {
 
-const mutationKey = ['setAttributeSourceOrder'];
+const mutationKey = ['createWorkflow'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -1068,10 +982,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setAttributeSourceOrder>>, {data: AttributeSourceOrderDto}> = (props) => {
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createWorkflow>>, {data: CreateWorkflowDto}> = (props) => {
           const {data} = props ?? {};
 
-          return  setAttributeSourceOrder(data,requestOptions)
+          return  createWorkflow(data,requestOptions)
         }
 
 
@@ -1081,55 +995,61 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type SetAttributeSourceOrderMutationResult = NonNullable<Awaited<ReturnType<typeof setAttributeSourceOrder>>>
-    export type SetAttributeSourceOrderMutationBody = AttributeSourceOrderDto
-    export type SetAttributeSourceOrderMutationError = unknown
+    export type CreateWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof createWorkflow>>>
+    export type CreateWorkflowMutationBody = CreateWorkflowDto
+    export type CreateWorkflowMutationError = void
 
-    export const useSetAttributeSourceOrder = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setAttributeSourceOrder>>, TError,{data: AttributeSourceOrderDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+    export const useCreateWorkflow = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{data: CreateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof setAttributeSourceOrder>>,
+        Awaited<ReturnType<typeof createWorkflow>>,
         TError,
-        {data: AttributeSourceOrderDto},
+        {data: CreateWorkflowDto},
         TContext
       > => {
-      return useMutation(getSetAttributeSourceOrderMutationOptions(options), queryClient);
+      return useMutation(getCreateWorkflowMutationOptions(options), queryClient);
     }
 
-export type getResponse200 = {
-  data: void
+export type getWorkflowResponse200 = {
+  data: Workflow
   status: 200
 }
 
-export type getResponseSuccess = (getResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getResponse = (getResponseSuccess)
-
-export const getGetUrl = (dir: string,
-    file: string,
-    params?: GetParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : value.toString())
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/resources/${dir}/${file}?${stringifiedParams}` : `/resources/${dir}/${file}`
+export type getWorkflowResponse401 = {
+  data: void
+  status: 401
 }
 
-export const get = async (dir: string,
-    file: string,
-    params?: GetParams, options?: RequestInit): Promise<getResponse> => {
+export type getWorkflowResponse403 = {
+  data: void
+  status: 403
+}
 
-  return customFetch<getResponse>(getGetUrl(dir,file,params),
+export type getWorkflowResponse404 = {
+  data: void
+  status: 404
+}
+
+export type getWorkflowResponseSuccess = (getWorkflowResponse200) & {
+  headers: Headers;
+};
+export type getWorkflowResponseError = (getWorkflowResponse401 | getWorkflowResponse403 | getWorkflowResponse404) & {
+  headers: Headers;
+};
+
+export type getWorkflowResponse = (getWorkflowResponseSuccess | getWorkflowResponseError)
+
+export const getGetWorkflowUrl = (uuid: string,) => {
+
+
+
+
+  return `/workflows/${uuid}`
+}
+
+export const getWorkflow = async (uuid: string, options?: RequestInit): Promise<getWorkflowResponse> => {
+
+  return customFetch<getWorkflowResponse>(getGetWorkflowUrl(uuid),
   {
     ...options,
     method: 'GET'
@@ -1142,78 +1062,786 @@ export const get = async (dir: string,
 
 
 
-export const getGetQueryKey = (dir: string,
-    file: string,
-    params?: GetParams,) => {
+export const getGetWorkflowQueryKey = (uuid: string,) => {
     return [
-    `/resources/${dir}/${file}`, ...(params ? [params] : [])
+    `/workflows/${uuid}`
     ] as const;
     }
 
 
-export const getGetQueryOptions = <TData = Awaited<ReturnType<typeof get>>, TError = unknown>(dir: string,
-    file: string,
-    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetWorkflowQueryOptions = <TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetQueryKey(dir,file,params);
+  const queryKey =  queryOptions?.queryKey ?? getGetWorkflowQueryKey(uuid);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof get>>> = ({ signal }) => get(dir,file,params, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWorkflow>>> = ({ signal }) => getWorkflow(uuid, { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: dir !== null && dir !== undefined && file !== null && file !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: uuid !== null && uuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetQueryResult = NonNullable<Awaited<ReturnType<typeof get>>>
-export type GetQueryError = unknown
+export type GetWorkflowQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkflow>>>
+export type GetWorkflowQueryError = void
 
 
-export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
- dir: string,
-    file: string,
-    params: undefined |  GetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>> & Pick<
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof get>>,
+          Awaited<ReturnType<typeof getWorkflow>>,
           TError,
-          Awaited<ReturnType<typeof get>>
+          Awaited<ReturnType<typeof getWorkflow>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
- dir: string,
-    file: string,
-    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>> & Pick<
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof get>>,
+          Awaited<ReturnType<typeof getWorkflow>>,
           TError,
-          Awaited<ReturnType<typeof get>>
+          Awaited<ReturnType<typeof getWorkflow>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
- dir: string,
-    file: string,
-    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
- dir: string,
-    file: string,
-    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetQueryOptions(dir,file,params,options)
+  const queryOptions = getGetWorkflowQueryOptions(uuid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type deleteWorkflowResponse204 = {
+  data: void
+  status: 204
+}
+
+export type deleteWorkflowResponse401 = {
+  data: void
+  status: 401
+}
+
+export type deleteWorkflowResponse403 = {
+  data: void
+  status: 403
+}
+
+export type deleteWorkflowResponse404 = {
+  data: void
+  status: 404
+}
+
+export type deleteWorkflowResponseSuccess = (deleteWorkflowResponse204) & {
+  headers: Headers;
+};
+export type deleteWorkflowResponseError = (deleteWorkflowResponse401 | deleteWorkflowResponse403 | deleteWorkflowResponse404) & {
+  headers: Headers;
+};
+
+export type deleteWorkflowResponse = (deleteWorkflowResponseSuccess | deleteWorkflowResponseError)
+
+export const getDeleteWorkflowUrl = (uuid: string,) => {
+
+
+
+
+  return `/workflows/${uuid}`
+}
+
+export const deleteWorkflow = async (uuid: string, options?: RequestInit): Promise<deleteWorkflowResponse> => {
+
+  return customFetch<deleteWorkflowResponse>(getDeleteWorkflowUrl(uuid),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteWorkflowMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{uuid: string}, TContext> => {
+
+const mutationKey = ['deleteWorkflow'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkflow>>, {uuid: string}> = (props) => {
+          const {uuid} = props ?? {};
+
+          return  deleteWorkflow(uuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkflow>>>
+
+    export type DeleteWorkflowMutationError = void
+
+    export const useDeleteWorkflow = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteWorkflow>>,
+        TError,
+        {uuid: string},
+        TContext
+      > => {
+      return useMutation(getDeleteWorkflowMutationOptions(options), queryClient);
+    }
+
+export type addWorkflowTriggerResponse200 = {
+  data: Workflow
+  status: 200
+}
+
+export type addWorkflowTriggerResponse401 = {
+  data: void
+  status: 401
+}
+
+export type addWorkflowTriggerResponse403 = {
+  data: void
+  status: 403
+}
+
+export type addWorkflowTriggerResponse404 = {
+  data: void
+  status: 404
+}
+
+export type addWorkflowTriggerResponse409 = {
+  data: void
+  status: 409
+}
+
+export type addWorkflowTriggerResponseSuccess = (addWorkflowTriggerResponse200) & {
+  headers: Headers;
+};
+export type addWorkflowTriggerResponseError = (addWorkflowTriggerResponse401 | addWorkflowTriggerResponse403 | addWorkflowTriggerResponse404 | addWorkflowTriggerResponse409) & {
+  headers: Headers;
+};
+
+export type addWorkflowTriggerResponse = (addWorkflowTriggerResponseSuccess | addWorkflowTriggerResponseError)
+
+export const getAddWorkflowTriggerUrl = (uuid: string,) => {
+
+
+
+
+  return `/workflows/${uuid}/trigger`
+}
+
+export const addWorkflowTrigger = async (uuid: string,
+    addWorkflowStepDto: AddWorkflowStepDto, options?: RequestInit): Promise<addWorkflowTriggerResponse> => {
+
+  return customFetch<addWorkflowTriggerResponse>(getAddWorkflowTriggerUrl(uuid),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(addWorkflowStepDto)
+  }
+);}
+
+
+
+
+export const getAddWorkflowTriggerMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addWorkflowTrigger>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addWorkflowTrigger>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext> => {
+
+const mutationKey = ['addWorkflowTrigger'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addWorkflowTrigger>>, {uuid: string;data: AddWorkflowStepDto}> = (props) => {
+          const {uuid,data} = props ?? {};
+
+          return  addWorkflowTrigger(uuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddWorkflowTriggerMutationResult = NonNullable<Awaited<ReturnType<typeof addWorkflowTrigger>>>
+    export type AddWorkflowTriggerMutationBody = AddWorkflowStepDto
+    export type AddWorkflowTriggerMutationError = void
+
+    export const useAddWorkflowTrigger = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addWorkflowTrigger>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof addWorkflowTrigger>>,
+        TError,
+        {uuid: string;data: AddWorkflowStepDto},
+        TContext
+      > => {
+      return useMutation(getAddWorkflowTriggerMutationOptions(options), queryClient);
+    }
+
+export type addWorkflowStepResponse200 = {
+  data: Workflow
+  status: 200
+}
+
+export type addWorkflowStepResponse401 = {
+  data: void
+  status: 401
+}
+
+export type addWorkflowStepResponse403 = {
+  data: void
+  status: 403
+}
+
+export type addWorkflowStepResponse404 = {
+  data: void
+  status: 404
+}
+
+export type addWorkflowStepResponse409 = {
+  data: void
+  status: 409
+}
+
+export type addWorkflowStepResponseSuccess = (addWorkflowStepResponse200) & {
+  headers: Headers;
+};
+export type addWorkflowStepResponseError = (addWorkflowStepResponse401 | addWorkflowStepResponse403 | addWorkflowStepResponse404 | addWorkflowStepResponse409) & {
+  headers: Headers;
+};
+
+export type addWorkflowStepResponse = (addWorkflowStepResponseSuccess | addWorkflowStepResponseError)
+
+export const getAddWorkflowStepUrl = (uuid: string,) => {
+
+
+
+
+  return `/workflows/${uuid}/step`
+}
+
+export const addWorkflowStep = async (uuid: string,
+    addWorkflowStepDto: AddWorkflowStepDto, options?: RequestInit): Promise<addWorkflowStepResponse> => {
+
+  return customFetch<addWorkflowStepResponse>(getAddWorkflowStepUrl(uuid),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(addWorkflowStepDto)
+  }
+);}
+
+
+
+
+export const getAddWorkflowStepMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addWorkflowStep>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addWorkflowStep>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext> => {
+
+const mutationKey = ['addWorkflowStep'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addWorkflowStep>>, {uuid: string;data: AddWorkflowStepDto}> = (props) => {
+          const {uuid,data} = props ?? {};
+
+          return  addWorkflowStep(uuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddWorkflowStepMutationResult = NonNullable<Awaited<ReturnType<typeof addWorkflowStep>>>
+    export type AddWorkflowStepMutationBody = AddWorkflowStepDto
+    export type AddWorkflowStepMutationError = void
+
+    export const useAddWorkflowStep = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addWorkflowStep>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof addWorkflowStep>>,
+        TError,
+        {uuid: string;data: AddWorkflowStepDto},
+        TContext
+      > => {
+      return useMutation(getAddWorkflowStepMutationOptions(options), queryClient);
+    }
+
+export type deleteWorkflowStepResponse200 = {
+  data: Workflow
+  status: 200
+}
+
+export type deleteWorkflowStepResponse401 = {
+  data: void
+  status: 401
+}
+
+export type deleteWorkflowStepResponse403 = {
+  data: void
+  status: 403
+}
+
+export type deleteWorkflowStepResponse404 = {
+  data: void
+  status: 404
+}
+
+export type deleteWorkflowStepResponseSuccess = (deleteWorkflowStepResponse200) & {
+  headers: Headers;
+};
+export type deleteWorkflowStepResponseError = (deleteWorkflowStepResponse401 | deleteWorkflowStepResponse403 | deleteWorkflowStepResponse404) & {
+  headers: Headers;
+};
+
+export type deleteWorkflowStepResponse = (deleteWorkflowStepResponseSuccess | deleteWorkflowStepResponseError)
+
+export const getDeleteWorkflowStepUrl = (workflowUuid: string,
+    stepUuid: string,) => {
+
+
+
+
+  return `/workflows/${workflowUuid}/step/${stepUuid}`
+}
+
+export const deleteWorkflowStep = async (workflowUuid: string,
+    stepUuid: string, options?: RequestInit): Promise<deleteWorkflowStepResponse> => {
+
+  return customFetch<deleteWorkflowStepResponse>(getDeleteWorkflowStepUrl(workflowUuid,stepUuid),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getDeleteWorkflowStepMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflowStep>>, TError,{workflowUuid: string;stepUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflowStep>>, TError,{workflowUuid: string;stepUuid: string}, TContext> => {
+
+const mutationKey = ['deleteWorkflowStep'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteWorkflowStep>>, {workflowUuid: string;stepUuid: string}> = (props) => {
+          const {workflowUuid,stepUuid} = props ?? {};
+
+          return  deleteWorkflowStep(workflowUuid,stepUuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type DeleteWorkflowStepMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkflowStep>>>
+
+    export type DeleteWorkflowStepMutationError = void
+
+    export const useDeleteWorkflowStep = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflowStep>>, TError,{workflowUuid: string;stepUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof deleteWorkflowStep>>,
+        TError,
+        {workflowUuid: string;stepUuid: string},
+        TContext
+      > => {
+      return useMutation(getDeleteWorkflowStepMutationOptions(options), queryClient);
+    }
+
+export type updateWorkflowStepOptionsResponse200 = {
+  data: Workflow
+  status: 200
+}
+
+export type updateWorkflowStepOptionsResponse401 = {
+  data: void
+  status: 401
+}
+
+export type updateWorkflowStepOptionsResponse403 = {
+  data: void
+  status: 403
+}
+
+export type updateWorkflowStepOptionsResponse404 = {
+  data: void
+  status: 404
+}
+
+export type updateWorkflowStepOptionsResponseSuccess = (updateWorkflowStepOptionsResponse200) & {
+  headers: Headers;
+};
+export type updateWorkflowStepOptionsResponseError = (updateWorkflowStepOptionsResponse401 | updateWorkflowStepOptionsResponse403 | updateWorkflowStepOptionsResponse404) & {
+  headers: Headers;
+};
+
+export type updateWorkflowStepOptionsResponse = (updateWorkflowStepOptionsResponseSuccess | updateWorkflowStepOptionsResponseError)
+
+export const getUpdateWorkflowStepOptionsUrl = (workflowUuid: string,
+    stepUuid: string,) => {
+
+
+
+
+  return `/workflows/${workflowUuid}/step/${stepUuid}`
+}
+
+export const updateWorkflowStepOptions = async (workflowUuid: string,
+    stepUuid: string,
+    updateWorkflowStepOptionsDto: UpdateWorkflowStepOptionsDto, options?: RequestInit): Promise<updateWorkflowStepOptionsResponse> => {
+
+  return customFetch<updateWorkflowStepOptionsResponse>(getUpdateWorkflowStepOptionsUrl(workflowUuid,stepUuid),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateWorkflowStepOptionsDto)
+  }
+);}
+
+
+
+
+export const getUpdateWorkflowStepOptionsMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflowStepOptions>>, TError,{workflowUuid: string;stepUuid: string;data: UpdateWorkflowStepOptionsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateWorkflowStepOptions>>, TError,{workflowUuid: string;stepUuid: string;data: UpdateWorkflowStepOptionsDto}, TContext> => {
+
+const mutationKey = ['updateWorkflowStepOptions'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateWorkflowStepOptions>>, {workflowUuid: string;stepUuid: string;data: UpdateWorkflowStepOptionsDto}> = (props) => {
+          const {workflowUuid,stepUuid,data} = props ?? {};
+
+          return  updateWorkflowStepOptions(workflowUuid,stepUuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateWorkflowStepOptionsMutationResult = NonNullable<Awaited<ReturnType<typeof updateWorkflowStepOptions>>>
+    export type UpdateWorkflowStepOptionsMutationBody = UpdateWorkflowStepOptionsDto
+    export type UpdateWorkflowStepOptionsMutationError = void
+
+    export const useUpdateWorkflowStepOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflowStepOptions>>, TError,{workflowUuid: string;stepUuid: string;data: UpdateWorkflowStepOptionsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateWorkflowStepOptions>>,
+        TError,
+        {workflowUuid: string;stepUuid: string;data: UpdateWorkflowStepOptionsDto},
+        TContext
+      > => {
+      return useMutation(getUpdateWorkflowStepOptionsMutationOptions(options), queryClient);
+    }
+
+export type getAllWorkflowTriggersResponse200 = {
+  data: WorkflowStepDefinition[]
+  status: 200
+}
+
+export type getAllWorkflowTriggersResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getAllWorkflowTriggersResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getAllWorkflowTriggersResponseSuccess = (getAllWorkflowTriggersResponse200) & {
+  headers: Headers;
+};
+export type getAllWorkflowTriggersResponseError = (getAllWorkflowTriggersResponse401 | getAllWorkflowTriggersResponse403) & {
+  headers: Headers;
+};
+
+export type getAllWorkflowTriggersResponse = (getAllWorkflowTriggersResponseSuccess | getAllWorkflowTriggersResponseError)
+
+export const getGetAllWorkflowTriggersUrl = () => {
+
+
+
+
+  return `/workflow-steps/triggers`
+}
+
+export const getAllWorkflowTriggers = async ( options?: RequestInit): Promise<getAllWorkflowTriggersResponse> => {
+
+  return customFetch<getAllWorkflowTriggersResponse>(getGetAllWorkflowTriggersUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAllWorkflowTriggersQueryKey = () => {
+    return [
+    `/workflow-steps/triggers`
+    ] as const;
+    }
+
+
+export const getGetAllWorkflowTriggersQueryOptions = <TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAllWorkflowTriggersQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllWorkflowTriggers>>> = ({ signal }) => getAllWorkflowTriggers({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAllWorkflowTriggersQueryResult = NonNullable<Awaited<ReturnType<typeof getAllWorkflowTriggers>>>
+export type GetAllWorkflowTriggersQueryError = void
+
+
+export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = void>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllWorkflowTriggers>>,
+          TError,
+          Awaited<ReturnType<typeof getAllWorkflowTriggers>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllWorkflowTriggers>>,
+          TError,
+          Awaited<ReturnType<typeof getAllWorkflowTriggers>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAllWorkflowTriggersQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getAllWorkflowStepsResponse200 = {
+  data: WorkflowStepDefinition[]
+  status: 200
+}
+
+export type getAllWorkflowStepsResponse401 = {
+  data: void
+  status: 401
+}
+
+export type getAllWorkflowStepsResponse403 = {
+  data: void
+  status: 403
+}
+
+export type getAllWorkflowStepsResponseSuccess = (getAllWorkflowStepsResponse200) & {
+  headers: Headers;
+};
+export type getAllWorkflowStepsResponseError = (getAllWorkflowStepsResponse401 | getAllWorkflowStepsResponse403) & {
+  headers: Headers;
+};
+
+export type getAllWorkflowStepsResponse = (getAllWorkflowStepsResponseSuccess | getAllWorkflowStepsResponseError)
+
+export const getGetAllWorkflowStepsUrl = () => {
+
+
+
+
+  return `/workflow-steps/steps`
+}
+
+export const getAllWorkflowSteps = async ( options?: RequestInit): Promise<getAllWorkflowStepsResponse> => {
+
+  return customFetch<getAllWorkflowStepsResponse>(getGetAllWorkflowStepsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAllWorkflowStepsQueryKey = () => {
+    return [
+    `/workflow-steps/steps`
+    ] as const;
+    }
+
+
+export const getGetAllWorkflowStepsQueryOptions = <TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAllWorkflowStepsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllWorkflowSteps>>> = ({ signal }) => getAllWorkflowSteps({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAllWorkflowStepsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllWorkflowSteps>>>
+export type GetAllWorkflowStepsQueryError = void
+
+
+export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = void>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllWorkflowSteps>>,
+          TError,
+          Awaited<ReturnType<typeof getAllWorkflowSteps>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllWorkflowSteps>>,
+          TError,
+          Awaited<ReturnType<typeof getAllWorkflowSteps>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = void>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAllWorkflowStepsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -1691,6 +2319,434 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetUserQueryOptions(uuid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getIconResponse200 = {
+  data: void
+  status: 200
+}
+
+export type getIconResponseSuccess = (getIconResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getIconResponse = (getIconResponseSuccess)
+
+export const getGetIconUrl = (pluginId: string,
+    iconId: string,) => {
+
+
+
+
+  return `/icons/${pluginId}/${iconId}`
+}
+
+export const getIcon = async (pluginId: string,
+    iconId: string, options?: RequestInit): Promise<getIconResponse> => {
+
+  return customFetch<getIconResponse>(getGetIconUrl(pluginId,iconId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetIconQueryKey = (pluginId: string,
+    iconId: string,) => {
+    return [
+    `/icons/${pluginId}/${iconId}`
+    ] as const;
+    }
+
+
+export const getGetIconQueryOptions = <TData = Awaited<ReturnType<typeof getIcon>>, TError = unknown>(pluginId: string,
+    iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetIconQueryKey(pluginId,iconId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getIcon>>> = ({ signal }) => getIcon(pluginId,iconId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && iconId !== null && iconId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetIconQueryResult = NonNullable<Awaited<ReturnType<typeof getIcon>>>
+export type GetIconQueryError = unknown
+
+
+export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = unknown>(
+ pluginId: string,
+    iconId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIcon>>,
+          TError,
+          Awaited<ReturnType<typeof getIcon>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = unknown>(
+ pluginId: string,
+    iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIcon>>,
+          TError,
+          Awaited<ReturnType<typeof getIcon>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = unknown>(
+ pluginId: string,
+    iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = unknown>(
+ pluginId: string,
+    iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetIconQueryOptions(pluginId,iconId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getAllAttributeSourcesResponse200 = {
+  data: AttributeSource[]
+  status: 200
+}
+
+export type getAllAttributeSourcesResponseSuccess = (getAllAttributeSourcesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getAllAttributeSourcesResponse = (getAllAttributeSourcesResponseSuccess)
+
+export const getGetAllAttributeSourcesUrl = () => {
+
+
+
+
+  return `/attribute-sources`
+}
+
+export const getAllAttributeSources = async ( options?: RequestInit): Promise<getAllAttributeSourcesResponse> => {
+
+  return customFetch<getAllAttributeSourcesResponse>(getGetAllAttributeSourcesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAllAttributeSourcesQueryKey = () => {
+    return [
+    `/attribute-sources`
+    ] as const;
+    }
+
+
+export const getGetAllAttributeSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAllAttributeSourcesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllAttributeSources>>> = ({ signal }) => getAllAttributeSources({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAllAttributeSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllAttributeSources>>>
+export type GetAllAttributeSourcesQueryError = unknown
+
+
+export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllAttributeSources>>,
+          TError,
+          Awaited<ReturnType<typeof getAllAttributeSources>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllAttributeSources>>,
+          TError,
+          Awaited<ReturnType<typeof getAllAttributeSources>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAllAttributeSourcesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type setAttributeSourceOrderResponse200 = {
+  data: AttributeSource[]
+  status: 200
+}
+
+export type setAttributeSourceOrderResponseSuccess = (setAttributeSourceOrderResponse200) & {
+  headers: Headers;
+};
+;
+
+export type setAttributeSourceOrderResponse = (setAttributeSourceOrderResponseSuccess)
+
+export const getSetAttributeSourceOrderUrl = () => {
+
+
+
+
+  return `/attribute-sources/order`
+}
+
+export const setAttributeSourceOrder = async (attributeSourceOrderDto: AttributeSourceOrderDto, options?: RequestInit): Promise<setAttributeSourceOrderResponse> => {
+
+  return customFetch<setAttributeSourceOrderResponse>(getSetAttributeSourceOrderUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(attributeSourceOrderDto)
+  }
+);}
+
+
+
+
+export const getSetAttributeSourceOrderMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setAttributeSourceOrder>>, TError,{data: AttributeSourceOrderDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setAttributeSourceOrder>>, TError,{data: AttributeSourceOrderDto}, TContext> => {
+
+const mutationKey = ['setAttributeSourceOrder'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setAttributeSourceOrder>>, {data: AttributeSourceOrderDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  setAttributeSourceOrder(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetAttributeSourceOrderMutationResult = NonNullable<Awaited<ReturnType<typeof setAttributeSourceOrder>>>
+    export type SetAttributeSourceOrderMutationBody = AttributeSourceOrderDto
+    export type SetAttributeSourceOrderMutationError = unknown
+
+    export const useSetAttributeSourceOrder = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setAttributeSourceOrder>>, TError,{data: AttributeSourceOrderDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof setAttributeSourceOrder>>,
+        TError,
+        {data: AttributeSourceOrderDto},
+        TContext
+      > => {
+      return useMutation(getSetAttributeSourceOrderMutationOptions(options), queryClient);
+    }
+
+export type getResponse200 = {
+  data: void
+  status: 200
+}
+
+export type getResponseSuccess = (getResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getResponse = (getResponseSuccess)
+
+export const getGetUrl = (dir: string,
+    file: string,
+    params?: GetParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/resources/${dir}/${file}?${stringifiedParams}` : `/resources/${dir}/${file}`
+}
+
+export const get = async (dir: string,
+    file: string,
+    params?: GetParams, options?: RequestInit): Promise<getResponse> => {
+
+  return customFetch<getResponse>(getGetUrl(dir,file,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetQueryKey = (dir: string,
+    file: string,
+    params?: GetParams,) => {
+    return [
+    `/resources/${dir}/${file}`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetQueryOptions = <TData = Awaited<ReturnType<typeof get>>, TError = unknown>(dir: string,
+    file: string,
+    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetQueryKey(dir,file,params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof get>>> = ({ signal }) => get(dir,file,params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: dir !== null && dir !== undefined && file !== null && file !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetQueryResult = NonNullable<Awaited<ReturnType<typeof get>>>
+export type GetQueryError = unknown
+
+
+export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
+ dir: string,
+    file: string,
+    params: undefined |  GetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof get>>,
+          TError,
+          Awaited<ReturnType<typeof get>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
+ dir: string,
+    file: string,
+    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof get>>,
+          TError,
+          Awaited<ReturnType<typeof get>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
+ dir: string,
+    file: string,
+    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
+ dir: string,
+    file: string,
+    params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetQueryOptions(dir,file,params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
