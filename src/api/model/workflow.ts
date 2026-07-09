@@ -11,4 +11,8 @@ export interface Workflow {
   name: string;
   dateCreated: Date;
   steps: WorkflowStep[] | null;
+  currentActiveStepIndex: number | null;
+  currentActiveStepUuid: string | null;
+  totalActiveSteps: number | null;
+  currentActiveStepPercent: number | null;
 }
