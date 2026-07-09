@@ -402,407 +402,6 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getSearchLibraryMutationOptions(options), queryClient);
     }
 
-export type getAllAttributesResponse200 = {
-  data: AllAttributes
-  status: 200
-}
-
-export type getAllAttributesResponseSuccess = (getAllAttributesResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getAllAttributesResponse = (getAllAttributesResponseSuccess)
-
-export const getGetAllAttributesUrl = () => {
-
-
-
-
-  return `/attributes`
-}
-
-export const getAllAttributes = async ( options?: RequestInit): Promise<getAllAttributesResponse> => {
-
-  return customFetch<getAllAttributesResponse>(getGetAllAttributesUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetAllAttributesQueryKey = () => {
-    return [
-    `/attributes`
-    ] as const;
-    }
-
-
-export const getGetAllAttributesQueryOptions = <TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetAllAttributesQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllAttributes>>> = ({ signal }) => getAllAttributes({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetAllAttributesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllAttributes>>>
-export type GetAllAttributesQueryError = unknown
-
-
-export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAllAttributes>>,
-          TError,
-          Awaited<ReturnType<typeof getAllAttributes>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAllAttributes>>,
-          TError,
-          Awaited<ReturnType<typeof getAllAttributes>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetAllAttributesQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type uploadAttributeBufferResponse204 = {
-  data: void
-  status: 204
-}
-
-export type uploadAttributeBufferResponse401 = {
-  data: void
-  status: 401
-}
-
-export type uploadAttributeBufferResponse403 = {
-  data: void
-  status: 403
-}
-
-export type uploadAttributeBufferResponse404 = {
-  data: void
-  status: 404
-}
-
-export type uploadAttributeBufferResponseSuccess = (uploadAttributeBufferResponse204) & {
-  headers: Headers;
-};
-export type uploadAttributeBufferResponseError = (uploadAttributeBufferResponse401 | uploadAttributeBufferResponse403 | uploadAttributeBufferResponse404) & {
-  headers: Headers;
-};
-
-export type uploadAttributeBufferResponse = (uploadAttributeBufferResponseSuccess | uploadAttributeBufferResponseError)
-
-export const getUploadAttributeBufferUrl = (uuid: string,) => {
-
-
-
-
-  return `/attributes/buffer/${uuid}`
-}
-
-export const uploadAttributeBuffer = async (uuid: string,
-    uploadAttributeBufferBody: UploadAttributeBufferBody, options?: RequestInit): Promise<uploadAttributeBufferResponse> => {
-    const formData = new FormData();
-if(uploadAttributeBufferBody.file !== undefined) {
- formData.append(`file`, uploadAttributeBufferBody.file);
- }
-
-  return customFetch<uploadAttributeBufferResponse>(getUploadAttributeBufferUrl(uuid),
-  {
-    ...options,
-    method: 'PUT'
-    ,
-    body: formData
-  }
-);}
-
-
-
-
-export const getUploadAttributeBufferMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext> => {
-
-const mutationKey = ['uploadAttributeBuffer'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadAttributeBuffer>>, {uuid: string;data: UploadAttributeBufferBody}> = (props) => {
-          const {uuid,data} = props ?? {};
-
-          return  uploadAttributeBuffer(uuid,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UploadAttributeBufferMutationResult = NonNullable<Awaited<ReturnType<typeof uploadAttributeBuffer>>>
-    export type UploadAttributeBufferMutationBody = UploadAttributeBufferBody
-    export type UploadAttributeBufferMutationError = void
-
-    export const useUploadAttributeBuffer = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof uploadAttributeBuffer>>,
-        TError,
-        {uuid: string;data: UploadAttributeBufferBody},
-        TContext
-      > => {
-      return useMutation(getUploadAttributeBufferMutationOptions(options), queryClient);
-    }
-
-export type getTasksResponse200 = {
-  data: AllTasksResponse
-  status: 200
-}
-
-export type getTasksResponseSuccess = (getTasksResponse200) & {
-  headers: Headers;
-};
-;
-
-export type getTasksResponse = (getTasksResponseSuccess)
-
-export const getGetTasksUrl = () => {
-
-
-
-
-  return `/tasks`
-}
-
-export const getTasks = async ( options?: RequestInit): Promise<getTasksResponse> => {
-
-  return customFetch<getTasksResponse>(getGetTasksUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetTasksQueryKey = () => {
-    return [
-    `/tasks`
-    ] as const;
-    }
-
-
-export const getGetTasksQueryOptions = <TData = Awaited<ReturnType<typeof getTasks>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetTasksQueryKey();
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTasks>>> = ({ signal }) => getTasks({ signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetTasksQueryResult = NonNullable<Awaited<ReturnType<typeof getTasks>>>
-export type GetTasksQueryError = unknown
-
-
-export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTasks>>,
-          TError,
-          Awaited<ReturnType<typeof getTasks>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTasks>>,
-          TError,
-          Awaited<ReturnType<typeof getTasks>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetTasksQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type startTaskResponse204 = {
-  data: void
-  status: 204
-}
-
-export type startTaskResponse404 = {
-  data: void
-  status: 404
-}
-
-export type startTaskResponse409 = {
-  data: void
-  status: 409
-}
-
-export type startTaskResponseSuccess = (startTaskResponse204) & {
-  headers: Headers;
-};
-export type startTaskResponseError = (startTaskResponse404 | startTaskResponse409) & {
-  headers: Headers;
-};
-
-export type startTaskResponse = (startTaskResponseSuccess | startTaskResponseError)
-
-export const getStartTaskUrl = (taskUuid: string,) => {
-
-
-
-
-  return `/tasks/${taskUuid}/start`
-}
-
-export const startTask = async (taskUuid: string,
-    startTaskDto: StartTaskDto, options?: RequestInit): Promise<startTaskResponse> => {
-
-  return customFetch<startTaskResponse>(getStartTaskUrl(taskUuid),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(startTaskDto)
-  }
-);}
-
-
-
-
-export const getStartTaskMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext> => {
-
-const mutationKey = ['startTask'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startTask>>, {taskUuid: string;data: StartTaskDto}> = (props) => {
-          const {taskUuid,data} = props ?? {};
-
-          return  startTask(taskUuid,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type StartTaskMutationResult = NonNullable<Awaited<ReturnType<typeof startTask>>>
-    export type StartTaskMutationBody = StartTaskDto
-    export type StartTaskMutationError = void
-
-    export const useStartTask = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof startTask>>,
-        TError,
-        {taskUuid: string;data: StartTaskDto},
-        TContext
-      > => {
-      return useMutation(getStartTaskMutationOptions(options), queryClient);
-    }
-
 export type getAllWorkflowsResponse200 = {
   data: Workflow[]
   status: 200
@@ -2330,6 +1929,407 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
 
 
 
+
+export type getAllAttributesResponse200 = {
+  data: AllAttributes
+  status: 200
+}
+
+export type getAllAttributesResponseSuccess = (getAllAttributesResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getAllAttributesResponse = (getAllAttributesResponseSuccess)
+
+export const getGetAllAttributesUrl = () => {
+
+
+
+
+  return `/attributes`
+}
+
+export const getAllAttributes = async ( options?: RequestInit): Promise<getAllAttributesResponse> => {
+
+  return customFetch<getAllAttributesResponse>(getGetAllAttributesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAllAttributesQueryKey = () => {
+    return [
+    `/attributes`
+    ] as const;
+    }
+
+
+export const getGetAllAttributesQueryOptions = <TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAllAttributesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAllAttributes>>> = ({ signal }) => getAllAttributes({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAllAttributesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllAttributes>>>
+export type GetAllAttributesQueryError = unknown
+
+
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllAttributes>>,
+          TError,
+          Awaited<ReturnType<typeof getAllAttributes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAllAttributes>>,
+          TError,
+          Awaited<ReturnType<typeof getAllAttributes>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAllAttributesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type uploadAttributeBufferResponse204 = {
+  data: void
+  status: 204
+}
+
+export type uploadAttributeBufferResponse401 = {
+  data: void
+  status: 401
+}
+
+export type uploadAttributeBufferResponse403 = {
+  data: void
+  status: 403
+}
+
+export type uploadAttributeBufferResponse404 = {
+  data: void
+  status: 404
+}
+
+export type uploadAttributeBufferResponseSuccess = (uploadAttributeBufferResponse204) & {
+  headers: Headers;
+};
+export type uploadAttributeBufferResponseError = (uploadAttributeBufferResponse401 | uploadAttributeBufferResponse403 | uploadAttributeBufferResponse404) & {
+  headers: Headers;
+};
+
+export type uploadAttributeBufferResponse = (uploadAttributeBufferResponseSuccess | uploadAttributeBufferResponseError)
+
+export const getUploadAttributeBufferUrl = (uuid: string,) => {
+
+
+
+
+  return `/attributes/buffer/${uuid}`
+}
+
+export const uploadAttributeBuffer = async (uuid: string,
+    uploadAttributeBufferBody: UploadAttributeBufferBody, options?: RequestInit): Promise<uploadAttributeBufferResponse> => {
+    const formData = new FormData();
+if(uploadAttributeBufferBody.file !== undefined) {
+ formData.append(`file`, uploadAttributeBufferBody.file);
+ }
+
+  return customFetch<uploadAttributeBufferResponse>(getUploadAttributeBufferUrl(uuid),
+  {
+    ...options,
+    method: 'PUT'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+export const getUploadAttributeBufferMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext> => {
+
+const mutationKey = ['uploadAttributeBuffer'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof uploadAttributeBuffer>>, {uuid: string;data: UploadAttributeBufferBody}> = (props) => {
+          const {uuid,data} = props ?? {};
+
+          return  uploadAttributeBuffer(uuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UploadAttributeBufferMutationResult = NonNullable<Awaited<ReturnType<typeof uploadAttributeBuffer>>>
+    export type UploadAttributeBufferMutationBody = UploadAttributeBufferBody
+    export type UploadAttributeBufferMutationError = void
+
+    export const useUploadAttributeBuffer = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof uploadAttributeBuffer>>,
+        TError,
+        {uuid: string;data: UploadAttributeBufferBody},
+        TContext
+      > => {
+      return useMutation(getUploadAttributeBufferMutationOptions(options), queryClient);
+    }
+
+export type getTasksResponse200 = {
+  data: AllTasksResponse
+  status: 200
+}
+
+export type getTasksResponseSuccess = (getTasksResponse200) & {
+  headers: Headers;
+};
+;
+
+export type getTasksResponse = (getTasksResponseSuccess)
+
+export const getGetTasksUrl = () => {
+
+
+
+
+  return `/tasks`
+}
+
+export const getTasks = async ( options?: RequestInit): Promise<getTasksResponse> => {
+
+  return customFetch<getTasksResponse>(getGetTasksUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTasksQueryKey = () => {
+    return [
+    `/tasks`
+    ] as const;
+    }
+
+
+export const getGetTasksQueryOptions = <TData = Awaited<ReturnType<typeof getTasks>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTasksQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTasks>>> = ({ signal }) => getTasks({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTasksQueryResult = NonNullable<Awaited<ReturnType<typeof getTasks>>>
+export type GetTasksQueryError = unknown
+
+
+export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTasks>>,
+          TError,
+          Awaited<ReturnType<typeof getTasks>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTasks>>,
+          TError,
+          Awaited<ReturnType<typeof getTasks>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTasksQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type startTaskResponse204 = {
+  data: void
+  status: 204
+}
+
+export type startTaskResponse404 = {
+  data: void
+  status: 404
+}
+
+export type startTaskResponse409 = {
+  data: void
+  status: 409
+}
+
+export type startTaskResponseSuccess = (startTaskResponse204) & {
+  headers: Headers;
+};
+export type startTaskResponseError = (startTaskResponse404 | startTaskResponse409) & {
+  headers: Headers;
+};
+
+export type startTaskResponse = (startTaskResponseSuccess | startTaskResponseError)
+
+export const getStartTaskUrl = (taskUuid: string,) => {
+
+
+
+
+  return `/tasks/${taskUuid}/start`
+}
+
+export const startTask = async (taskUuid: string,
+    startTaskDto: StartTaskDto, options?: RequestInit): Promise<startTaskResponse> => {
+
+  return customFetch<startTaskResponse>(getStartTaskUrl(taskUuid),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(startTaskDto)
+  }
+);}
+
+
+
+
+export const getStartTaskMutationOptions = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext> => {
+
+const mutationKey = ['startTask'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof startTask>>, {taskUuid: string;data: StartTaskDto}> = (props) => {
+          const {taskUuid,data} = props ?? {};
+
+          return  startTask(taskUuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type StartTaskMutationResult = NonNullable<Awaited<ReturnType<typeof startTask>>>
+    export type StartTaskMutationBody = StartTaskDto
+    export type StartTaskMutationError = void
+
+    export const useStartTask = <TError = void,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof startTask>>,
+        TError,
+        {taskUuid: string;data: StartTaskDto},
+        TContext
+      > => {
+      return useMutation(getStartTaskMutationOptions(options), queryClient);
+    }
 
 export type getIconResponse200 = {
   data: void
