@@ -112,6 +112,8 @@ export * from './loadedAttribute';
 export * from './loginDto';
 export * from './newPlaylistAlbumDto';
 export * from './orderedAttributeSourceDto';
+export * from './paragraphConfigNode';
+export * from './paragraphConfigNodeType';
 export * from './playlist';
 export * from './playlistTrack';
 export * from './playlistTracksQuery';

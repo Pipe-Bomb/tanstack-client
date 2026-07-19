@@ -5,9 +5,10 @@
  * OpenAPI spec version: 0.0.2
  */
 import type { HeadingConfigNode } from './headingConfigNode';
+import type { ParagraphConfigNode } from './paragraphConfigNode';
 import type { SectionConfigNode } from './sectionConfigNode';
 import type { TextConfigNode } from './textConfigNode';
 
 export interface PluginConfig {
-  node: TextConfigNode | HeadingConfigNode | SectionConfigNode;
+  node: TextConfigNode | HeadingConfigNode | SectionConfigNode | ParagraphConfigNode;
 }
