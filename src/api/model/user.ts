@@ -5,9 +5,11 @@
  * OpenAPI spec version: 0.0.2
  */
 import type { Playlist } from './playlist';
+import type { Privilege } from './privilege';
 
 export interface User {
   uuid: string;
   username: string;
   playlists: Playlist[] | null;
+  privileges: Privilege[] | null;
 }
