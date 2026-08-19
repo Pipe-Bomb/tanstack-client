@@ -55,6 +55,7 @@ import type {
   LibraryFindResponse,
   LibrarySearchDto,
   LoginDto,
+  PipeBombError,
   Playlist,
   PlaylistTrack,
   PlaylistTracksQuery,
@@ -68,12 +69,15 @@ import type {
   SearchResults,
   StartTaskDto,
   StreamInstance,
+  SystemConfigKeysDto,
+  SystemConfigOptions,
   Track,
   TrackCreationSession,
   TrackIdsDto,
   UpdatePlaylistAttributesDto,
   UpdatePlaylistTracksDto,
   UpdatePrivilegesDto,
+  UpdateSystemConfigOptionsDto,
   UpdateWorkflowStepOptionsDto,
   UploadAttributeBufferBody,
   User,
@@ -89,17 +93,32 @@ type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
 
 
 
+export type HTTPStatusCode1xx = 100 | 101 | 102 | 103;
+export type HTTPStatusCode2xx = 200 | 201 | 202 | 203 | 204 | 205 | 206 | 207;
+export type HTTPStatusCode3xx = 300 | 301 | 302 | 303 | 304 | 305 | 307 | 308;
+export type HTTPStatusCode4xx = 400 | 401 | 402 | 403 | 404 | 405 | 406 | 407 | 408 | 409 | 410 | 411 | 412 | 413 | 414 | 415 | 416 | 417 | 418 | 419 | 420 | 421 | 422 | 423 | 424 | 426 | 428 | 429 | 431 | 451;
+export type HTTPStatusCode5xx = 500 | 501 | 502 | 503 | 504 | 505 | 507 | 511;
+export type HTTPStatusCodes = HTTPStatusCode1xx | HTTPStatusCode2xx | HTTPStatusCode3xx | HTTPStatusCode4xx | HTTPStatusCode5xx;
+
+
 export type getResponse200 = {
   data: void
   status: 200
 }
 
+export type getResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getResponseSuccess = (getResponse200) & {
   headers: Headers;
 };
-;
+export type getResponseError = (getResponse5xx) & {
+  headers: Headers;
+};
 
-export type getResponse = (getResponseSuccess)
+export type getResponse = (getResponseSuccess | getResponseError)
 
 export const getGetUrl = (dir: string,
     file: string,
@@ -144,7 +163,7 @@ export const getGetQueryKey = (dir: string,
     }
 
 
-export const getGetQueryOptions = <TData = Awaited<ReturnType<typeof get>>, TError = unknown>(dir: string,
+export const getGetQueryOptions = <TData = Awaited<ReturnType<typeof get>>, TError = PipeBombError>(dir: string,
     file: string,
     params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
@@ -165,10 +184,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetQueryResult = NonNullable<Awaited<ReturnType<typeof get>>>
-export type GetQueryError = unknown
+export type GetQueryError = PipeBombError
 
 
-export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
+export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = PipeBombError>(
  dir: string,
     file: string,
     params: undefined |  GetParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>> & Pick<
@@ -180,7 +199,7 @@ export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
+export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = PipeBombError>(
  dir: string,
     file: string,
     params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>> & Pick<
@@ -192,14 +211,14 @@ export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
+export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = PipeBombError>(
  dir: string,
     file: string,
     params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = unknown>(
+export function useGet<TData = Awaited<ReturnType<typeof get>>, TError = PipeBombError>(
  dir: string,
     file: string,
     params?: GetParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof get>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
@@ -224,12 +243,19 @@ export type getAllLibrariesResponse200 = {
   status: 200
 }
 
+export type getAllLibrariesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getAllLibrariesResponseSuccess = (getAllLibrariesResponse200) & {
   headers: Headers;
 };
-;
+export type getAllLibrariesResponseError = (getAllLibrariesResponse5xx) & {
+  headers: Headers;
+};
 
-export type getAllLibrariesResponse = (getAllLibrariesResponseSuccess)
+export type getAllLibrariesResponse = (getAllLibrariesResponseSuccess | getAllLibrariesResponseError)
 
 export const getGetAllLibrariesUrl = () => {
 
@@ -261,7 +287,7 @@ export const getGetAllLibrariesQueryKey = () => {
     }
 
 
-export const getGetAllLibrariesQueryOptions = <TData = Awaited<ReturnType<typeof getAllLibraries>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllLibraries>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllLibrariesQueryOptions = <TData = Awaited<ReturnType<typeof getAllLibraries>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllLibraries>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -280,10 +306,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllLibrariesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllLibraries>>>
-export type GetAllLibrariesQueryError = unknown
+export type GetAllLibrariesQueryError = PipeBombError
 
 
-export function useGetAllLibraries<TData = Awaited<ReturnType<typeof getAllLibraries>>, TError = unknown>(
+export function useGetAllLibraries<TData = Awaited<ReturnType<typeof getAllLibraries>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllLibraries>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllLibraries>>,
@@ -293,7 +319,7 @@ export function useGetAllLibraries<TData = Awaited<ReturnType<typeof getAllLibra
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllLibraries<TData = Awaited<ReturnType<typeof getAllLibraries>>, TError = unknown>(
+export function useGetAllLibraries<TData = Awaited<ReturnType<typeof getAllLibraries>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllLibraries>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllLibraries>>,
@@ -303,12 +329,12 @@ export function useGetAllLibraries<TData = Awaited<ReturnType<typeof getAllLibra
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllLibraries<TData = Awaited<ReturnType<typeof getAllLibraries>>, TError = unknown>(
+export function useGetAllLibraries<TData = Awaited<ReturnType<typeof getAllLibraries>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllLibraries>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllLibraries<TData = Awaited<ReturnType<typeof getAllLibraries>>, TError = unknown>(
+export function useGetAllLibraries<TData = Awaited<ReturnType<typeof getAllLibraries>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllLibraries>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -332,14 +358,19 @@ export type getLibraryResponse200 = {
 }
 
 export type getLibraryResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getLibraryResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getLibraryResponseSuccess = (getLibraryResponse200) & {
   headers: Headers;
 };
-export type getLibraryResponseError = (getLibraryResponse404) & {
+export type getLibraryResponseError = (getLibraryResponse404 | getLibraryResponse5xx) & {
   headers: Headers;
 };
 
@@ -378,7 +409,7 @@ export const getGetLibraryQueryKey = (pluginId: string,
     }
 
 
-export const getGetLibraryQueryOptions = <TData = Awaited<ReturnType<typeof getLibrary>>, TError = void>(pluginId: string,
+export const getGetLibraryQueryOptions = <TData = Awaited<ReturnType<typeof getLibrary>>, TError = PipeBombError>(pluginId: string,
     libraryId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
@@ -398,10 +429,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetLibraryQueryResult = NonNullable<Awaited<ReturnType<typeof getLibrary>>>
-export type GetLibraryQueryError = void
+export type GetLibraryQueryError = PipeBombError
 
 
-export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TError = void>(
+export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -412,7 +443,7 @@ export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TE
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TError = void>(
+export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -423,13 +454,13 @@ export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TE
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TError = void>(
+export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TError = void>(
+export function useGetLibrary<TData = Awaited<ReturnType<typeof getLibrary>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLibrary>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
@@ -454,14 +485,19 @@ export type searchLibraryResponse200 = {
 }
 
 export type searchLibraryResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type searchLibraryResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type searchLibraryResponseSuccess = (searchLibraryResponse200) & {
   headers: Headers;
 };
-export type searchLibraryResponseError = (searchLibraryResponse404) & {
+export type searchLibraryResponseError = (searchLibraryResponse404 | searchLibraryResponse5xx) & {
   headers: Headers;
 };
 
@@ -492,7 +528,7 @@ export const searchLibrary = async (pluginId: string,
 
 
 
-export const getSearchLibraryMutationOptions = <TError = void,
+export const getSearchLibraryMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchLibrary>>, TError,{pluginId: string;libraryId: string;data: LibrarySearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof searchLibrary>>, TError,{pluginId: string;libraryId: string;data: LibrarySearchDto}, TContext> => {
 
@@ -521,9 +557,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type SearchLibraryMutationResult = NonNullable<Awaited<ReturnType<typeof searchLibrary>>>
     export type SearchLibraryMutationBody = LibrarySearchDto
-    export type SearchLibraryMutationError = void
+    export type SearchLibraryMutationError = PipeBombError
 
-    export const useSearchLibrary = <TError = void,
+    export const useSearchLibrary = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchLibrary>>, TError,{pluginId: string;libraryId: string;data: LibrarySearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof searchLibrary>>,
@@ -540,19 +576,24 @@ export type getAllWorkflowsResponse200 = {
 }
 
 export type getAllWorkflowsResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type getAllWorkflowsResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
+}
+
+export type getAllWorkflowsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getAllWorkflowsResponseSuccess = (getAllWorkflowsResponse200) & {
   headers: Headers;
 };
-export type getAllWorkflowsResponseError = (getAllWorkflowsResponse401 | getAllWorkflowsResponse403) & {
+export type getAllWorkflowsResponseError = (getAllWorkflowsResponse401 | getAllWorkflowsResponse403 | getAllWorkflowsResponse5xx) & {
   headers: Headers;
 };
 
@@ -588,7 +629,7 @@ export const getGetAllWorkflowsQueryKey = () => {
     }
 
 
-export const getGetAllWorkflowsQueryOptions = <TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllWorkflowsQueryOptions = <TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -607,10 +648,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllWorkflowsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllWorkflows>>>
-export type GetAllWorkflowsQueryError = void
+export type GetAllWorkflowsQueryError = PipeBombError
 
 
-export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = void>(
+export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllWorkflows>>,
@@ -620,7 +661,7 @@ export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkf
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = void>(
+export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllWorkflows>>,
@@ -630,12 +671,12 @@ export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkf
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = void>(
+export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = void>(
+export function useGetAllWorkflows<TData = Awaited<ReturnType<typeof getAllWorkflows>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflows>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -659,19 +700,24 @@ export type createWorkflowResponse200 = {
 }
 
 export type createWorkflowResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type createWorkflowResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
+}
+
+export type createWorkflowResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type createWorkflowResponseSuccess = (createWorkflowResponse200) & {
   headers: Headers;
 };
-export type createWorkflowResponseError = (createWorkflowResponse401 | createWorkflowResponse403) & {
+export type createWorkflowResponseError = (createWorkflowResponse401 | createWorkflowResponse403 | createWorkflowResponse5xx) & {
   headers: Headers;
 };
 
@@ -699,7 +745,7 @@ export const createWorkflow = async (createWorkflowDto: CreateWorkflowDto, optio
 
 
 
-export const getCreateWorkflowMutationOptions = <TError = void,
+export const getCreateWorkflowMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{data: CreateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{data: CreateWorkflowDto}, TContext> => {
 
@@ -728,9 +774,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type CreateWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof createWorkflow>>>
     export type CreateWorkflowMutationBody = CreateWorkflowDto
-    export type CreateWorkflowMutationError = void
+    export type CreateWorkflowMutationError = PipeBombError
 
-    export const useCreateWorkflow = <TError = void,
+    export const useCreateWorkflow = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createWorkflow>>, TError,{data: CreateWorkflowDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createWorkflow>>,
@@ -747,24 +793,29 @@ export type getWorkflowResponse200 = {
 }
 
 export type getWorkflowResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type getWorkflowResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type getWorkflowResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getWorkflowResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getWorkflowResponseSuccess = (getWorkflowResponse200) & {
   headers: Headers;
 };
-export type getWorkflowResponseError = (getWorkflowResponse401 | getWorkflowResponse403 | getWorkflowResponse404) & {
+export type getWorkflowResponseError = (getWorkflowResponse401 | getWorkflowResponse403 | getWorkflowResponse404 | getWorkflowResponse5xx) & {
   headers: Headers;
 };
 
@@ -800,7 +851,7 @@ export const getGetWorkflowQueryKey = (uuid: string,) => {
     }
 
 
-export const getGetWorkflowQueryOptions = <TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetWorkflowQueryOptions = <TData = Awaited<ReturnType<typeof getWorkflow>>, TError = PipeBombError>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -819,10 +870,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetWorkflowQueryResult = NonNullable<Awaited<ReturnType<typeof getWorkflow>>>
-export type GetWorkflowQueryError = void
+export type GetWorkflowQueryError = PipeBombError
 
 
-export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = PipeBombError>(
  uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkflow>>,
@@ -832,7 +883,7 @@ export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, 
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getWorkflow>>,
@@ -842,12 +893,12 @@ export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, 
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = void>(
+export function useGetWorkflow<TData = Awaited<ReturnType<typeof getWorkflow>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getWorkflow>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -871,24 +922,29 @@ export type deleteWorkflowResponse204 = {
 }
 
 export type deleteWorkflowResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type deleteWorkflowResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type deleteWorkflowResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type deleteWorkflowResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type deleteWorkflowResponseSuccess = (deleteWorkflowResponse204) & {
   headers: Headers;
 };
-export type deleteWorkflowResponseError = (deleteWorkflowResponse401 | deleteWorkflowResponse403 | deleteWorkflowResponse404) & {
+export type deleteWorkflowResponseError = (deleteWorkflowResponse401 | deleteWorkflowResponse403 | deleteWorkflowResponse404 | deleteWorkflowResponse5xx) & {
   headers: Headers;
 };
 
@@ -916,7 +972,7 @@ export const deleteWorkflow = async (uuid: string, options?: RequestInit): Promi
 
 
 
-export const getDeleteWorkflowMutationOptions = <TError = void,
+export const getDeleteWorkflowMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{uuid: string}, TContext> => {
 
@@ -945,9 +1001,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DeleteWorkflowMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkflow>>>
 
-    export type DeleteWorkflowMutationError = void
+    export type DeleteWorkflowMutationError = PipeBombError
 
-    export const useDeleteWorkflow = <TError = void,
+    export const useDeleteWorkflow = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflow>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteWorkflow>>,
@@ -964,29 +1020,34 @@ export type addWorkflowTriggerResponse200 = {
 }
 
 export type addWorkflowTriggerResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type addWorkflowTriggerResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type addWorkflowTriggerResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
 }
 
 export type addWorkflowTriggerResponse409 = {
-  data: void
+  data: PipeBombError
   status: 409
+}
+
+export type addWorkflowTriggerResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type addWorkflowTriggerResponseSuccess = (addWorkflowTriggerResponse200) & {
   headers: Headers;
 };
-export type addWorkflowTriggerResponseError = (addWorkflowTriggerResponse401 | addWorkflowTriggerResponse403 | addWorkflowTriggerResponse404 | addWorkflowTriggerResponse409) & {
+export type addWorkflowTriggerResponseError = (addWorkflowTriggerResponse401 | addWorkflowTriggerResponse403 | addWorkflowTriggerResponse404 | addWorkflowTriggerResponse409 | addWorkflowTriggerResponse5xx) & {
   headers: Headers;
 };
 
@@ -1015,7 +1076,7 @@ export const addWorkflowTrigger = async (uuid: string,
 
 
 
-export const getAddWorkflowTriggerMutationOptions = <TError = void,
+export const getAddWorkflowTriggerMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addWorkflowTrigger>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof addWorkflowTrigger>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext> => {
 
@@ -1044,9 +1105,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type AddWorkflowTriggerMutationResult = NonNullable<Awaited<ReturnType<typeof addWorkflowTrigger>>>
     export type AddWorkflowTriggerMutationBody = AddWorkflowStepDto
-    export type AddWorkflowTriggerMutationError = void
+    export type AddWorkflowTriggerMutationError = PipeBombError
 
-    export const useAddWorkflowTrigger = <TError = void,
+    export const useAddWorkflowTrigger = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addWorkflowTrigger>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof addWorkflowTrigger>>,
@@ -1063,29 +1124,34 @@ export type addWorkflowStepResponse200 = {
 }
 
 export type addWorkflowStepResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type addWorkflowStepResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type addWorkflowStepResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
 }
 
 export type addWorkflowStepResponse409 = {
-  data: void
+  data: PipeBombError
   status: 409
+}
+
+export type addWorkflowStepResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type addWorkflowStepResponseSuccess = (addWorkflowStepResponse200) & {
   headers: Headers;
 };
-export type addWorkflowStepResponseError = (addWorkflowStepResponse401 | addWorkflowStepResponse403 | addWorkflowStepResponse404 | addWorkflowStepResponse409) & {
+export type addWorkflowStepResponseError = (addWorkflowStepResponse401 | addWorkflowStepResponse403 | addWorkflowStepResponse404 | addWorkflowStepResponse409 | addWorkflowStepResponse5xx) & {
   headers: Headers;
 };
 
@@ -1114,7 +1180,7 @@ export const addWorkflowStep = async (uuid: string,
 
 
 
-export const getAddWorkflowStepMutationOptions = <TError = void,
+export const getAddWorkflowStepMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addWorkflowStep>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof addWorkflowStep>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext> => {
 
@@ -1143,9 +1209,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type AddWorkflowStepMutationResult = NonNullable<Awaited<ReturnType<typeof addWorkflowStep>>>
     export type AddWorkflowStepMutationBody = AddWorkflowStepDto
-    export type AddWorkflowStepMutationError = void
+    export type AddWorkflowStepMutationError = PipeBombError
 
-    export const useAddWorkflowStep = <TError = void,
+    export const useAddWorkflowStep = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addWorkflowStep>>, TError,{uuid: string;data: AddWorkflowStepDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof addWorkflowStep>>,
@@ -1162,24 +1228,29 @@ export type deleteWorkflowStepResponse200 = {
 }
 
 export type deleteWorkflowStepResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type deleteWorkflowStepResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type deleteWorkflowStepResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type deleteWorkflowStepResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type deleteWorkflowStepResponseSuccess = (deleteWorkflowStepResponse200) & {
   headers: Headers;
 };
-export type deleteWorkflowStepResponseError = (deleteWorkflowStepResponse401 | deleteWorkflowStepResponse403 | deleteWorkflowStepResponse404) & {
+export type deleteWorkflowStepResponseError = (deleteWorkflowStepResponse401 | deleteWorkflowStepResponse403 | deleteWorkflowStepResponse404 | deleteWorkflowStepResponse5xx) & {
   headers: Headers;
 };
 
@@ -1209,7 +1280,7 @@ export const deleteWorkflowStep = async (workflowUuid: string,
 
 
 
-export const getDeleteWorkflowStepMutationOptions = <TError = void,
+export const getDeleteWorkflowStepMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflowStep>>, TError,{workflowUuid: string;stepUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflowStep>>, TError,{workflowUuid: string;stepUuid: string}, TContext> => {
 
@@ -1238,9 +1309,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DeleteWorkflowStepMutationResult = NonNullable<Awaited<ReturnType<typeof deleteWorkflowStep>>>
 
-    export type DeleteWorkflowStepMutationError = void
+    export type DeleteWorkflowStepMutationError = PipeBombError
 
-    export const useDeleteWorkflowStep = <TError = void,
+    export const useDeleteWorkflowStep = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteWorkflowStep>>, TError,{workflowUuid: string;stepUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteWorkflowStep>>,
@@ -1257,24 +1328,29 @@ export type updateWorkflowStepOptionsResponse200 = {
 }
 
 export type updateWorkflowStepOptionsResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type updateWorkflowStepOptionsResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type updateWorkflowStepOptionsResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type updateWorkflowStepOptionsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type updateWorkflowStepOptionsResponseSuccess = (updateWorkflowStepOptionsResponse200) & {
   headers: Headers;
 };
-export type updateWorkflowStepOptionsResponseError = (updateWorkflowStepOptionsResponse401 | updateWorkflowStepOptionsResponse403 | updateWorkflowStepOptionsResponse404) & {
+export type updateWorkflowStepOptionsResponseError = (updateWorkflowStepOptionsResponse401 | updateWorkflowStepOptionsResponse403 | updateWorkflowStepOptionsResponse404 | updateWorkflowStepOptionsResponse5xx) & {
   headers: Headers;
 };
 
@@ -1305,7 +1381,7 @@ export const updateWorkflowStepOptions = async (workflowUuid: string,
 
 
 
-export const getUpdateWorkflowStepOptionsMutationOptions = <TError = void,
+export const getUpdateWorkflowStepOptionsMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflowStepOptions>>, TError,{workflowUuid: string;stepUuid: string;data: UpdateWorkflowStepOptionsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateWorkflowStepOptions>>, TError,{workflowUuid: string;stepUuid: string;data: UpdateWorkflowStepOptionsDto}, TContext> => {
 
@@ -1334,9 +1410,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type UpdateWorkflowStepOptionsMutationResult = NonNullable<Awaited<ReturnType<typeof updateWorkflowStepOptions>>>
     export type UpdateWorkflowStepOptionsMutationBody = UpdateWorkflowStepOptionsDto
-    export type UpdateWorkflowStepOptionsMutationError = void
+    export type UpdateWorkflowStepOptionsMutationError = PipeBombError
 
-    export const useUpdateWorkflowStepOptions = <TError = void,
+    export const useUpdateWorkflowStepOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateWorkflowStepOptions>>, TError,{workflowUuid: string;stepUuid: string;data: UpdateWorkflowStepOptionsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateWorkflowStepOptions>>,
@@ -1353,19 +1429,24 @@ export type getAllWorkflowTriggersResponse200 = {
 }
 
 export type getAllWorkflowTriggersResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type getAllWorkflowTriggersResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
+}
+
+export type getAllWorkflowTriggersResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getAllWorkflowTriggersResponseSuccess = (getAllWorkflowTriggersResponse200) & {
   headers: Headers;
 };
-export type getAllWorkflowTriggersResponseError = (getAllWorkflowTriggersResponse401 | getAllWorkflowTriggersResponse403) & {
+export type getAllWorkflowTriggersResponseError = (getAllWorkflowTriggersResponse401 | getAllWorkflowTriggersResponse403 | getAllWorkflowTriggersResponse5xx) & {
   headers: Headers;
 };
 
@@ -1401,7 +1482,7 @@ export const getGetAllWorkflowTriggersQueryKey = () => {
     }
 
 
-export const getGetAllWorkflowTriggersQueryOptions = <TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllWorkflowTriggersQueryOptions = <TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -1420,10 +1501,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllWorkflowTriggersQueryResult = NonNullable<Awaited<ReturnType<typeof getAllWorkflowTriggers>>>
-export type GetAllWorkflowTriggersQueryError = void
+export type GetAllWorkflowTriggersQueryError = PipeBombError
 
 
-export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = void>(
+export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllWorkflowTriggers>>,
@@ -1433,7 +1514,7 @@ export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getA
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = void>(
+export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllWorkflowTriggers>>,
@@ -1443,12 +1524,12 @@ export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getA
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = void>(
+export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = void>(
+export function useGetAllWorkflowTriggers<TData = Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowTriggers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -1472,19 +1553,24 @@ export type getAllWorkflowStepsResponse200 = {
 }
 
 export type getAllWorkflowStepsResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type getAllWorkflowStepsResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
+}
+
+export type getAllWorkflowStepsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getAllWorkflowStepsResponseSuccess = (getAllWorkflowStepsResponse200) & {
   headers: Headers;
 };
-export type getAllWorkflowStepsResponseError = (getAllWorkflowStepsResponse401 | getAllWorkflowStepsResponse403) & {
+export type getAllWorkflowStepsResponseError = (getAllWorkflowStepsResponse401 | getAllWorkflowStepsResponse403 | getAllWorkflowStepsResponse5xx) & {
   headers: Headers;
 };
 
@@ -1520,7 +1606,7 @@ export const getGetAllWorkflowStepsQueryKey = () => {
     }
 
 
-export const getGetAllWorkflowStepsQueryOptions = <TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllWorkflowStepsQueryOptions = <TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -1539,10 +1625,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllWorkflowStepsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllWorkflowSteps>>>
-export type GetAllWorkflowStepsQueryError = void
+export type GetAllWorkflowStepsQueryError = PipeBombError
 
 
-export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = void>(
+export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllWorkflowSteps>>,
@@ -1552,7 +1638,7 @@ export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllW
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = void>(
+export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllWorkflowSteps>>,
@@ -1562,12 +1648,12 @@ export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllW
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = void>(
+export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = void>(
+export function useGetAllWorkflowSteps<TData = Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllWorkflowSteps>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -1591,19 +1677,24 @@ export type getAllUsersResponse200 = {
 }
 
 export type getAllUsersResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type getAllUsersResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
+}
+
+export type getAllUsersResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getAllUsersResponseSuccess = (getAllUsersResponse200) & {
   headers: Headers;
 };
-export type getAllUsersResponseError = (getAllUsersResponse401 | getAllUsersResponse403) & {
+export type getAllUsersResponseError = (getAllUsersResponse401 | getAllUsersResponse403 | getAllUsersResponse5xx) & {
   headers: Headers;
 };
 
@@ -1639,7 +1730,7 @@ export const getGetAllUsersQueryKey = () => {
     }
 
 
-export const getGetAllUsersQueryOptions = <TData = Awaited<ReturnType<typeof getAllUsers>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllUsersQueryOptions = <TData = Awaited<ReturnType<typeof getAllUsers>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -1658,10 +1749,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllUsersQueryResult = NonNullable<Awaited<ReturnType<typeof getAllUsers>>>
-export type GetAllUsersQueryError = void
+export type GetAllUsersQueryError = PipeBombError
 
 
-export function useGetAllUsers<TData = Awaited<ReturnType<typeof getAllUsers>>, TError = void>(
+export function useGetAllUsers<TData = Awaited<ReturnType<typeof getAllUsers>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsers>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllUsers>>,
@@ -1671,7 +1762,7 @@ export function useGetAllUsers<TData = Awaited<ReturnType<typeof getAllUsers>>, 
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllUsers<TData = Awaited<ReturnType<typeof getAllUsers>>, TError = void>(
+export function useGetAllUsers<TData = Awaited<ReturnType<typeof getAllUsers>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsers>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllUsers>>,
@@ -1681,12 +1772,12 @@ export function useGetAllUsers<TData = Awaited<ReturnType<typeof getAllUsers>>, 
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllUsers<TData = Awaited<ReturnType<typeof getAllUsers>>, TError = void>(
+export function useGetAllUsers<TData = Awaited<ReturnType<typeof getAllUsers>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllUsers<TData = Awaited<ReturnType<typeof getAllUsers>>, TError = void>(
+export function useGetAllUsers<TData = Awaited<ReturnType<typeof getAllUsers>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUsers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -1710,14 +1801,19 @@ export type loginUserResponse200 = {
 }
 
 export type loginUserResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
+}
+
+export type loginUserResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type loginUserResponseSuccess = (loginUserResponse200) & {
   headers: Headers;
 };
-export type loginUserResponseError = (loginUserResponse401) & {
+export type loginUserResponseError = (loginUserResponse401 | loginUserResponse5xx) & {
   headers: Headers;
 };
 
@@ -1745,7 +1841,7 @@ export const loginUser = async (loginDto: LoginDto, options?: RequestInit): Prom
 
 
 
-export const getLoginUserMutationOptions = <TError = void,
+export const getLoginUserMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof loginUser>>, TError,{data: LoginDto}, TContext> => {
 
@@ -1774,9 +1870,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type LoginUserMutationResult = NonNullable<Awaited<ReturnType<typeof loginUser>>>
     export type LoginUserMutationBody = LoginDto
-    export type LoginUserMutationError = void
+    export type LoginUserMutationError = PipeBombError
 
-    export const useLoginUser = <TError = void,
+    export const useLoginUser = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof loginUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof loginUser>>,
@@ -1792,15 +1888,25 @@ export type createUserResponse201 = {
   status: 201
 }
 
+export type createUserResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
 export type createUserResponse409 = {
-  data: void
+  data: PipeBombError
   status: 409
+}
+
+export type createUserResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type createUserResponseSuccess = (createUserResponse201) & {
   headers: Headers;
 };
-export type createUserResponseError = (createUserResponse409) & {
+export type createUserResponseError = (createUserResponse403 | createUserResponse409 | createUserResponse5xx) & {
   headers: Headers;
 };
 
@@ -1828,7 +1934,7 @@ export const createUser = async (loginDto: LoginDto, options?: RequestInit): Pro
 
 
 
-export const getCreateUserMutationOptions = <TError = void,
+export const getCreateUserMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: LoginDto}, TContext> => {
 
@@ -1857,9 +1963,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type CreateUserMutationResult = NonNullable<Awaited<ReturnType<typeof createUser>>>
     export type CreateUserMutationBody = LoginDto
-    export type CreateUserMutationError = void
+    export type CreateUserMutationError = PipeBombError
 
-    export const useCreateUser = <TError = void,
+    export const useCreateUser = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createUser>>, TError,{data: LoginDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createUser>>,
@@ -1876,14 +1982,19 @@ export type getSelfResponse200 = {
 }
 
 export type getSelfResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
+}
+
+export type getSelfResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getSelfResponseSuccess = (getSelfResponse200) & {
   headers: Headers;
 };
-export type getSelfResponseError = (getSelfResponse401) & {
+export type getSelfResponseError = (getSelfResponse401 | getSelfResponse5xx) & {
   headers: Headers;
 };
 
@@ -1919,7 +2030,7 @@ export const getGetSelfQueryKey = () => {
     }
 
 
-export const getGetSelfQueryOptions = <TData = Awaited<ReturnType<typeof getSelf>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetSelfQueryOptions = <TData = Awaited<ReturnType<typeof getSelf>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -1938,10 +2049,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetSelfQueryResult = NonNullable<Awaited<ReturnType<typeof getSelf>>>
-export type GetSelfQueryError = void
+export type GetSelfQueryError = PipeBombError
 
 
-export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
+export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getSelf>>,
@@ -1951,7 +2062,7 @@ export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError =
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
+export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getSelf>>,
@@ -1961,12 +2072,12 @@ export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError =
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
+export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = void>(
+export function useGetSelf<TData = Awaited<ReturnType<typeof getSelf>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSelf>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -1990,14 +2101,19 @@ export type logoutUserResponse204 = {
 }
 
 export type logoutUserResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
+}
+
+export type logoutUserResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type logoutUserResponseSuccess = (logoutUserResponse204) & {
   headers: Headers;
 };
-export type logoutUserResponseError = (logoutUserResponse401) & {
+export type logoutUserResponseError = (logoutUserResponse401 | logoutUserResponse5xx) & {
   headers: Headers;
 };
 
@@ -2025,7 +2141,7 @@ export const logoutUser = async ( options?: RequestInit): Promise<logoutUserResp
 
 
 
-export const getLogoutUserMutationOptions = <TError = void,
+export const getLogoutUserMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutUser>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof logoutUser>>, TError,void, TContext> => {
 
@@ -2054,9 +2170,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type LogoutUserMutationResult = NonNullable<Awaited<ReturnType<typeof logoutUser>>>
 
-    export type LogoutUserMutationError = void
+    export type LogoutUserMutationError = PipeBombError
 
-    export const useLogoutUser = <TError = void,
+    export const useLogoutUser = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof logoutUser>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof logoutUser>>,
@@ -2073,14 +2189,19 @@ export type getUserResponse200 = {
 }
 
 export type getUserResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getUserResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getUserResponseSuccess = (getUserResponse200) & {
   headers: Headers;
 };
-export type getUserResponseError = (getUserResponse404) & {
+export type getUserResponseError = (getUserResponse404 | getUserResponse5xx) & {
   headers: Headers;
 };
 
@@ -2116,7 +2237,7 @@ export const getGetUserQueryKey = (uuid: string,) => {
     }
 
 
-export const getGetUserQueryOptions = <TData = Awaited<ReturnType<typeof getUser>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetUserQueryOptions = <TData = Awaited<ReturnType<typeof getUser>>, TError = PipeBombError>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -2135,10 +2256,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetUserQueryResult = NonNullable<Awaited<ReturnType<typeof getUser>>>
-export type GetUserQueryError = void
+export type GetUserQueryError = PipeBombError
 
 
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = void>(
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = PipeBombError>(
  uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getUser>>,
@@ -2148,7 +2269,7 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = void>(
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getUser>>,
@@ -2158,12 +2279,12 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = void>(
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = void>(
+export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUser>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -2181,17 +2302,423 @@ export function useGetUser<TData = Awaited<ReturnType<typeof getUser>>, TError =
 
 
 
+export type getSystemConfigOptionsResponse200 = {
+  data: SystemConfigOptions
+  status: 200
+}
+
+export type getSystemConfigOptionsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getSystemConfigOptionsResponseSuccess = (getSystemConfigOptionsResponse200) & {
+  headers: Headers;
+};
+export type getSystemConfigOptionsResponseError = (getSystemConfigOptionsResponse5xx) & {
+  headers: Headers;
+};
+
+export type getSystemConfigOptionsResponse = (getSystemConfigOptionsResponseSuccess | getSystemConfigOptionsResponseError)
+
+export const getGetSystemConfigOptionsUrl = () => {
+
+
+
+
+  return `/system-config`
+}
+
+export const getSystemConfigOptions = async (systemConfigKeysDto: SystemConfigKeysDto, options?: RequestInit): Promise<getSystemConfigOptionsResponse> => {
+
+  return customFetch<getSystemConfigOptionsResponse>(getGetSystemConfigOptionsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(systemConfigKeysDto)
+  }
+);}
+
+
+
+
+export const getGetSystemConfigOptionsMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getSystemConfigOptions>>, TError,{data: SystemConfigKeysDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof getSystemConfigOptions>>, TError,{data: SystemConfigKeysDto}, TContext> => {
+
+const mutationKey = ['getSystemConfigOptions'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getSystemConfigOptions>>, {data: SystemConfigKeysDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  getSystemConfigOptions(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GetSystemConfigOptionsMutationResult = NonNullable<Awaited<ReturnType<typeof getSystemConfigOptions>>>
+    export type GetSystemConfigOptionsMutationBody = SystemConfigKeysDto
+    export type GetSystemConfigOptionsMutationError = PipeBombError
+
+    export const useGetSystemConfigOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getSystemConfigOptions>>, TError,{data: SystemConfigKeysDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof getSystemConfigOptions>>,
+        TError,
+        {data: SystemConfigKeysDto},
+        TContext
+      > => {
+      return useMutation(getGetSystemConfigOptionsMutationOptions(options), queryClient);
+    }
+
+export type updateSystemConfigOptionsResponse200 = {
+  data: SystemConfigOptions
+  status: 200
+}
+
+export type updateSystemConfigOptionsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type updateSystemConfigOptionsResponseSuccess = (updateSystemConfigOptionsResponse200) & {
+  headers: Headers;
+};
+export type updateSystemConfigOptionsResponseError = (updateSystemConfigOptionsResponse5xx) & {
+  headers: Headers;
+};
+
+export type updateSystemConfigOptionsResponse = (updateSystemConfigOptionsResponseSuccess | updateSystemConfigOptionsResponseError)
+
+export const getUpdateSystemConfigOptionsUrl = () => {
+
+
+
+
+  return `/system-config`
+}
+
+export const updateSystemConfigOptions = async (updateSystemConfigOptionsDto: UpdateSystemConfigOptionsDto, options?: RequestInit): Promise<updateSystemConfigOptionsResponse> => {
+
+  return customFetch<updateSystemConfigOptionsResponse>(getUpdateSystemConfigOptionsUrl(),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateSystemConfigOptionsDto)
+  }
+);}
+
+
+
+
+export const getUpdateSystemConfigOptionsMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSystemConfigOptions>>, TError,{data: UpdateSystemConfigOptionsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSystemConfigOptions>>, TError,{data: UpdateSystemConfigOptionsDto}, TContext> => {
+
+const mutationKey = ['updateSystemConfigOptions'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSystemConfigOptions>>, {data: UpdateSystemConfigOptionsDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateSystemConfigOptions(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSystemConfigOptionsMutationResult = NonNullable<Awaited<ReturnType<typeof updateSystemConfigOptions>>>
+    export type UpdateSystemConfigOptionsMutationBody = UpdateSystemConfigOptionsDto
+    export type UpdateSystemConfigOptionsMutationError = PipeBombError
+
+    export const useUpdateSystemConfigOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSystemConfigOptions>>, TError,{data: UpdateSystemConfigOptionsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateSystemConfigOptions>>,
+        TError,
+        {data: UpdateSystemConfigOptionsDto},
+        TContext
+      > => {
+      return useMutation(getUpdateSystemConfigOptionsMutationOptions(options), queryClient);
+    }
+
+export type getUserPrivilegesResponse200 = {
+  data: Privilege[]
+  status: 200
+}
+
+export type getUserPrivilegesResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type getUserPrivilegesResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type getUserPrivilegesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getUserPrivilegesResponseSuccess = (getUserPrivilegesResponse200) & {
+  headers: Headers;
+};
+export type getUserPrivilegesResponseError = (getUserPrivilegesResponse401 | getUserPrivilegesResponse403 | getUserPrivilegesResponse5xx) & {
+  headers: Headers;
+};
+
+export type getUserPrivilegesResponse = (getUserPrivilegesResponseSuccess | getUserPrivilegesResponseError)
+
+export const getGetUserPrivilegesUrl = (userUuid: string,) => {
+
+
+
+
+  return `/privileges/${userUuid}`
+}
+
+export const getUserPrivileges = async (userUuid: string, options?: RequestInit): Promise<getUserPrivilegesResponse> => {
+
+  return customFetch<getUserPrivilegesResponse>(getGetUserPrivilegesUrl(userUuid),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetUserPrivilegesQueryKey = (userUuid: string,) => {
+    return [
+    `/privileges/${userUuid}`
+    ] as const;
+    }
+
+
+export const getGetUserPrivilegesQueryOptions = <TData = Awaited<ReturnType<typeof getUserPrivileges>>, TError = PipeBombError>(userUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetUserPrivilegesQueryKey(userUuid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserPrivileges>>> = ({ signal }) => getUserPrivileges(userUuid, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: userUuid !== null && userUuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetUserPrivilegesQueryResult = NonNullable<Awaited<ReturnType<typeof getUserPrivileges>>>
+export type GetUserPrivilegesQueryError = PipeBombError
+
+
+export function useGetUserPrivileges<TData = Awaited<ReturnType<typeof getUserPrivileges>>, TError = PipeBombError>(
+ userUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUserPrivileges>>,
+          TError,
+          Awaited<ReturnType<typeof getUserPrivileges>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetUserPrivileges<TData = Awaited<ReturnType<typeof getUserPrivileges>>, TError = PipeBombError>(
+ userUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUserPrivileges>>,
+          TError,
+          Awaited<ReturnType<typeof getUserPrivileges>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetUserPrivileges<TData = Awaited<ReturnType<typeof getUserPrivileges>>, TError = PipeBombError>(
+ userUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetUserPrivileges<TData = Awaited<ReturnType<typeof getUserPrivileges>>, TError = PipeBombError>(
+ userUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetUserPrivilegesQueryOptions(userUuid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type updateUserPrivilegesResponse200 = {
+  data: Privilege[]
+  status: 200
+}
+
+export type updateUserPrivilegesResponse400 = {
+  data: PipeBombError
+  status: 400
+}
+
+export type updateUserPrivilegesResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type updateUserPrivilegesResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type updateUserPrivilegesResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type updateUserPrivilegesResponse409 = {
+  data: PipeBombError
+  status: 409
+}
+
+export type updateUserPrivilegesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type updateUserPrivilegesResponseSuccess = (updateUserPrivilegesResponse200) & {
+  headers: Headers;
+};
+export type updateUserPrivilegesResponseError = (updateUserPrivilegesResponse400 | updateUserPrivilegesResponse401 | updateUserPrivilegesResponse403 | updateUserPrivilegesResponse404 | updateUserPrivilegesResponse409 | updateUserPrivilegesResponse5xx) & {
+  headers: Headers;
+};
+
+export type updateUserPrivilegesResponse = (updateUserPrivilegesResponseSuccess | updateUserPrivilegesResponseError)
+
+export const getUpdateUserPrivilegesUrl = (userUuid: string,) => {
+
+
+
+
+  return `/privileges/${userUuid}`
+}
+
+export const updateUserPrivileges = async (userUuid: string,
+    updatePrivilegesDto: UpdatePrivilegesDto, options?: RequestInit): Promise<updateUserPrivilegesResponse> => {
+
+  return customFetch<updateUserPrivilegesResponse>(getUpdateUserPrivilegesUrl(userUuid),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updatePrivilegesDto)
+  }
+);}
+
+
+
+
+export const getUpdateUserPrivilegesMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserPrivileges>>, TError,{userUuid: string;data: UpdatePrivilegesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateUserPrivileges>>, TError,{userUuid: string;data: UpdatePrivilegesDto}, TContext> => {
+
+const mutationKey = ['updateUserPrivileges'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateUserPrivileges>>, {userUuid: string;data: UpdatePrivilegesDto}> = (props) => {
+          const {userUuid,data} = props ?? {};
+
+          return  updateUserPrivileges(userUuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateUserPrivilegesMutationResult = NonNullable<Awaited<ReturnType<typeof updateUserPrivileges>>>
+    export type UpdateUserPrivilegesMutationBody = UpdatePrivilegesDto
+    export type UpdateUserPrivilegesMutationError = PipeBombError
+
+    export const useUpdateUserPrivileges = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserPrivileges>>, TError,{userUuid: string;data: UpdatePrivilegesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateUserPrivileges>>,
+        TError,
+        {userUuid: string;data: UpdatePrivilegesDto},
+        TContext
+      > => {
+      return useMutation(getUpdateUserPrivilegesMutationOptions(options), queryClient);
+    }
+
 export type getAllAttributesResponse200 = {
   data: AllAttributes
   status: 200
 }
 
+export type getAllAttributesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getAllAttributesResponseSuccess = (getAllAttributesResponse200) & {
   headers: Headers;
 };
-;
+export type getAllAttributesResponseError = (getAllAttributesResponse5xx) & {
+  headers: Headers;
+};
 
-export type getAllAttributesResponse = (getAllAttributesResponseSuccess)
+export type getAllAttributesResponse = (getAllAttributesResponseSuccess | getAllAttributesResponseError)
 
 export const getGetAllAttributesUrl = () => {
 
@@ -2223,7 +2750,7 @@ export const getGetAllAttributesQueryKey = () => {
     }
 
 
-export const getGetAllAttributesQueryOptions = <TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllAttributesQueryOptions = <TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -2242,10 +2769,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllAttributesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllAttributes>>>
-export type GetAllAttributesQueryError = unknown
+export type GetAllAttributesQueryError = PipeBombError
 
 
-export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllAttributes>>,
@@ -2255,7 +2782,7 @@ export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttr
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllAttributes>>,
@@ -2265,12 +2792,12 @@ export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttr
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = unknown>(
+export function useGetAllAttributes<TData = Awaited<ReturnType<typeof getAllAttributes>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributes>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -2294,24 +2821,29 @@ export type uploadAttributeBufferResponse204 = {
 }
 
 export type uploadAttributeBufferResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type uploadAttributeBufferResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type uploadAttributeBufferResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type uploadAttributeBufferResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type uploadAttributeBufferResponseSuccess = (uploadAttributeBufferResponse204) & {
   headers: Headers;
 };
-export type uploadAttributeBufferResponseError = (uploadAttributeBufferResponse401 | uploadAttributeBufferResponse403 | uploadAttributeBufferResponse404) & {
+export type uploadAttributeBufferResponseError = (uploadAttributeBufferResponse401 | uploadAttributeBufferResponse403 | uploadAttributeBufferResponse404 | uploadAttributeBufferResponse5xx) & {
   headers: Headers;
 };
 
@@ -2344,7 +2876,7 @@ if(uploadAttributeBufferBody.file !== undefined) {
 
 
 
-export const getUploadAttributeBufferMutationOptions = <TError = void,
+export const getUploadAttributeBufferMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext> => {
 
@@ -2373,9 +2905,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type UploadAttributeBufferMutationResult = NonNullable<Awaited<ReturnType<typeof uploadAttributeBuffer>>>
     export type UploadAttributeBufferMutationBody = UploadAttributeBufferBody
-    export type UploadAttributeBufferMutationError = void
+    export type UploadAttributeBufferMutationError = PipeBombError
 
-    export const useUploadAttributeBuffer = <TError = void,
+    export const useUploadAttributeBuffer = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof uploadAttributeBuffer>>, TError,{uuid: string;data: UploadAttributeBufferBody}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof uploadAttributeBuffer>>,
@@ -2392,19 +2924,24 @@ export type getTasksResponse200 = {
 }
 
 export type getTasksResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type getTasksResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
+}
+
+export type getTasksResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getTasksResponseSuccess = (getTasksResponse200) & {
   headers: Headers;
 };
-export type getTasksResponseError = (getTasksResponse401 | getTasksResponse403) & {
+export type getTasksResponseError = (getTasksResponse401 | getTasksResponse403 | getTasksResponse5xx) & {
   headers: Headers;
 };
 
@@ -2440,7 +2977,7 @@ export const getGetTasksQueryKey = () => {
     }
 
 
-export const getGetTasksQueryOptions = <TData = Awaited<ReturnType<typeof getTasks>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetTasksQueryOptions = <TData = Awaited<ReturnType<typeof getTasks>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -2459,10 +2996,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetTasksQueryResult = NonNullable<Awaited<ReturnType<typeof getTasks>>>
-export type GetTasksQueryError = void
+export type GetTasksQueryError = PipeBombError
 
 
-export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = void>(
+export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getTasks>>,
@@ -2472,7 +3009,7 @@ export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = void>(
+export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getTasks>>,
@@ -2482,12 +3019,12 @@ export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = void>(
+export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = void>(
+export function useGetTasks<TData = Awaited<ReturnType<typeof getTasks>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTasks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -2511,29 +3048,34 @@ export type startTaskResponse204 = {
 }
 
 export type startTaskResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type startTaskResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type startTaskResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
 }
 
 export type startTaskResponse409 = {
-  data: void
+  data: PipeBombError
   status: 409
+}
+
+export type startTaskResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type startTaskResponseSuccess = (startTaskResponse204) & {
   headers: Headers;
 };
-export type startTaskResponseError = (startTaskResponse401 | startTaskResponse403 | startTaskResponse404 | startTaskResponse409) & {
+export type startTaskResponseError = (startTaskResponse401 | startTaskResponse403 | startTaskResponse404 | startTaskResponse409 | startTaskResponse5xx) & {
   headers: Headers;
 };
 
@@ -2562,7 +3104,7 @@ export const startTask = async (taskUuid: string,
 
 
 
-export const getStartTaskMutationOptions = <TError = void,
+export const getStartTaskMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext> => {
 
@@ -2591,9 +3133,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type StartTaskMutationResult = NonNullable<Awaited<ReturnType<typeof startTask>>>
     export type StartTaskMutationBody = StartTaskDto
-    export type StartTaskMutationError = void
+    export type StartTaskMutationError = PipeBombError
 
-    export const useStartTask = <TError = void,
+    export const useStartTask = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof startTask>>, TError,{taskUuid: string;data: StartTaskDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof startTask>>,
@@ -2605,17 +3147,22 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     }
 
 export type getIconResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type getIconResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
 }
 
+export type getIconResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 ;
-export type getIconResponseError = (getIconResponse401 | getIconResponse404) & {
+export type getIconResponseError = (getIconResponse401 | getIconResponse404 | getIconResponse5xx) & {
   headers: Headers;
 };
 
@@ -2654,7 +3201,7 @@ export const getGetIconQueryKey = (pluginId: string,
     }
 
 
-export const getGetIconQueryOptions = <TData = Awaited<ReturnType<typeof getIcon>>, TError = void>(pluginId: string,
+export const getGetIconQueryOptions = <TData = Awaited<ReturnType<typeof getIcon>>, TError = PipeBombError>(pluginId: string,
     iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
@@ -2674,10 +3221,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetIconQueryResult = NonNullable<Awaited<ReturnType<typeof getIcon>>>
-export type GetIconQueryError = void
+export type GetIconQueryError = PipeBombError
 
 
-export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = void>(
+export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = PipeBombError>(
  pluginId: string,
     iconId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -2688,7 +3235,7 @@ export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError =
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = void>(
+export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = PipeBombError>(
  pluginId: string,
     iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -2699,13 +3246,13 @@ export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError =
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = void>(
+export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = PipeBombError>(
  pluginId: string,
     iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = void>(
+export function useGetIcon<TData = Awaited<ReturnType<typeof getIcon>>, TError = PipeBombError>(
  pluginId: string,
     iconId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getIcon>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
@@ -2729,12 +3276,19 @@ export type getAllAttributeSourcesResponse200 = {
   status: 200
 }
 
+export type getAllAttributeSourcesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getAllAttributeSourcesResponseSuccess = (getAllAttributeSourcesResponse200) & {
   headers: Headers;
 };
-;
+export type getAllAttributeSourcesResponseError = (getAllAttributeSourcesResponse5xx) & {
+  headers: Headers;
+};
 
-export type getAllAttributeSourcesResponse = (getAllAttributeSourcesResponseSuccess)
+export type getAllAttributeSourcesResponse = (getAllAttributeSourcesResponseSuccess | getAllAttributeSourcesResponseError)
 
 export const getGetAllAttributeSourcesUrl = () => {
 
@@ -2766,7 +3320,7 @@ export const getGetAllAttributeSourcesQueryKey = () => {
     }
 
 
-export const getGetAllAttributeSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllAttributeSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -2785,10 +3339,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllAttributeSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllAttributeSources>>>
-export type GetAllAttributeSourcesQueryError = unknown
+export type GetAllAttributeSourcesQueryError = PipeBombError
 
 
-export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
+export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllAttributeSources>>,
@@ -2798,7 +3352,7 @@ export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getA
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
+export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllAttributeSources>>,
@@ -2808,12 +3362,12 @@ export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getA
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
+export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = unknown>(
+export function useGetAllAttributeSources<TData = Awaited<ReturnType<typeof getAllAttributeSources>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllAttributeSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -2836,12 +3390,19 @@ export type setAttributeSourceOrderResponse200 = {
   status: 200
 }
 
+export type setAttributeSourceOrderResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type setAttributeSourceOrderResponseSuccess = (setAttributeSourceOrderResponse200) & {
   headers: Headers;
 };
-;
+export type setAttributeSourceOrderResponseError = (setAttributeSourceOrderResponse5xx) & {
+  headers: Headers;
+};
 
-export type setAttributeSourceOrderResponse = (setAttributeSourceOrderResponseSuccess)
+export type setAttributeSourceOrderResponse = (setAttributeSourceOrderResponseSuccess | setAttributeSourceOrderResponseError)
 
 export const getSetAttributeSourceOrderUrl = () => {
 
@@ -2865,7 +3426,7 @@ export const setAttributeSourceOrder = async (attributeSourceOrderDto: Attribute
 
 
 
-export const getSetAttributeSourceOrderMutationOptions = <TError = unknown,
+export const getSetAttributeSourceOrderMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setAttributeSourceOrder>>, TError,{data: AttributeSourceOrderDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof setAttributeSourceOrder>>, TError,{data: AttributeSourceOrderDto}, TContext> => {
 
@@ -2894,9 +3455,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type SetAttributeSourceOrderMutationResult = NonNullable<Awaited<ReturnType<typeof setAttributeSourceOrder>>>
     export type SetAttributeSourceOrderMutationBody = AttributeSourceOrderDto
-    export type SetAttributeSourceOrderMutationError = unknown
+    export type SetAttributeSourceOrderMutationError = PipeBombError
 
-    export const useSetAttributeSourceOrder = <TError = unknown,
+    export const useSetAttributeSourceOrder = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setAttributeSourceOrder>>, TError,{data: AttributeSourceOrderDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof setAttributeSourceOrder>>,
@@ -2912,12 +3473,19 @@ export type getAllIdentifiersResponse200 = {
   status: 200
 }
 
+export type getAllIdentifiersResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getAllIdentifiersResponseSuccess = (getAllIdentifiersResponse200) & {
   headers: Headers;
 };
-;
+export type getAllIdentifiersResponseError = (getAllIdentifiersResponse5xx) & {
+  headers: Headers;
+};
 
-export type getAllIdentifiersResponse = (getAllIdentifiersResponseSuccess)
+export type getAllIdentifiersResponse = (getAllIdentifiersResponseSuccess | getAllIdentifiersResponseError)
 
 export const getGetAllIdentifiersUrl = () => {
 
@@ -2949,7 +3517,7 @@ export const getGetAllIdentifiersQueryKey = () => {
     }
 
 
-export const getGetAllIdentifiersQueryOptions = <TData = Awaited<ReturnType<typeof getAllIdentifiers>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllIdentifiers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllIdentifiersQueryOptions = <TData = Awaited<ReturnType<typeof getAllIdentifiers>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllIdentifiers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -2968,10 +3536,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllIdentifiersQueryResult = NonNullable<Awaited<ReturnType<typeof getAllIdentifiers>>>
-export type GetAllIdentifiersQueryError = unknown
+export type GetAllIdentifiersQueryError = PipeBombError
 
 
-export function useGetAllIdentifiers<TData = Awaited<ReturnType<typeof getAllIdentifiers>>, TError = unknown>(
+export function useGetAllIdentifiers<TData = Awaited<ReturnType<typeof getAllIdentifiers>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllIdentifiers>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllIdentifiers>>,
@@ -2981,7 +3549,7 @@ export function useGetAllIdentifiers<TData = Awaited<ReturnType<typeof getAllIde
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllIdentifiers<TData = Awaited<ReturnType<typeof getAllIdentifiers>>, TError = unknown>(
+export function useGetAllIdentifiers<TData = Awaited<ReturnType<typeof getAllIdentifiers>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllIdentifiers>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllIdentifiers>>,
@@ -2991,12 +3559,12 @@ export function useGetAllIdentifiers<TData = Awaited<ReturnType<typeof getAllIde
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllIdentifiers<TData = Awaited<ReturnType<typeof getAllIdentifiers>>, TError = unknown>(
+export function useGetAllIdentifiers<TData = Awaited<ReturnType<typeof getAllIdentifiers>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllIdentifiers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllIdentifiers<TData = Awaited<ReturnType<typeof getAllIdentifiers>>, TError = unknown>(
+export function useGetAllIdentifiers<TData = Awaited<ReturnType<typeof getAllIdentifiers>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllIdentifiers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3025,19 +3593,24 @@ export type getStreamResponse206 = {
 }
 
 export type getStreamResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
 }
 
 export type getStreamResponse416 = {
-  data: void
+  data: PipeBombError
   status: 416
+}
+
+export type getStreamResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getStreamResponseSuccess = (getStreamResponse200 | getStreamResponse206) & {
   headers: Headers;
 };
-export type getStreamResponseError = (getStreamResponse404 | getStreamResponse416) & {
+export type getStreamResponseError = (getStreamResponse404 | getStreamResponse416 | getStreamResponse5xx) & {
   headers: Headers;
 };
 
@@ -3073,7 +3646,7 @@ export const getGetStreamQueryKey = (id: string,) => {
     }
 
 
-export const getGetStreamQueryOptions = <TData = Awaited<ReturnType<typeof getStream>>, TError = void>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStream>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetStreamQueryOptions = <TData = Awaited<ReturnType<typeof getStream>>, TError = PipeBombError>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStream>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -3092,10 +3665,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetStreamQueryResult = NonNullable<Awaited<ReturnType<typeof getStream>>>
-export type GetStreamQueryError = void
+export type GetStreamQueryError = PipeBombError
 
 
-export function useGetStream<TData = Awaited<ReturnType<typeof getStream>>, TError = void>(
+export function useGetStream<TData = Awaited<ReturnType<typeof getStream>>, TError = PipeBombError>(
  id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStream>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getStream>>,
@@ -3105,7 +3678,7 @@ export function useGetStream<TData = Awaited<ReturnType<typeof getStream>>, TErr
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetStream<TData = Awaited<ReturnType<typeof getStream>>, TError = void>(
+export function useGetStream<TData = Awaited<ReturnType<typeof getStream>>, TError = PipeBombError>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStream>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getStream>>,
@@ -3115,12 +3688,12 @@ export function useGetStream<TData = Awaited<ReturnType<typeof getStream>>, TErr
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetStream<TData = Awaited<ReturnType<typeof getStream>>, TError = void>(
+export function useGetStream<TData = Awaited<ReturnType<typeof getStream>>, TError = PipeBombError>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStream>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetStream<TData = Awaited<ReturnType<typeof getStream>>, TError = void>(
+export function useGetStream<TData = Awaited<ReturnType<typeof getStream>>, TError = PipeBombError>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getStream>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3143,12 +3716,19 @@ export type getHLSPlaylistResponse200 = {
   status: 200
 }
 
+export type getHLSPlaylistResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getHLSPlaylistResponseSuccess = (getHLSPlaylistResponse200) & {
   headers: Headers;
 };
-;
+export type getHLSPlaylistResponseError = (getHLSPlaylistResponse5xx) & {
+  headers: Headers;
+};
 
-export type getHLSPlaylistResponse = (getHLSPlaylistResponseSuccess)
+export type getHLSPlaylistResponse = (getHLSPlaylistResponseSuccess | getHLSPlaylistResponseError)
 
 export const getGetHLSPlaylistUrl = (id: string,) => {
 
@@ -3180,7 +3760,7 @@ export const getGetHLSPlaylistQueryKey = (id: string,) => {
     }
 
 
-export const getGetHLSPlaylistQueryOptions = <TData = Awaited<ReturnType<typeof getHLSPlaylist>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHLSPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetHLSPlaylistQueryOptions = <TData = Awaited<ReturnType<typeof getHLSPlaylist>>, TError = PipeBombError>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHLSPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -3199,10 +3779,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetHLSPlaylistQueryResult = NonNullable<Awaited<ReturnType<typeof getHLSPlaylist>>>
-export type GetHLSPlaylistQueryError = unknown
+export type GetHLSPlaylistQueryError = PipeBombError
 
 
-export function useGetHLSPlaylist<TData = Awaited<ReturnType<typeof getHLSPlaylist>>, TError = unknown>(
+export function useGetHLSPlaylist<TData = Awaited<ReturnType<typeof getHLSPlaylist>>, TError = PipeBombError>(
  id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHLSPlaylist>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getHLSPlaylist>>,
@@ -3212,7 +3792,7 @@ export function useGetHLSPlaylist<TData = Awaited<ReturnType<typeof getHLSPlayli
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetHLSPlaylist<TData = Awaited<ReturnType<typeof getHLSPlaylist>>, TError = unknown>(
+export function useGetHLSPlaylist<TData = Awaited<ReturnType<typeof getHLSPlaylist>>, TError = PipeBombError>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHLSPlaylist>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getHLSPlaylist>>,
@@ -3222,12 +3802,12 @@ export function useGetHLSPlaylist<TData = Awaited<ReturnType<typeof getHLSPlayli
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetHLSPlaylist<TData = Awaited<ReturnType<typeof getHLSPlaylist>>, TError = unknown>(
+export function useGetHLSPlaylist<TData = Awaited<ReturnType<typeof getHLSPlaylist>>, TError = PipeBombError>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHLSPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetHLSPlaylist<TData = Awaited<ReturnType<typeof getHLSPlaylist>>, TError = unknown>(
+export function useGetHLSPlaylist<TData = Awaited<ReturnType<typeof getHLSPlaylist>>, TError = PipeBombError>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHLSPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3250,12 +3830,19 @@ export type getHLSSegmentResponse200 = {
   status: 200
 }
 
+export type getHLSSegmentResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getHLSSegmentResponseSuccess = (getHLSSegmentResponse200) & {
   headers: Headers;
 };
-;
+export type getHLSSegmentResponseError = (getHLSSegmentResponse5xx) & {
+  headers: Headers;
+};
 
-export type getHLSSegmentResponse = (getHLSSegmentResponseSuccess)
+export type getHLSSegmentResponse = (getHLSSegmentResponseSuccess | getHLSSegmentResponseError)
 
 export const getGetHLSSegmentUrl = (id: string,
     segmentId: string,) => {
@@ -3290,7 +3877,7 @@ export const getGetHLSSegmentQueryKey = (id: string,
     }
 
 
-export const getGetHLSSegmentQueryOptions = <TData = Awaited<ReturnType<typeof getHLSSegment>>, TError = unknown>(id: string,
+export const getGetHLSSegmentQueryOptions = <TData = Awaited<ReturnType<typeof getHLSSegment>>, TError = PipeBombError>(id: string,
     segmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHLSSegment>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
@@ -3310,10 +3897,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetHLSSegmentQueryResult = NonNullable<Awaited<ReturnType<typeof getHLSSegment>>>
-export type GetHLSSegmentQueryError = unknown
+export type GetHLSSegmentQueryError = PipeBombError
 
 
-export function useGetHLSSegment<TData = Awaited<ReturnType<typeof getHLSSegment>>, TError = unknown>(
+export function useGetHLSSegment<TData = Awaited<ReturnType<typeof getHLSSegment>>, TError = PipeBombError>(
  id: string,
     segmentId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHLSSegment>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -3324,7 +3911,7 @@ export function useGetHLSSegment<TData = Awaited<ReturnType<typeof getHLSSegment
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetHLSSegment<TData = Awaited<ReturnType<typeof getHLSSegment>>, TError = unknown>(
+export function useGetHLSSegment<TData = Awaited<ReturnType<typeof getHLSSegment>>, TError = PipeBombError>(
  id: string,
     segmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHLSSegment>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -3335,13 +3922,13 @@ export function useGetHLSSegment<TData = Awaited<ReturnType<typeof getHLSSegment
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetHLSSegment<TData = Awaited<ReturnType<typeof getHLSSegment>>, TError = unknown>(
+export function useGetHLSSegment<TData = Awaited<ReturnType<typeof getHLSSegment>>, TError = PipeBombError>(
  id: string,
     segmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHLSSegment>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetHLSSegment<TData = Awaited<ReturnType<typeof getHLSSegment>>, TError = unknown>(
+export function useGetHLSSegment<TData = Awaited<ReturnType<typeof getHLSSegment>>, TError = PipeBombError>(
  id: string,
     segmentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHLSSegment>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
@@ -3365,12 +3952,19 @@ export type getLanguageIdsResponse200 = {
   status: 200
 }
 
+export type getLanguageIdsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getLanguageIdsResponseSuccess = (getLanguageIdsResponse200) & {
   headers: Headers;
 };
-;
+export type getLanguageIdsResponseError = (getLanguageIdsResponse5xx) & {
+  headers: Headers;
+};
 
-export type getLanguageIdsResponse = (getLanguageIdsResponseSuccess)
+export type getLanguageIdsResponse = (getLanguageIdsResponseSuccess | getLanguageIdsResponseError)
 
 export const getGetLanguageIdsUrl = () => {
 
@@ -3402,7 +3996,7 @@ export const getGetLanguageIdsQueryKey = () => {
     }
 
 
-export const getGetLanguageIdsQueryOptions = <TData = Awaited<ReturnType<typeof getLanguageIds>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetLanguageIdsQueryOptions = <TData = Awaited<ReturnType<typeof getLanguageIds>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -3421,10 +4015,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetLanguageIdsQueryResult = NonNullable<Awaited<ReturnType<typeof getLanguageIds>>>
-export type GetLanguageIdsQueryError = unknown
+export type GetLanguageIdsQueryError = PipeBombError
 
 
-export function useGetLanguageIds<TData = Awaited<ReturnType<typeof getLanguageIds>>, TError = unknown>(
+export function useGetLanguageIds<TData = Awaited<ReturnType<typeof getLanguageIds>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageIds>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getLanguageIds>>,
@@ -3434,7 +4028,7 @@ export function useGetLanguageIds<TData = Awaited<ReturnType<typeof getLanguageI
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetLanguageIds<TData = Awaited<ReturnType<typeof getLanguageIds>>, TError = unknown>(
+export function useGetLanguageIds<TData = Awaited<ReturnType<typeof getLanguageIds>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageIds>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getLanguageIds>>,
@@ -3444,12 +4038,12 @@ export function useGetLanguageIds<TData = Awaited<ReturnType<typeof getLanguageI
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetLanguageIds<TData = Awaited<ReturnType<typeof getLanguageIds>>, TError = unknown>(
+export function useGetLanguageIds<TData = Awaited<ReturnType<typeof getLanguageIds>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetLanguageIds<TData = Awaited<ReturnType<typeof getLanguageIds>>, TError = unknown>(
+export function useGetLanguageIds<TData = Awaited<ReturnType<typeof getLanguageIds>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3472,12 +4066,19 @@ export type getLanguageMapResponse200 = {
   status: 200
 }
 
+export type getLanguageMapResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getLanguageMapResponseSuccess = (getLanguageMapResponse200) & {
   headers: Headers;
 };
-;
+export type getLanguageMapResponseError = (getLanguageMapResponse5xx) & {
+  headers: Headers;
+};
 
-export type getLanguageMapResponse = (getLanguageMapResponseSuccess)
+export type getLanguageMapResponse = (getLanguageMapResponseSuccess | getLanguageMapResponseError)
 
 export const getGetLanguageMapUrl = (languageId: string,) => {
 
@@ -3509,7 +4110,7 @@ export const getGetLanguageMapQueryKey = (languageId: string,) => {
     }
 
 
-export const getGetLanguageMapQueryOptions = <TData = Awaited<ReturnType<typeof getLanguageMap>>, TError = unknown>(languageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageMap>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetLanguageMapQueryOptions = <TData = Awaited<ReturnType<typeof getLanguageMap>>, TError = PipeBombError>(languageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageMap>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -3528,10 +4129,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetLanguageMapQueryResult = NonNullable<Awaited<ReturnType<typeof getLanguageMap>>>
-export type GetLanguageMapQueryError = unknown
+export type GetLanguageMapQueryError = PipeBombError
 
 
-export function useGetLanguageMap<TData = Awaited<ReturnType<typeof getLanguageMap>>, TError = unknown>(
+export function useGetLanguageMap<TData = Awaited<ReturnType<typeof getLanguageMap>>, TError = PipeBombError>(
  languageId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageMap>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getLanguageMap>>,
@@ -3541,7 +4142,7 @@ export function useGetLanguageMap<TData = Awaited<ReturnType<typeof getLanguageM
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetLanguageMap<TData = Awaited<ReturnType<typeof getLanguageMap>>, TError = unknown>(
+export function useGetLanguageMap<TData = Awaited<ReturnType<typeof getLanguageMap>>, TError = PipeBombError>(
  languageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageMap>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getLanguageMap>>,
@@ -3551,12 +4152,12 @@ export function useGetLanguageMap<TData = Awaited<ReturnType<typeof getLanguageM
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetLanguageMap<TData = Awaited<ReturnType<typeof getLanguageMap>>, TError = unknown>(
+export function useGetLanguageMap<TData = Awaited<ReturnType<typeof getLanguageMap>>, TError = PipeBombError>(
  languageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageMap>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetLanguageMap<TData = Awaited<ReturnType<typeof getLanguageMap>>, TError = unknown>(
+export function useGetLanguageMap<TData = Awaited<ReturnType<typeof getLanguageMap>>, TError = PipeBombError>(
  languageId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getLanguageMap>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3579,12 +4180,19 @@ export type getAllPluginConfigsResponse200 = {
   status: 200
 }
 
+export type getAllPluginConfigsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getAllPluginConfigsResponseSuccess = (getAllPluginConfigsResponse200) & {
   headers: Headers;
 };
-;
+export type getAllPluginConfigsResponseError = (getAllPluginConfigsResponse5xx) & {
+  headers: Headers;
+};
 
-export type getAllPluginConfigsResponse = (getAllPluginConfigsResponseSuccess)
+export type getAllPluginConfigsResponse = (getAllPluginConfigsResponseSuccess | getAllPluginConfigsResponseError)
 
 export const getGetAllPluginConfigsUrl = () => {
 
@@ -3616,7 +4224,7 @@ export const getGetAllPluginConfigsQueryKey = () => {
     }
 
 
-export const getGetAllPluginConfigsQueryOptions = <TData = Awaited<ReturnType<typeof getAllPluginConfigs>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPluginConfigs>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllPluginConfigsQueryOptions = <TData = Awaited<ReturnType<typeof getAllPluginConfigs>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPluginConfigs>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -3635,10 +4243,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllPluginConfigsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllPluginConfigs>>>
-export type GetAllPluginConfigsQueryError = unknown
+export type GetAllPluginConfigsQueryError = PipeBombError
 
 
-export function useGetAllPluginConfigs<TData = Awaited<ReturnType<typeof getAllPluginConfigs>>, TError = unknown>(
+export function useGetAllPluginConfigs<TData = Awaited<ReturnType<typeof getAllPluginConfigs>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPluginConfigs>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllPluginConfigs>>,
@@ -3648,7 +4256,7 @@ export function useGetAllPluginConfigs<TData = Awaited<ReturnType<typeof getAllP
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllPluginConfigs<TData = Awaited<ReturnType<typeof getAllPluginConfigs>>, TError = unknown>(
+export function useGetAllPluginConfigs<TData = Awaited<ReturnType<typeof getAllPluginConfigs>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPluginConfigs>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllPluginConfigs>>,
@@ -3658,12 +4266,12 @@ export function useGetAllPluginConfigs<TData = Awaited<ReturnType<typeof getAllP
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllPluginConfigs<TData = Awaited<ReturnType<typeof getAllPluginConfigs>>, TError = unknown>(
+export function useGetAllPluginConfigs<TData = Awaited<ReturnType<typeof getAllPluginConfigs>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPluginConfigs>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllPluginConfigs<TData = Awaited<ReturnType<typeof getAllPluginConfigs>>, TError = unknown>(
+export function useGetAllPluginConfigs<TData = Awaited<ReturnType<typeof getAllPluginConfigs>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPluginConfigs>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3686,12 +4294,19 @@ export type getAllUserConfigsResponse200 = {
   status: 200
 }
 
+export type getAllUserConfigsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getAllUserConfigsResponseSuccess = (getAllUserConfigsResponse200) & {
   headers: Headers;
 };
-;
+export type getAllUserConfigsResponseError = (getAllUserConfigsResponse5xx) & {
+  headers: Headers;
+};
 
-export type getAllUserConfigsResponse = (getAllUserConfigsResponseSuccess)
+export type getAllUserConfigsResponse = (getAllUserConfigsResponseSuccess | getAllUserConfigsResponseError)
 
 export const getGetAllUserConfigsUrl = () => {
 
@@ -3723,7 +4338,7 @@ export const getGetAllUserConfigsQueryKey = () => {
     }
 
 
-export const getGetAllUserConfigsQueryOptions = <TData = Awaited<ReturnType<typeof getAllUserConfigs>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUserConfigs>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllUserConfigsQueryOptions = <TData = Awaited<ReturnType<typeof getAllUserConfigs>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUserConfigs>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -3742,10 +4357,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllUserConfigsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllUserConfigs>>>
-export type GetAllUserConfigsQueryError = unknown
+export type GetAllUserConfigsQueryError = PipeBombError
 
 
-export function useGetAllUserConfigs<TData = Awaited<ReturnType<typeof getAllUserConfigs>>, TError = unknown>(
+export function useGetAllUserConfigs<TData = Awaited<ReturnType<typeof getAllUserConfigs>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUserConfigs>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllUserConfigs>>,
@@ -3755,7 +4370,7 @@ export function useGetAllUserConfigs<TData = Awaited<ReturnType<typeof getAllUse
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllUserConfigs<TData = Awaited<ReturnType<typeof getAllUserConfigs>>, TError = unknown>(
+export function useGetAllUserConfigs<TData = Awaited<ReturnType<typeof getAllUserConfigs>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUserConfigs>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllUserConfigs>>,
@@ -3765,12 +4380,12 @@ export function useGetAllUserConfigs<TData = Awaited<ReturnType<typeof getAllUse
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllUserConfigs<TData = Awaited<ReturnType<typeof getAllUserConfigs>>, TError = unknown>(
+export function useGetAllUserConfigs<TData = Awaited<ReturnType<typeof getAllUserConfigs>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUserConfigs>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllUserConfigs<TData = Awaited<ReturnType<typeof getAllUserConfigs>>, TError = unknown>(
+export function useGetAllUserConfigs<TData = Awaited<ReturnType<typeof getAllUserConfigs>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllUserConfigs>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3794,14 +4409,19 @@ export type getPluginConfigResponse200 = {
 }
 
 export type getPluginConfigResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getPluginConfigResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getPluginConfigResponseSuccess = (getPluginConfigResponse200) & {
   headers: Headers;
 };
-export type getPluginConfigResponseError = (getPluginConfigResponse404) & {
+export type getPluginConfigResponseError = (getPluginConfigResponse404 | getPluginConfigResponse5xx) & {
   headers: Headers;
 };
 
@@ -3837,7 +4457,7 @@ export const getGetPluginConfigQueryKey = (pluginId: string,) => {
     }
 
 
-export const getGetPluginConfigQueryOptions = <TData = Awaited<ReturnType<typeof getPluginConfig>>, TError = void>(pluginId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginConfig>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetPluginConfigQueryOptions = <TData = Awaited<ReturnType<typeof getPluginConfig>>, TError = PipeBombError>(pluginId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginConfig>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -3856,10 +4476,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetPluginConfigQueryResult = NonNullable<Awaited<ReturnType<typeof getPluginConfig>>>
-export type GetPluginConfigQueryError = void
+export type GetPluginConfigQueryError = PipeBombError
 
 
-export function useGetPluginConfig<TData = Awaited<ReturnType<typeof getPluginConfig>>, TError = void>(
+export function useGetPluginConfig<TData = Awaited<ReturnType<typeof getPluginConfig>>, TError = PipeBombError>(
  pluginId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginConfig>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getPluginConfig>>,
@@ -3869,7 +4489,7 @@ export function useGetPluginConfig<TData = Awaited<ReturnType<typeof getPluginCo
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPluginConfig<TData = Awaited<ReturnType<typeof getPluginConfig>>, TError = void>(
+export function useGetPluginConfig<TData = Awaited<ReturnType<typeof getPluginConfig>>, TError = PipeBombError>(
  pluginId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginConfig>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getPluginConfig>>,
@@ -3879,12 +4499,12 @@ export function useGetPluginConfig<TData = Awaited<ReturnType<typeof getPluginCo
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPluginConfig<TData = Awaited<ReturnType<typeof getPluginConfig>>, TError = void>(
+export function useGetPluginConfig<TData = Awaited<ReturnType<typeof getPluginConfig>>, TError = PipeBombError>(
  pluginId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginConfig>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetPluginConfig<TData = Awaited<ReturnType<typeof getPluginConfig>>, TError = void>(
+export function useGetPluginConfig<TData = Awaited<ReturnType<typeof getPluginConfig>>, TError = PipeBombError>(
  pluginId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPluginConfig>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -3908,14 +4528,19 @@ export type updatePluginConfigResponse200 = {
 }
 
 export type updatePluginConfigResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type updatePluginConfigResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type updatePluginConfigResponseSuccess = (updatePluginConfigResponse200) & {
   headers: Headers;
 };
-export type updatePluginConfigResponseError = (updatePluginConfigResponse404) & {
+export type updatePluginConfigResponseError = (updatePluginConfigResponse404 | updatePluginConfigResponse5xx) & {
   headers: Headers;
 };
 
@@ -3944,7 +4569,7 @@ export const updatePluginConfig = async (pluginId: string,
 
 
 
-export const getUpdatePluginConfigMutationOptions = <TError = void,
+export const getUpdatePluginConfigMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePluginConfig>>, TError,{pluginId: string;data: PluginConfigUpdateDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updatePluginConfig>>, TError,{pluginId: string;data: PluginConfigUpdateDto}, TContext> => {
 
@@ -3973,9 +4598,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type UpdatePluginConfigMutationResult = NonNullable<Awaited<ReturnType<typeof updatePluginConfig>>>
     export type UpdatePluginConfigMutationBody = PluginConfigUpdateDto
-    export type UpdatePluginConfigMutationError = void
+    export type UpdatePluginConfigMutationError = PipeBombError
 
-    export const useUpdatePluginConfig = <TError = void,
+    export const useUpdatePluginConfig = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePluginConfig>>, TError,{pluginId: string;data: PluginConfigUpdateDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updatePluginConfig>>,
@@ -3992,19 +4617,24 @@ export type getUserConfigResponse200 = {
 }
 
 export type getUserConfigResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type getUserConfigResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getUserConfigResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getUserConfigResponseSuccess = (getUserConfigResponse200) & {
   headers: Headers;
 };
-export type getUserConfigResponseError = (getUserConfigResponse403 | getUserConfigResponse404) & {
+export type getUserConfigResponseError = (getUserConfigResponse403 | getUserConfigResponse404 | getUserConfigResponse5xx) & {
   headers: Headers;
 };
 
@@ -4043,7 +4673,7 @@ export const getGetUserConfigQueryKey = (pluginId: string,
     }
 
 
-export const getGetUserConfigQueryOptions = <TData = Awaited<ReturnType<typeof getUserConfig>>, TError = void>(pluginId: string,
+export const getGetUserConfigQueryOptions = <TData = Awaited<ReturnType<typeof getUserConfig>>, TError = PipeBombError>(pluginId: string,
     configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserConfig>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
@@ -4063,10 +4693,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetUserConfigQueryResult = NonNullable<Awaited<ReturnType<typeof getUserConfig>>>
-export type GetUserConfigQueryError = void
+export type GetUserConfigQueryError = PipeBombError
 
 
-export function useGetUserConfig<TData = Awaited<ReturnType<typeof getUserConfig>>, TError = void>(
+export function useGetUserConfig<TData = Awaited<ReturnType<typeof getUserConfig>>, TError = PipeBombError>(
  pluginId: string,
     configId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserConfig>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -4077,7 +4707,7 @@ export function useGetUserConfig<TData = Awaited<ReturnType<typeof getUserConfig
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetUserConfig<TData = Awaited<ReturnType<typeof getUserConfig>>, TError = void>(
+export function useGetUserConfig<TData = Awaited<ReturnType<typeof getUserConfig>>, TError = PipeBombError>(
  pluginId: string,
     configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserConfig>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -4088,13 +4718,13 @@ export function useGetUserConfig<TData = Awaited<ReturnType<typeof getUserConfig
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetUserConfig<TData = Awaited<ReturnType<typeof getUserConfig>>, TError = void>(
+export function useGetUserConfig<TData = Awaited<ReturnType<typeof getUserConfig>>, TError = PipeBombError>(
  pluginId: string,
     configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserConfig>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetUserConfig<TData = Awaited<ReturnType<typeof getUserConfig>>, TError = void>(
+export function useGetUserConfig<TData = Awaited<ReturnType<typeof getUserConfig>>, TError = PipeBombError>(
  pluginId: string,
     configId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserConfig>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
@@ -4119,19 +4749,24 @@ export type updateUserConfigResponse200 = {
 }
 
 export type updateUserConfigResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type updateUserConfigResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type updateUserConfigResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type updateUserConfigResponseSuccess = (updateUserConfigResponse200) & {
   headers: Headers;
 };
-export type updateUserConfigResponseError = (updateUserConfigResponse403 | updateUserConfigResponse404) & {
+export type updateUserConfigResponseError = (updateUserConfigResponse403 | updateUserConfigResponse404 | updateUserConfigResponse5xx) & {
   headers: Headers;
 };
 
@@ -4162,7 +4797,7 @@ export const updateUserConfig = async (pluginId: string,
 
 
 
-export const getUpdateUserConfigMutationOptions = <TError = void,
+export const getUpdateUserConfigMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserConfig>>, TError,{pluginId: string;configId: string;data: PluginConfigUpdateDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateUserConfig>>, TError,{pluginId: string;configId: string;data: PluginConfigUpdateDto}, TContext> => {
 
@@ -4191,9 +4826,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type UpdateUserConfigMutationResult = NonNullable<Awaited<ReturnType<typeof updateUserConfig>>>
     export type UpdateUserConfigMutationBody = PluginConfigUpdateDto
-    export type UpdateUserConfigMutationError = void
+    export type UpdateUserConfigMutationError = PipeBombError
 
-    export const useUpdateUserConfig = <TError = void,
+    export const useUpdateUserConfig = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserConfig>>, TError,{pluginId: string;configId: string;data: PluginConfigUpdateDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateUserConfig>>,
@@ -4209,12 +4844,19 @@ export type getAllEphemeralSourcesResponse200 = {
   status: 200
 }
 
+export type getAllEphemeralSourcesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getAllEphemeralSourcesResponseSuccess = (getAllEphemeralSourcesResponse200) & {
   headers: Headers;
 };
-;
+export type getAllEphemeralSourcesResponseError = (getAllEphemeralSourcesResponse5xx) & {
+  headers: Headers;
+};
 
-export type getAllEphemeralSourcesResponse = (getAllEphemeralSourcesResponseSuccess)
+export type getAllEphemeralSourcesResponse = (getAllEphemeralSourcesResponseSuccess | getAllEphemeralSourcesResponseError)
 
 export const getGetAllEphemeralSourcesUrl = () => {
 
@@ -4246,7 +4888,7 @@ export const getGetAllEphemeralSourcesQueryKey = () => {
     }
 
 
-export const getGetAllEphemeralSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllEphemeralSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -4265,10 +4907,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllEphemeralSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof getAllEphemeralSources>>>
-export type GetAllEphemeralSourcesQueryError = unknown
+export type GetAllEphemeralSourcesQueryError = PipeBombError
 
 
-export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = unknown>(
+export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllEphemeralSources>>,
@@ -4278,7 +4920,7 @@ export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getA
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = unknown>(
+export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllEphemeralSources>>,
@@ -4288,12 +4930,12 @@ export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getA
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = unknown>(
+export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = unknown>(
+export function useGetAllEphemeralSources<TData = Awaited<ReturnType<typeof getAllEphemeralSources>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -4316,12 +4958,19 @@ export type searchEphemeralSourceResponse200 = {
   status: 200
 }
 
+export type searchEphemeralSourceResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type searchEphemeralSourceResponseSuccess = (searchEphemeralSourceResponse200) & {
   headers: Headers;
 };
-;
+export type searchEphemeralSourceResponseError = (searchEphemeralSourceResponse5xx) & {
+  headers: Headers;
+};
 
-export type searchEphemeralSourceResponse = (searchEphemeralSourceResponseSuccess)
+export type searchEphemeralSourceResponse = (searchEphemeralSourceResponseSuccess | searchEphemeralSourceResponseError)
 
 export const getSearchEphemeralSourceUrl = () => {
 
@@ -4345,7 +4994,7 @@ export const searchEphemeralSource = async (ephemeralSearchDto: EphemeralSearchD
 
 
 
-export const getSearchEphemeralSourceMutationOptions = <TError = unknown,
+export const getSearchEphemeralSourceMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchEphemeralSource>>, TError,{data: EphemeralSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof searchEphemeralSource>>, TError,{data: EphemeralSearchDto}, TContext> => {
 
@@ -4374,9 +5023,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type SearchEphemeralSourceMutationResult = NonNullable<Awaited<ReturnType<typeof searchEphemeralSource>>>
     export type SearchEphemeralSourceMutationBody = EphemeralSearchDto
-    export type SearchEphemeralSourceMutationError = unknown
+    export type SearchEphemeralSourceMutationError = PipeBombError
 
-    export const useSearchEphemeralSource = <TError = unknown,
+    export const useSearchEphemeralSource = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchEphemeralSource>>, TError,{data: EphemeralSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof searchEphemeralSource>>,
@@ -4392,12 +5041,19 @@ export type getAttributeBufferResponse200 = {
   status: 200
 }
 
+export type getAttributeBufferResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getAttributeBufferResponseSuccess = (getAttributeBufferResponse200) & {
   headers: Headers;
 };
-;
+export type getAttributeBufferResponseError = (getAttributeBufferResponse5xx) & {
+  headers: Headers;
+};
 
-export type getAttributeBufferResponse = (getAttributeBufferResponseSuccess)
+export type getAttributeBufferResponse = (getAttributeBufferResponseSuccess | getAttributeBufferResponseError)
 
 export const getGetAttributeBufferUrl = (file: string,
     params?: GetAttributeBufferParams,) => {
@@ -4439,7 +5095,7 @@ export const getGetAttributeBufferQueryKey = (file: string,
     }
 
 
-export const getGetAttributeBufferQueryOptions = <TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(file: string,
+export const getGetAttributeBufferQueryOptions = <TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = PipeBombError>(file: string,
     params?: GetAttributeBufferParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
@@ -4459,10 +5115,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAttributeBufferQueryResult = NonNullable<Awaited<ReturnType<typeof getAttributeBuffer>>>
-export type GetAttributeBufferQueryError = unknown
+export type GetAttributeBufferQueryError = PipeBombError
 
 
-export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
+export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = PipeBombError>(
  file: string,
     params: undefined |  GetAttributeBufferParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -4473,7 +5129,7 @@ export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttri
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
+export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = PipeBombError>(
  file: string,
     params?: GetAttributeBufferParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -4484,13 +5140,13 @@ export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttri
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
+export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = PipeBombError>(
  file: string,
     params?: GetAttributeBufferParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = unknown>(
+export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttributeBuffer>>, TError = PipeBombError>(
  file: string,
     params?: GetAttributeBufferParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAttributeBuffer>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
@@ -4515,14 +5171,19 @@ export type createPlaylistResponse200 = {
 }
 
 export type createPlaylistResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
+}
+
+export type createPlaylistResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type createPlaylistResponseSuccess = (createPlaylistResponse200) & {
   headers: Headers;
 };
-export type createPlaylistResponseError = (createPlaylistResponse401) & {
+export type createPlaylistResponseError = (createPlaylistResponse401 | createPlaylistResponse5xx) & {
   headers: Headers;
 };
 
@@ -4550,7 +5211,7 @@ export const createPlaylist = async (createPlaylistDto: CreatePlaylistDto, optio
 
 
 
-export const getCreatePlaylistMutationOptions = <TError = void,
+export const getCreatePlaylistMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext> => {
 
@@ -4579,9 +5240,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type CreatePlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof createPlaylist>>>
     export type CreatePlaylistMutationBody = CreatePlaylistDto
-    export type CreatePlaylistMutationError = void
+    export type CreatePlaylistMutationError = PipeBombError
 
-    export const useCreatePlaylist = <TError = void,
+    export const useCreatePlaylist = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createPlaylist>>, TError,{data: CreatePlaylistDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createPlaylist>>,
@@ -4598,14 +5259,19 @@ export type getOwnPlaylistsResponse200 = {
 }
 
 export type getOwnPlaylistsResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
+}
+
+export type getOwnPlaylistsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getOwnPlaylistsResponseSuccess = (getOwnPlaylistsResponse200) & {
   headers: Headers;
 };
-export type getOwnPlaylistsResponseError = (getOwnPlaylistsResponse401) & {
+export type getOwnPlaylistsResponseError = (getOwnPlaylistsResponse401 | getOwnPlaylistsResponse5xx) & {
   headers: Headers;
 };
 
@@ -4641,7 +5307,7 @@ export const getGetOwnPlaylistsQueryKey = () => {
     }
 
 
-export const getGetOwnPlaylistsQueryOptions = <TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetOwnPlaylistsQueryOptions = <TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -4660,10 +5326,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetOwnPlaylistsQueryResult = NonNullable<Awaited<ReturnType<typeof getOwnPlaylists>>>
-export type GetOwnPlaylistsQueryError = void
+export type GetOwnPlaylistsQueryError = PipeBombError
 
 
-export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getOwnPlaylists>>,
@@ -4673,7 +5339,7 @@ export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlayl
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getOwnPlaylists>>,
@@ -4683,12 +5349,12 @@ export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlayl
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = void>(
+export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlaylists>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -4712,19 +5378,24 @@ export type getPlaylistResponse200 = {
 }
 
 export type getPlaylistResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type getPlaylistResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
+}
+
+export type getPlaylistResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getPlaylistResponseSuccess = (getPlaylistResponse200) & {
   headers: Headers;
 };
-export type getPlaylistResponseError = (getPlaylistResponse401 | getPlaylistResponse403) & {
+export type getPlaylistResponseError = (getPlaylistResponse401 | getPlaylistResponse403 | getPlaylistResponse5xx) & {
   headers: Headers;
 };
 
@@ -4770,7 +5441,7 @@ export const getGetPlaylistQueryKey = (uuid: string,
     }
 
 
-export const getGetPlaylistQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(uuid: string,
+export const getGetPlaylistQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylist>>, TError = PipeBombError>(uuid: string,
     params?: GetPlaylistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
@@ -4790,10 +5461,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetPlaylistQueryResult = NonNullable<Awaited<ReturnType<typeof getPlaylist>>>
-export type GetPlaylistQueryError = void
+export type GetPlaylistQueryError = PipeBombError
 
 
-export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = PipeBombError>(
  uuid: string,
     params: undefined |  GetPlaylistParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -4804,7 +5475,7 @@ export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, 
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = PipeBombError>(
  uuid: string,
     params?: GetPlaylistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -4815,13 +5486,13 @@ export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, 
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = PipeBombError>(
  uuid: string,
     params?: GetPlaylistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = void>(
+export function useGetPlaylist<TData = Awaited<ReturnType<typeof getPlaylist>>, TError = PipeBombError>(
  uuid: string,
     params?: GetPlaylistParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
@@ -4846,24 +5517,29 @@ export type getPlaylistTracksResponse200 = {
 }
 
 export type getPlaylistTracksResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type getPlaylistTracksResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type getPlaylistTracksResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getPlaylistTracksResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getPlaylistTracksResponseSuccess = (getPlaylistTracksResponse200) & {
   headers: Headers;
 };
-export type getPlaylistTracksResponseError = (getPlaylistTracksResponse401 | getPlaylistTracksResponse403 | getPlaylistTracksResponse404) & {
+export type getPlaylistTracksResponseError = (getPlaylistTracksResponse401 | getPlaylistTracksResponse403 | getPlaylistTracksResponse404 | getPlaylistTracksResponse5xx) & {
   headers: Headers;
 };
 
@@ -4892,7 +5568,7 @@ export const getPlaylistTracks = async (uuid: string,
 
 
 
-export const getGetPlaylistTracksMutationOptions = <TError = void,
+export const getGetPlaylistTracksMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPlaylistTracks>>, TError,{uuid: string;data: PlaylistTracksQuery}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof getPlaylistTracks>>, TError,{uuid: string;data: PlaylistTracksQuery}, TContext> => {
 
@@ -4921,9 +5597,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type GetPlaylistTracksMutationResult = NonNullable<Awaited<ReturnType<typeof getPlaylistTracks>>>
     export type GetPlaylistTracksMutationBody = PlaylistTracksQuery
-    export type GetPlaylistTracksMutationError = void
+    export type GetPlaylistTracksMutationError = PipeBombError
 
-    export const useGetPlaylistTracks = <TError = void,
+    export const useGetPlaylistTracks = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getPlaylistTracks>>, TError,{uuid: string;data: PlaylistTracksQuery}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof getPlaylistTracks>>,
@@ -4940,24 +5616,29 @@ export type deletePlaylistResponse204 = {
 }
 
 export type deletePlaylistResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type deletePlaylistResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type deletePlaylistResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type deletePlaylistResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type deletePlaylistResponseSuccess = (deletePlaylistResponse204) & {
   headers: Headers;
 };
-export type deletePlaylistResponseError = (deletePlaylistResponse401 | deletePlaylistResponse403 | deletePlaylistResponse404) & {
+export type deletePlaylistResponseError = (deletePlaylistResponse401 | deletePlaylistResponse403 | deletePlaylistResponse404 | deletePlaylistResponse5xx) & {
   headers: Headers;
 };
 
@@ -4985,7 +5666,7 @@ export const deletePlaylist = async (uuid: string, options?: RequestInit): Promi
 
 
 
-export const getDeletePlaylistMutationOptions = <TError = void,
+export const getDeletePlaylistMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext> => {
 
@@ -5014,9 +5695,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DeletePlaylistMutationResult = NonNullable<Awaited<ReturnType<typeof deletePlaylist>>>
 
-    export type DeletePlaylistMutationError = void
+    export type DeletePlaylistMutationError = PipeBombError
 
-    export const useDeletePlaylist = <TError = void,
+    export const useDeletePlaylist = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylist>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deletePlaylist>>,
@@ -5033,24 +5714,29 @@ export type getAllPlaylistTrackIdsResponse200 = {
 }
 
 export type getAllPlaylistTrackIdsResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type getAllPlaylistTrackIdsResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type getAllPlaylistTrackIdsResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getAllPlaylistTrackIdsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getAllPlaylistTrackIdsResponseSuccess = (getAllPlaylistTrackIdsResponse200) & {
   headers: Headers;
 };
-export type getAllPlaylistTrackIdsResponseError = (getAllPlaylistTrackIdsResponse401 | getAllPlaylistTrackIdsResponse403 | getAllPlaylistTrackIdsResponse404) & {
+export type getAllPlaylistTrackIdsResponseError = (getAllPlaylistTrackIdsResponse401 | getAllPlaylistTrackIdsResponse403 | getAllPlaylistTrackIdsResponse404 | getAllPlaylistTrackIdsResponse5xx) & {
   headers: Headers;
 };
 
@@ -5086,7 +5772,7 @@ export const getGetAllPlaylistTrackIdsQueryKey = (uuid: string,) => {
     }
 
 
-export const getGetAllPlaylistTrackIdsQueryOptions = <TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAllPlaylistTrackIdsQueryOptions = <TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = PipeBombError>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -5105,10 +5791,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAllPlaylistTrackIdsQueryResult = NonNullable<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>>
-export type GetAllPlaylistTrackIdsQueryError = void
+export type GetAllPlaylistTrackIdsQueryError = PipeBombError
 
 
-export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
+export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = PipeBombError>(
  uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllPlaylistTrackIds>>,
@@ -5118,7 +5804,7 @@ export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getA
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
+export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAllPlaylistTrackIds>>,
@@ -5128,12 +5814,12 @@ export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getA
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
+export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = void>(
+export function useGetAllPlaylistTrackIds<TData = Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAllPlaylistTrackIds>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -5157,24 +5843,29 @@ export type updatePlaylistTracksResponse200 = {
 }
 
 export type updatePlaylistTracksResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type updatePlaylistTracksResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type updatePlaylistTracksResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type updatePlaylistTracksResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type updatePlaylistTracksResponseSuccess = (updatePlaylistTracksResponse200) & {
   headers: Headers;
 };
-export type updatePlaylistTracksResponseError = (updatePlaylistTracksResponse401 | updatePlaylistTracksResponse403 | updatePlaylistTracksResponse404) & {
+export type updatePlaylistTracksResponseError = (updatePlaylistTracksResponse401 | updatePlaylistTracksResponse403 | updatePlaylistTracksResponse404 | updatePlaylistTracksResponse5xx) & {
   headers: Headers;
 };
 
@@ -5203,7 +5894,7 @@ export const updatePlaylistTracks = async (uuid: string,
 
 
 
-export const getUpdatePlaylistTracksMutationOptions = <TError = void,
+export const getUpdatePlaylistTracksMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistTracks>>, TError,{uuid: string;data: UpdatePlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistTracks>>, TError,{uuid: string;data: UpdatePlaylistTracksDto}, TContext> => {
 
@@ -5232,9 +5923,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type UpdatePlaylistTracksMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlaylistTracks>>>
     export type UpdatePlaylistTracksMutationBody = UpdatePlaylistTracksDto
-    export type UpdatePlaylistTracksMutationError = void
+    export type UpdatePlaylistTracksMutationError = PipeBombError
 
-    export const useUpdatePlaylistTracks = <TError = void,
+    export const useUpdatePlaylistTracks = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistTracks>>, TError,{uuid: string;data: UpdatePlaylistTracksDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updatePlaylistTracks>>,
@@ -5251,24 +5942,29 @@ export type updatePlaylistAttributesResponse200 = {
 }
 
 export type updatePlaylistAttributesResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type updatePlaylistAttributesResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type updatePlaylistAttributesResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type updatePlaylistAttributesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type updatePlaylistAttributesResponseSuccess = (updatePlaylistAttributesResponse200) & {
   headers: Headers;
 };
-export type updatePlaylistAttributesResponseError = (updatePlaylistAttributesResponse401 | updatePlaylistAttributesResponse403 | updatePlaylistAttributesResponse404) & {
+export type updatePlaylistAttributesResponseError = (updatePlaylistAttributesResponse401 | updatePlaylistAttributesResponse403 | updatePlaylistAttributesResponse404 | updatePlaylistAttributesResponse5xx) & {
   headers: Headers;
 };
 
@@ -5297,7 +5993,7 @@ export const updatePlaylistAttributes = async (uuid: string,
 
 
 
-export const getUpdatePlaylistAttributesMutationOptions = <TError = void,
+export const getUpdatePlaylistAttributesMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistAttributes>>, TError,{uuid: string;data: UpdatePlaylistAttributesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistAttributes>>, TError,{uuid: string;data: UpdatePlaylistAttributesDto}, TContext> => {
 
@@ -5326,9 +6022,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type UpdatePlaylistAttributesMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlaylistAttributes>>>
     export type UpdatePlaylistAttributesMutationBody = UpdatePlaylistAttributesDto
-    export type UpdatePlaylistAttributesMutationError = void
+    export type UpdatePlaylistAttributesMutationError = PipeBombError
 
-    export const useUpdatePlaylistAttributes = <TError = void,
+    export const useUpdatePlaylistAttributes = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistAttributes>>, TError,{uuid: string;data: UpdatePlaylistAttributesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updatePlaylistAttributes>>,
@@ -5344,12 +6040,19 @@ export type updatePlaylistVisibilityResponse200 = {
   status: 200
 }
 
+export type updatePlaylistVisibilityResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type updatePlaylistVisibilityResponseSuccess = (updatePlaylistVisibilityResponse200) & {
   headers: Headers;
 };
-;
+export type updatePlaylistVisibilityResponseError = (updatePlaylistVisibilityResponse5xx) & {
+  headers: Headers;
+};
 
-export type updatePlaylistVisibilityResponse = (updatePlaylistVisibilityResponseSuccess)
+export type updatePlaylistVisibilityResponse = (updatePlaylistVisibilityResponseSuccess | updatePlaylistVisibilityResponseError)
 
 export const getUpdatePlaylistVisibilityUrl = (uuid: string,) => {
 
@@ -5374,7 +6077,7 @@ export const updatePlaylistVisibility = async (uuid: string,
 
 
 
-export const getUpdatePlaylistVisibilityMutationOptions = <TError = unknown,
+export const getUpdatePlaylistVisibilityMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistVisibility>>, TError,{uuid: string;data: PlaylistVisibilityDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistVisibility>>, TError,{uuid: string;data: PlaylistVisibilityDto}, TContext> => {
 
@@ -5403,9 +6106,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type UpdatePlaylistVisibilityMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlaylistVisibility>>>
     export type UpdatePlaylistVisibilityMutationBody = PlaylistVisibilityDto
-    export type UpdatePlaylistVisibilityMutationError = unknown
+    export type UpdatePlaylistVisibilityMutationError = PipeBombError
 
-    export const useUpdatePlaylistVisibility = <TError = unknown,
+    export const useUpdatePlaylistVisibility = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistVisibility>>, TError,{uuid: string;data: PlaylistVisibilityDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updatePlaylistVisibility>>,
@@ -5422,24 +6125,29 @@ export type getPlaylistUpdateProgressResponse200 = {
 }
 
 export type getPlaylistUpdateProgressResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type getPlaylistUpdateProgressResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type getPlaylistUpdateProgressResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getPlaylistUpdateProgressResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getPlaylistUpdateProgressResponseSuccess = (getPlaylistUpdateProgressResponse200) & {
   headers: Headers;
 };
-export type getPlaylistUpdateProgressResponseError = (getPlaylistUpdateProgressResponse401 | getPlaylistUpdateProgressResponse403 | getPlaylistUpdateProgressResponse404) & {
+export type getPlaylistUpdateProgressResponseError = (getPlaylistUpdateProgressResponse401 | getPlaylistUpdateProgressResponse403 | getPlaylistUpdateProgressResponse404 | getPlaylistUpdateProgressResponse5xx) & {
   headers: Headers;
 };
 
@@ -5475,7 +6183,7 @@ export const getGetPlaylistUpdateProgressQueryKey = (uuid: string,) => {
     }
 
 
-export const getGetPlaylistUpdateProgressQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetPlaylistUpdateProgressQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = PipeBombError>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -5494,10 +6202,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetPlaylistUpdateProgressQueryResult = NonNullable<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>>
-export type GetPlaylistUpdateProgressQueryError = void
+export type GetPlaylistUpdateProgressQueryError = PipeBombError
 
 
-export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = PipeBombError>(
  uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getPlaylistUpdateProgress>>,
@@ -5507,7 +6215,7 @@ export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof g
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getPlaylistUpdateProgress>>,
@@ -5517,12 +6225,12 @@ export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof g
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = void>(
+export function useGetPlaylistUpdateProgress<TData = Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError = PipeBombError>(
  uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistUpdateProgress>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -5546,24 +6254,29 @@ export type addPlaylistSmartFilterGroupResponse204 = {
 }
 
 export type addPlaylistSmartFilterGroupResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type addPlaylistSmartFilterGroupResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type addPlaylistSmartFilterGroupResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type addPlaylistSmartFilterGroupResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type addPlaylistSmartFilterGroupResponseSuccess = (addPlaylistSmartFilterGroupResponse204) & {
   headers: Headers;
 };
-export type addPlaylistSmartFilterGroupResponseError = (addPlaylistSmartFilterGroupResponse401 | addPlaylistSmartFilterGroupResponse403 | addPlaylistSmartFilterGroupResponse404) & {
+export type addPlaylistSmartFilterGroupResponseError = (addPlaylistSmartFilterGroupResponse401 | addPlaylistSmartFilterGroupResponse403 | addPlaylistSmartFilterGroupResponse404 | addPlaylistSmartFilterGroupResponse5xx) & {
   headers: Headers;
 };
 
@@ -5592,7 +6305,7 @@ export const addPlaylistSmartFilterGroup = async (uuid: string,
 
 
 
-export const getAddPlaylistSmartFilterGroupMutationOptions = <TError = void,
+export const getAddPlaylistSmartFilterGroupMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext> => {
 
@@ -5621,9 +6334,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type AddPlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>>
     export type AddPlaylistSmartFilterGroupMutationBody = CreateSmartFilterGroupDto
-    export type AddPlaylistSmartFilterGroupMutationError = void
+    export type AddPlaylistSmartFilterGroupMutationError = PipeBombError
 
-    export const useAddPlaylistSmartFilterGroup = <TError = void,
+    export const useAddPlaylistSmartFilterGroup = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>, TError,{uuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof addPlaylistSmartFilterGroup>>,
@@ -5640,24 +6353,29 @@ export type runPlaylistSmartFiltersResponse204 = {
 }
 
 export type runPlaylistSmartFiltersResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type runPlaylistSmartFiltersResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type runPlaylistSmartFiltersResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type runPlaylistSmartFiltersResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type runPlaylistSmartFiltersResponseSuccess = (runPlaylistSmartFiltersResponse204) & {
   headers: Headers;
 };
-export type runPlaylistSmartFiltersResponseError = (runPlaylistSmartFiltersResponse401 | runPlaylistSmartFiltersResponse403 | runPlaylistSmartFiltersResponse404) & {
+export type runPlaylistSmartFiltersResponseError = (runPlaylistSmartFiltersResponse401 | runPlaylistSmartFiltersResponse403 | runPlaylistSmartFiltersResponse404 | runPlaylistSmartFiltersResponse5xx) & {
   headers: Headers;
 };
 
@@ -5685,7 +6403,7 @@ export const runPlaylistSmartFilters = async (uuid: string, options?: RequestIni
 
 
 
-export const getRunPlaylistSmartFiltersMutationOptions = <TError = void,
+export const getRunPlaylistSmartFiltersMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext> => {
 
@@ -5714,9 +6432,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type RunPlaylistSmartFiltersMutationResult = NonNullable<Awaited<ReturnType<typeof runPlaylistSmartFilters>>>
 
-    export type RunPlaylistSmartFiltersMutationError = void
+    export type RunPlaylistSmartFiltersMutationError = PipeBombError
 
-    export const useRunPlaylistSmartFilters = <TError = void,
+    export const useRunPlaylistSmartFilters = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof runPlaylistSmartFilters>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof runPlaylistSmartFilters>>,
@@ -5733,24 +6451,29 @@ export type updatePlaylistSmartFilterGroupResponse204 = {
 }
 
 export type updatePlaylistSmartFilterGroupResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type updatePlaylistSmartFilterGroupResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type updatePlaylistSmartFilterGroupResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type updatePlaylistSmartFilterGroupResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type updatePlaylistSmartFilterGroupResponseSuccess = (updatePlaylistSmartFilterGroupResponse204) & {
   headers: Headers;
 };
-export type updatePlaylistSmartFilterGroupResponseError = (updatePlaylistSmartFilterGroupResponse401 | updatePlaylistSmartFilterGroupResponse403 | updatePlaylistSmartFilterGroupResponse404) & {
+export type updatePlaylistSmartFilterGroupResponseError = (updatePlaylistSmartFilterGroupResponse401 | updatePlaylistSmartFilterGroupResponse403 | updatePlaylistSmartFilterGroupResponse404 | updatePlaylistSmartFilterGroupResponse5xx) & {
   headers: Headers;
 };
 
@@ -5781,7 +6504,7 @@ export const updatePlaylistSmartFilterGroup = async (playlistUuid: string,
 
 
 
-export const getUpdatePlaylistSmartFilterGroupMutationOptions = <TError = void,
+export const getUpdatePlaylistSmartFilterGroupMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext> => {
 
@@ -5810,9 +6533,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type UpdatePlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>>
     export type UpdatePlaylistSmartFilterGroupMutationBody = CreateSmartFilterGroupDto
-    export type UpdatePlaylistSmartFilterGroupMutationError = void
+    export type UpdatePlaylistSmartFilterGroupMutationError = PipeBombError
 
-    export const useUpdatePlaylistSmartFilterGroup = <TError = void,
+    export const useUpdatePlaylistSmartFilterGroup = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string;data: CreateSmartFilterGroupDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updatePlaylistSmartFilterGroup>>,
@@ -5829,24 +6552,29 @@ export type deletePlaylistSmartFilterGroupResponse204 = {
 }
 
 export type deletePlaylistSmartFilterGroupResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type deletePlaylistSmartFilterGroupResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type deletePlaylistSmartFilterGroupResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type deletePlaylistSmartFilterGroupResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type deletePlaylistSmartFilterGroupResponseSuccess = (deletePlaylistSmartFilterGroupResponse204) & {
   headers: Headers;
 };
-export type deletePlaylistSmartFilterGroupResponseError = (deletePlaylistSmartFilterGroupResponse401 | deletePlaylistSmartFilterGroupResponse403 | deletePlaylistSmartFilterGroupResponse404) & {
+export type deletePlaylistSmartFilterGroupResponseError = (deletePlaylistSmartFilterGroupResponse401 | deletePlaylistSmartFilterGroupResponse403 | deletePlaylistSmartFilterGroupResponse404 | deletePlaylistSmartFilterGroupResponse5xx) & {
   headers: Headers;
 };
 
@@ -5876,7 +6604,7 @@ export const deletePlaylistSmartFilterGroup = async (playlistUuid: string,
 
 
 
-export const getDeletePlaylistSmartFilterGroupMutationOptions = <TError = void,
+export const getDeletePlaylistSmartFilterGroupMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext> => {
 
@@ -5905,9 +6633,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type DeletePlaylistSmartFilterGroupMutationResult = NonNullable<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>>
 
-    export type DeletePlaylistSmartFilterGroupMutationError = void
+    export type DeletePlaylistSmartFilterGroupMutationError = PipeBombError
 
-    export const useDeletePlaylistSmartFilterGroup = <TError = void,
+    export const useDeletePlaylistSmartFilterGroup = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>, TError,{playlistUuid: string;filterGroupUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deletePlaylistSmartFilterGroup>>,
@@ -5924,14 +6652,19 @@ export type getTrackResponse200 = {
 }
 
 export type getTrackResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getTrackResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getTrackResponseSuccess = (getTrackResponse200) & {
   headers: Headers;
 };
-export type getTrackResponseError = (getTrackResponse404) & {
+export type getTrackResponseError = (getTrackResponse404 | getTrackResponse5xx) & {
   headers: Headers;
 };
 
@@ -5973,7 +6706,7 @@ export const getGetTrackQueryKey = (pluginId: string,
     }
 
 
-export const getGetTrackQueryOptions = <TData = Awaited<ReturnType<typeof getTrack>>, TError = void>(pluginId: string,
+export const getGetTrackQueryOptions = <TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
@@ -5994,10 +6727,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetTrackQueryResult = NonNullable<Awaited<ReturnType<typeof getTrack>>>
-export type GetTrackQueryError = void
+export type GetTrackQueryError = PipeBombError
 
 
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = void>(
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>> & Pick<
@@ -6009,7 +6742,7 @@ export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = void>(
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>> & Pick<
@@ -6021,14 +6754,14 @@ export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = void>(
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = void>(
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
@@ -6053,12 +6786,19 @@ export type getTracksResponse200 = {
   status: 200
 }
 
+export type getTracksResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getTracksResponseSuccess = (getTracksResponse200) & {
   headers: Headers;
 };
-;
+export type getTracksResponseError = (getTracksResponse5xx) & {
+  headers: Headers;
+};
 
-export type getTracksResponse = (getTracksResponseSuccess)
+export type getTracksResponse = (getTracksResponseSuccess | getTracksResponseError)
 
 export const getGetTracksUrl = () => {
 
@@ -6082,7 +6822,7 @@ export const getTracks = async (trackIdsDto: TrackIdsDto, options?: RequestInit)
 
 
 
-export const getGetTracksMutationOptions = <TError = unknown,
+export const getGetTracksMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getTracks>>, TError,{data: TrackIdsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof getTracks>>, TError,{data: TrackIdsDto}, TContext> => {
 
@@ -6111,9 +6851,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type GetTracksMutationResult = NonNullable<Awaited<ReturnType<typeof getTracks>>>
     export type GetTracksMutationBody = TrackIdsDto
-    export type GetTracksMutationError = unknown
+    export type GetTracksMutationError = PipeBombError
 
-    export const useGetTracks = <TError = unknown,
+    export const useGetTracks = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getTracks>>, TError,{data: TrackIdsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof getTracks>>,
@@ -6130,14 +6870,19 @@ export type getTrackIdentitiesResponse200 = {
 }
 
 export type getTrackIdentitiesResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getTrackIdentitiesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getTrackIdentitiesResponseSuccess = (getTrackIdentitiesResponse200) & {
   headers: Headers;
 };
-export type getTrackIdentitiesResponseError = (getTrackIdentitiesResponse404) & {
+export type getTrackIdentitiesResponseError = (getTrackIdentitiesResponse404 | getTrackIdentitiesResponse5xx) & {
   headers: Headers;
 };
 
@@ -6179,7 +6924,7 @@ export const getGetTrackIdentitiesQueryKey = (pluginId: string,
     }
 
 
-export const getGetTrackIdentitiesQueryOptions = <TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = void>(pluginId: string,
+export const getGetTrackIdentitiesQueryOptions = <TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
@@ -6200,10 +6945,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetTrackIdentitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getTrackIdentities>>>
-export type GetTrackIdentitiesQueryError = void
+export type GetTrackIdentitiesQueryError = PipeBombError
 
 
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = void>(
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>> & Pick<
@@ -6215,7 +6960,7 @@ export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrack
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = void>(
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>> & Pick<
@@ -6227,14 +6972,14 @@ export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrack
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = void>(
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = void>(
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
@@ -6260,24 +7005,29 @@ export type createTrackAudioSessionResponse200 = {
 }
 
 export type createTrackAudioSessionResponse401 = {
-  data: void
+  data: PipeBombError
   status: 401
 }
 
 export type createTrackAudioSessionResponse403 = {
-  data: void
+  data: PipeBombError
   status: 403
 }
 
 export type createTrackAudioSessionResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type createTrackAudioSessionResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type createTrackAudioSessionResponseSuccess = (createTrackAudioSessionResponse200) & {
   headers: Headers;
 };
-export type createTrackAudioSessionResponseError = (createTrackAudioSessionResponse401 | createTrackAudioSessionResponse403 | createTrackAudioSessionResponse404) & {
+export type createTrackAudioSessionResponseError = (createTrackAudioSessionResponse401 | createTrackAudioSessionResponse403 | createTrackAudioSessionResponse404 | createTrackAudioSessionResponse5xx) & {
   headers: Headers;
 };
 
@@ -6319,7 +7069,7 @@ export const getCreateTrackAudioSessionQueryKey = (pluginId: string,
     }
 
 
-export const getCreateTrackAudioSessionQueryOptions = <TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = void>(pluginId: string,
+export const getCreateTrackAudioSessionQueryOptions = <TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
@@ -6340,10 +7090,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type CreateTrackAudioSessionQueryResult = NonNullable<Awaited<ReturnType<typeof createTrackAudioSession>>>
-export type CreateTrackAudioSessionQueryError = void
+export type CreateTrackAudioSessionQueryError = PipeBombError
 
 
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = void>(
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>> & Pick<
@@ -6355,7 +7105,7 @@ export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof cre
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = void>(
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>> & Pick<
@@ -6367,14 +7117,14 @@ export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof cre
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = void>(
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = void>(
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
@@ -6400,14 +7150,19 @@ export type getTrackExternalUrlsResponse200 = {
 }
 
 export type getTrackExternalUrlsResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getTrackExternalUrlsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getTrackExternalUrlsResponseSuccess = (getTrackExternalUrlsResponse200) & {
   headers: Headers;
 };
-export type getTrackExternalUrlsResponseError = (getTrackExternalUrlsResponse404) & {
+export type getTrackExternalUrlsResponseError = (getTrackExternalUrlsResponse404 | getTrackExternalUrlsResponse5xx) & {
   headers: Headers;
 };
 
@@ -6449,7 +7204,7 @@ export const getGetTrackExternalUrlsQueryKey = (pluginId: string,
     }
 
 
-export const getGetTrackExternalUrlsQueryOptions = <TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = void>(pluginId: string,
+export const getGetTrackExternalUrlsQueryOptions = <TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
@@ -6470,10 +7225,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetTrackExternalUrlsQueryResult = NonNullable<Awaited<ReturnType<typeof getTrackExternalUrls>>>
-export type GetTrackExternalUrlsQueryError = void
+export type GetTrackExternalUrlsQueryError = PipeBombError
 
 
-export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = void>(
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>> & Pick<
@@ -6485,7 +7240,7 @@ export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTra
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = void>(
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>> & Pick<
@@ -6497,14 +7252,14 @@ export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTra
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = void>(
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = void>(
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
  pluginId: string,
     libraryId: string,
     trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
@@ -6529,12 +7284,19 @@ export type getJsonResponse200 = {
   status: 200
 }
 
+export type getJsonResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type getJsonResponseSuccess = (getJsonResponse200) & {
   headers: Headers;
 };
-;
+export type getJsonResponseError = (getJsonResponse5xx) & {
+  headers: Headers;
+};
 
-export type getJsonResponse = (getJsonResponseSuccess)
+export type getJsonResponse = (getJsonResponseSuccess | getJsonResponseError)
 
 export const getGetJsonUrl = () => {
 
@@ -6566,7 +7328,7 @@ export const getGetJsonQueryKey = () => {
     }
 
 
-export const getGetJsonQueryOptions = <TData = Awaited<ReturnType<typeof getJson>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetJsonQueryOptions = <TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -6585,10 +7347,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetJsonQueryResult = NonNullable<Awaited<ReturnType<typeof getJson>>>
-export type GetJsonQueryError = unknown
+export type GetJsonQueryError = PipeBombError
 
 
-export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = unknown>(
+export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getJson>>,
@@ -6598,7 +7360,7 @@ export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError =
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = unknown>(
+export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getJson>>,
@@ -6608,12 +7370,12 @@ export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError =
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = unknown>(
+export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = unknown>(
+export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -6637,14 +7399,19 @@ export type getArtistResponse200 = {
 }
 
 export type getArtistResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getArtistResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getArtistResponseSuccess = (getArtistResponse200) & {
   headers: Headers;
 };
-export type getArtistResponseError = (getArtistResponse404) & {
+export type getArtistResponseError = (getArtistResponse404 | getArtistResponse5xx) & {
   headers: Headers;
 };
 
@@ -6680,7 +7447,7 @@ export const getGetArtistQueryKey = (artistUuid: string,) => {
     }
 
 
-export const getGetArtistQueryOptions = <TData = Awaited<ReturnType<typeof getArtist>>, TError = void>(artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetArtistQueryOptions = <TData = Awaited<ReturnType<typeof getArtist>>, TError = PipeBombError>(artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -6699,10 +7466,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetArtistQueryResult = NonNullable<Awaited<ReturnType<typeof getArtist>>>
-export type GetArtistQueryError = void
+export type GetArtistQueryError = PipeBombError
 
 
-export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TError = void>(
+export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TError = PipeBombError>(
  artistUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtist>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getArtist>>,
@@ -6712,7 +7479,7 @@ export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TErr
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TError = void>(
+export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TError = PipeBombError>(
  artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtist>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getArtist>>,
@@ -6722,12 +7489,12 @@ export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TErr
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TError = void>(
+export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TError = PipeBombError>(
  artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TError = void>(
+export function useGetArtist<TData = Awaited<ReturnType<typeof getArtist>>, TError = PipeBombError>(
  artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtist>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -6751,14 +7518,19 @@ export type updateArtistMetadataResponse200 = {
 }
 
 export type updateArtistMetadataResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type updateArtistMetadataResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type updateArtistMetadataResponseSuccess = (updateArtistMetadataResponse200) & {
   headers: Headers;
 };
-export type updateArtistMetadataResponseError = (updateArtistMetadataResponse404) & {
+export type updateArtistMetadataResponseError = (updateArtistMetadataResponse404 | updateArtistMetadataResponse5xx) & {
   headers: Headers;
 };
 
@@ -6786,7 +7558,7 @@ export const updateArtistMetadata = async (artistUuid: string, options?: Request
 
 
 
-export const getUpdateArtistMetadataMutationOptions = <TError = void,
+export const getUpdateArtistMetadataMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArtistMetadata>>, TError,{artistUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof updateArtistMetadata>>, TError,{artistUuid: string}, TContext> => {
 
@@ -6815,9 +7587,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type UpdateArtistMetadataMutationResult = NonNullable<Awaited<ReturnType<typeof updateArtistMetadata>>>
 
-    export type UpdateArtistMetadataMutationError = void
+    export type UpdateArtistMetadataMutationError = PipeBombError
 
-    export const useUpdateArtistMetadata = <TError = void,
+    export const useUpdateArtistMetadata = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateArtistMetadata>>, TError,{artistUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateArtistMetadata>>,
@@ -6834,14 +7606,19 @@ export type getArtistByIdentityResponse200 = {
 }
 
 export type getArtistByIdentityResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getArtistByIdentityResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getArtistByIdentityResponseSuccess = (getArtistByIdentityResponse200) & {
   headers: Headers;
 };
-export type getArtistByIdentityResponseError = (getArtistByIdentityResponse404) & {
+export type getArtistByIdentityResponseError = (getArtistByIdentityResponse404 | getArtistByIdentityResponse5xx) & {
   headers: Headers;
 };
 
@@ -6883,7 +7660,7 @@ export const getGetArtistByIdentityQueryKey = (pluginId: string,
     }
 
 
-export const getGetArtistByIdentityQueryOptions = <TData = Awaited<ReturnType<typeof getArtistByIdentity>>, TError = void>(pluginId: string,
+export const getGetArtistByIdentityQueryOptions = <TData = Awaited<ReturnType<typeof getArtistByIdentity>>, TError = PipeBombError>(pluginId: string,
     identifierId: string,
     identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
@@ -6904,10 +7681,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetArtistByIdentityQueryResult = NonNullable<Awaited<ReturnType<typeof getArtistByIdentity>>>
-export type GetArtistByIdentityQueryError = void
+export type GetArtistByIdentityQueryError = PipeBombError
 
 
-export function useGetArtistByIdentity<TData = Awaited<ReturnType<typeof getArtistByIdentity>>, TError = void>(
+export function useGetArtistByIdentity<TData = Awaited<ReturnType<typeof getArtistByIdentity>>, TError = PipeBombError>(
  pluginId: string,
     identifierId: string,
     identity: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistByIdentity>>, TError, TData>> & Pick<
@@ -6919,7 +7696,7 @@ export function useGetArtistByIdentity<TData = Awaited<ReturnType<typeof getArti
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetArtistByIdentity<TData = Awaited<ReturnType<typeof getArtistByIdentity>>, TError = void>(
+export function useGetArtistByIdentity<TData = Awaited<ReturnType<typeof getArtistByIdentity>>, TError = PipeBombError>(
  pluginId: string,
     identifierId: string,
     identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistByIdentity>>, TError, TData>> & Pick<
@@ -6931,14 +7708,14 @@ export function useGetArtistByIdentity<TData = Awaited<ReturnType<typeof getArti
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetArtistByIdentity<TData = Awaited<ReturnType<typeof getArtistByIdentity>>, TError = void>(
+export function useGetArtistByIdentity<TData = Awaited<ReturnType<typeof getArtistByIdentity>>, TError = PipeBombError>(
  pluginId: string,
     identifierId: string,
     identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetArtistByIdentity<TData = Awaited<ReturnType<typeof getArtistByIdentity>>, TError = void>(
+export function useGetArtistByIdentity<TData = Awaited<ReturnType<typeof getArtistByIdentity>>, TError = PipeBombError>(
  pluginId: string,
     identifierId: string,
     identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
@@ -6964,14 +7741,19 @@ export type getArtistEphemeralContentByIdentityResponse200 = {
 }
 
 export type getArtistEphemeralContentByIdentityResponse400 = {
-  data: void
+  data: PipeBombError
   status: 400
+}
+
+export type getArtistEphemeralContentByIdentityResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getArtistEphemeralContentByIdentityResponseSuccess = (getArtistEphemeralContentByIdentityResponse200) & {
   headers: Headers;
 };
-export type getArtistEphemeralContentByIdentityResponseError = (getArtistEphemeralContentByIdentityResponse400) & {
+export type getArtistEphemeralContentByIdentityResponseError = (getArtistEphemeralContentByIdentityResponse400 | getArtistEphemeralContentByIdentityResponse5xx) & {
   headers: Headers;
 };
 
@@ -7003,7 +7785,7 @@ export const getArtistEphemeralContentByIdentity = async (pluginId: string,
 
 
 
-export const getGetArtistEphemeralContentByIdentityMutationOptions = <TError = void,
+export const getGetArtistEphemeralContentByIdentityMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getArtistEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof getArtistEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext> => {
 
@@ -7032,9 +7814,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type GetArtistEphemeralContentByIdentityMutationResult = NonNullable<Awaited<ReturnType<typeof getArtistEphemeralContentByIdentity>>>
 
-    export type GetArtistEphemeralContentByIdentityMutationError = void
+    export type GetArtistEphemeralContentByIdentityMutationError = PipeBombError
 
-    export const useGetArtistEphemeralContentByIdentity = <TError = void,
+    export const useGetArtistEphemeralContentByIdentity = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getArtistEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof getArtistEphemeralContentByIdentity>>,
@@ -7051,14 +7833,19 @@ export type getArtistEphemeralSourcesResponse200 = {
 }
 
 export type getArtistEphemeralSourcesResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getArtistEphemeralSourcesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getArtistEphemeralSourcesResponseSuccess = (getArtistEphemeralSourcesResponse200) & {
   headers: Headers;
 };
-export type getArtistEphemeralSourcesResponseError = (getArtistEphemeralSourcesResponse404) & {
+export type getArtistEphemeralSourcesResponseError = (getArtistEphemeralSourcesResponse404 | getArtistEphemeralSourcesResponse5xx) & {
   headers: Headers;
 };
 
@@ -7094,7 +7881,7 @@ export const getGetArtistEphemeralSourcesQueryKey = (artistUuid: string,) => {
     }
 
 
-export const getGetArtistEphemeralSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError = void>(artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetArtistEphemeralSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError = PipeBombError>(artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -7113,10 +7900,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetArtistEphemeralSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof getArtistEphemeralSources>>>
-export type GetArtistEphemeralSourcesQueryError = void
+export type GetArtistEphemeralSourcesQueryError = PipeBombError
 
 
-export function useGetArtistEphemeralSources<TData = Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError = void>(
+export function useGetArtistEphemeralSources<TData = Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError = PipeBombError>(
  artistUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getArtistEphemeralSources>>,
@@ -7126,7 +7913,7 @@ export function useGetArtistEphemeralSources<TData = Awaited<ReturnType<typeof g
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetArtistEphemeralSources<TData = Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError = void>(
+export function useGetArtistEphemeralSources<TData = Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError = PipeBombError>(
  artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getArtistEphemeralSources>>,
@@ -7136,12 +7923,12 @@ export function useGetArtistEphemeralSources<TData = Awaited<ReturnType<typeof g
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetArtistEphemeralSources<TData = Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError = void>(
+export function useGetArtistEphemeralSources<TData = Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError = PipeBombError>(
  artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetArtistEphemeralSources<TData = Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError = void>(
+export function useGetArtistEphemeralSources<TData = Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError = PipeBombError>(
  artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -7165,19 +7952,24 @@ export type getArtistEphemeralContentResponse200 = {
 }
 
 export type getArtistEphemeralContentResponse400 = {
-  data: void
+  data: PipeBombError
   status: 400
 }
 
 export type getArtistEphemeralContentResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getArtistEphemeralContentResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getArtistEphemeralContentResponseSuccess = (getArtistEphemeralContentResponse200) & {
   headers: Headers;
 };
-export type getArtistEphemeralContentResponseError = (getArtistEphemeralContentResponse400 | getArtistEphemeralContentResponse404) & {
+export type getArtistEphemeralContentResponseError = (getArtistEphemeralContentResponse400 | getArtistEphemeralContentResponse404 | getArtistEphemeralContentResponse5xx) & {
   headers: Headers;
 };
 
@@ -7206,7 +7998,7 @@ export const getArtistEphemeralContent = async (artistUuid: string,
 
 
 
-export const getGetArtistEphemeralContentMutationOptions = <TError = void,
+export const getGetArtistEphemeralContentMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getArtistEphemeralContent>>, TError,{artistUuid: string;data: EphemeralSourceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof getArtistEphemeralContent>>, TError,{artistUuid: string;data: EphemeralSourceDto}, TContext> => {
 
@@ -7235,9 +8027,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type GetArtistEphemeralContentMutationResult = NonNullable<Awaited<ReturnType<typeof getArtistEphemeralContent>>>
     export type GetArtistEphemeralContentMutationBody = EphemeralSourceDto
-    export type GetArtistEphemeralContentMutationError = void
+    export type GetArtistEphemeralContentMutationError = PipeBombError
 
-    export const useGetArtistEphemeralContent = <TError = void,
+    export const useGetArtistEphemeralContent = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getArtistEphemeralContent>>, TError,{artistUuid: string;data: EphemeralSourceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof getArtistEphemeralContent>>,
@@ -7253,12 +8045,19 @@ export type searchArtistsResponse200 = {
   status: 200
 }
 
+export type searchArtistsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type searchArtistsResponseSuccess = (searchArtistsResponse200) & {
   headers: Headers;
 };
-;
+export type searchArtistsResponseError = (searchArtistsResponse5xx) & {
+  headers: Headers;
+};
 
-export type searchArtistsResponse = (searchArtistsResponseSuccess)
+export type searchArtistsResponse = (searchArtistsResponseSuccess | searchArtistsResponseError)
 
 export const getSearchArtistsUrl = () => {
 
@@ -7282,7 +8081,7 @@ export const searchArtists = async (artistsSearchDto: ArtistsSearchDto, options?
 
 
 
-export const getSearchArtistsMutationOptions = <TError = unknown,
+export const getSearchArtistsMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchArtists>>, TError,{data: ArtistsSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof searchArtists>>, TError,{data: ArtistsSearchDto}, TContext> => {
 
@@ -7311,9 +8110,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type SearchArtistsMutationResult = NonNullable<Awaited<ReturnType<typeof searchArtists>>>
     export type SearchArtistsMutationBody = ArtistsSearchDto
-    export type SearchArtistsMutationError = unknown
+    export type SearchArtistsMutationError = PipeBombError
 
-    export const useSearchArtists = <TError = unknown,
+    export const useSearchArtists = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchArtists>>, TError,{data: ArtistsSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof searchArtists>>,
@@ -7330,14 +8129,19 @@ export type getArtistExternalUrlsResponse200 = {
 }
 
 export type getArtistExternalUrlsResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getArtistExternalUrlsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getArtistExternalUrlsResponseSuccess = (getArtistExternalUrlsResponse200) & {
   headers: Headers;
 };
-export type getArtistExternalUrlsResponseError = (getArtistExternalUrlsResponse404) & {
+export type getArtistExternalUrlsResponseError = (getArtistExternalUrlsResponse404 | getArtistExternalUrlsResponse5xx) & {
   headers: Headers;
 };
 
@@ -7373,7 +8177,7 @@ export const getGetArtistExternalUrlsQueryKey = (artistUuid: string,) => {
     }
 
 
-export const getGetArtistExternalUrlsQueryOptions = <TData = Awaited<ReturnType<typeof getArtistExternalUrls>>, TError = void>(artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetArtistExternalUrlsQueryOptions = <TData = Awaited<ReturnType<typeof getArtistExternalUrls>>, TError = PipeBombError>(artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -7392,10 +8196,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetArtistExternalUrlsQueryResult = NonNullable<Awaited<ReturnType<typeof getArtistExternalUrls>>>
-export type GetArtistExternalUrlsQueryError = void
+export type GetArtistExternalUrlsQueryError = PipeBombError
 
 
-export function useGetArtistExternalUrls<TData = Awaited<ReturnType<typeof getArtistExternalUrls>>, TError = void>(
+export function useGetArtistExternalUrls<TData = Awaited<ReturnType<typeof getArtistExternalUrls>>, TError = PipeBombError>(
  artistUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistExternalUrls>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getArtistExternalUrls>>,
@@ -7405,7 +8209,7 @@ export function useGetArtistExternalUrls<TData = Awaited<ReturnType<typeof getAr
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetArtistExternalUrls<TData = Awaited<ReturnType<typeof getArtistExternalUrls>>, TError = void>(
+export function useGetArtistExternalUrls<TData = Awaited<ReturnType<typeof getArtistExternalUrls>>, TError = PipeBombError>(
  artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistExternalUrls>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getArtistExternalUrls>>,
@@ -7415,12 +8219,12 @@ export function useGetArtistExternalUrls<TData = Awaited<ReturnType<typeof getAr
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetArtistExternalUrls<TData = Awaited<ReturnType<typeof getArtistExternalUrls>>, TError = void>(
+export function useGetArtistExternalUrls<TData = Awaited<ReturnType<typeof getArtistExternalUrls>>, TError = PipeBombError>(
  artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetArtistExternalUrls<TData = Awaited<ReturnType<typeof getArtistExternalUrls>>, TError = void>(
+export function useGetArtistExternalUrls<TData = Awaited<ReturnType<typeof getArtistExternalUrls>>, TError = PipeBombError>(
  artistUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getArtistExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -7444,14 +8248,19 @@ export type getAlbumResponse200 = {
 }
 
 export type getAlbumResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getAlbumResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getAlbumResponseSuccess = (getAlbumResponse200) & {
   headers: Headers;
 };
-export type getAlbumResponseError = (getAlbumResponse404) & {
+export type getAlbumResponseError = (getAlbumResponse404 | getAlbumResponse5xx) & {
   headers: Headers;
 };
 
@@ -7487,7 +8296,7 @@ export const getGetAlbumQueryKey = (albumUuid: string,) => {
     }
 
 
-export const getGetAlbumQueryOptions = <TData = Awaited<ReturnType<typeof getAlbum>>, TError = void>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAlbumQueryOptions = <TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -7506,10 +8315,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAlbumQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbum>>>
-export type GetAlbumQueryError = void
+export type GetAlbumQueryError = PipeBombError
 
 
-export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = void>(
+export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
  albumUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAlbum>>,
@@ -7519,7 +8328,7 @@ export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = void>(
+export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
  albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAlbum>>,
@@ -7529,12 +8338,12 @@ export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = void>(
+export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
  albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = void>(
+export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
  albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -7558,14 +8367,19 @@ export type getAlbumByIdentityResponse200 = {
 }
 
 export type getAlbumByIdentityResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getAlbumByIdentityResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getAlbumByIdentityResponseSuccess = (getAlbumByIdentityResponse200) & {
   headers: Headers;
 };
-export type getAlbumByIdentityResponseError = (getAlbumByIdentityResponse404) & {
+export type getAlbumByIdentityResponseError = (getAlbumByIdentityResponse404 | getAlbumByIdentityResponse5xx) & {
   headers: Headers;
 };
 
@@ -7607,7 +8421,7 @@ export const getGetAlbumByIdentityQueryKey = (pluginId: string,
     }
 
 
-export const getGetAlbumByIdentityQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = void>(pluginId: string,
+export const getGetAlbumByIdentityQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(pluginId: string,
     identifierId: string,
     identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
@@ -7628,10 +8442,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAlbumByIdentityQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbumByIdentity>>>
-export type GetAlbumByIdentityQueryError = void
+export type GetAlbumByIdentityQueryError = PipeBombError
 
 
-export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = void>(
+export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
  pluginId: string,
     identifierId: string,
     identity: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>> & Pick<
@@ -7643,7 +8457,7 @@ export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbum
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = void>(
+export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
  pluginId: string,
     identifierId: string,
     identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>> & Pick<
@@ -7655,14 +8469,14 @@ export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbum
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = void>(
+export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
  pluginId: string,
     identifierId: string,
     identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = void>(
+export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
  pluginId: string,
     identifierId: string,
     identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
@@ -7688,14 +8502,19 @@ export type getAlbumEphemeralContentByIdentityResponse200 = {
 }
 
 export type getAlbumEphemeralContentByIdentityResponse400 = {
-  data: void
+  data: PipeBombError
   status: 400
+}
+
+export type getAlbumEphemeralContentByIdentityResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getAlbumEphemeralContentByIdentityResponseSuccess = (getAlbumEphemeralContentByIdentityResponse200) & {
   headers: Headers;
 };
-export type getAlbumEphemeralContentByIdentityResponseError = (getAlbumEphemeralContentByIdentityResponse400) & {
+export type getAlbumEphemeralContentByIdentityResponseError = (getAlbumEphemeralContentByIdentityResponse400 | getAlbumEphemeralContentByIdentityResponse5xx) & {
   headers: Headers;
 };
 
@@ -7727,7 +8546,7 @@ export const getAlbumEphemeralContentByIdentity = async (pluginId: string,
 
 
 
-export const getGetAlbumEphemeralContentByIdentityMutationOptions = <TError = void,
+export const getGetAlbumEphemeralContentByIdentityMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext> => {
 
@@ -7756,9 +8575,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type GetAlbumEphemeralContentByIdentityMutationResult = NonNullable<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>>
 
-    export type GetAlbumEphemeralContentByIdentityMutationError = void
+    export type GetAlbumEphemeralContentByIdentityMutationError = PipeBombError
 
-    export const useGetAlbumEphemeralContentByIdentity = <TError = void,
+    export const useGetAlbumEphemeralContentByIdentity = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>,
@@ -7775,14 +8594,19 @@ export type getAlbumEphemeralSourcesResponse200 = {
 }
 
 export type getAlbumEphemeralSourcesResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getAlbumEphemeralSourcesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getAlbumEphemeralSourcesResponseSuccess = (getAlbumEphemeralSourcesResponse200) & {
   headers: Headers;
 };
-export type getAlbumEphemeralSourcesResponseError = (getAlbumEphemeralSourcesResponse404) & {
+export type getAlbumEphemeralSourcesResponseError = (getAlbumEphemeralSourcesResponse404 | getAlbumEphemeralSourcesResponse5xx) & {
   headers: Headers;
 };
 
@@ -7818,7 +8642,7 @@ export const getGetAlbumEphemeralSourcesQueryKey = (albumUuid: string,) => {
     }
 
 
-export const getGetAlbumEphemeralSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = void>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAlbumEphemeralSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -7837,10 +8661,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAlbumEphemeralSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbumEphemeralSources>>>
-export type GetAlbumEphemeralSourcesQueryError = void
+export type GetAlbumEphemeralSourcesQueryError = PipeBombError
 
 
-export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = void>(
+export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
  albumUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAlbumEphemeralSources>>,
@@ -7850,7 +8674,7 @@ export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof ge
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = void>(
+export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
  albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAlbumEphemeralSources>>,
@@ -7860,12 +8684,12 @@ export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof ge
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = void>(
+export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
  albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = void>(
+export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
  albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -7889,19 +8713,24 @@ export type getAlbumEphemeralContentResponse200 = {
 }
 
 export type getAlbumEphemeralContentResponse400 = {
-  data: void
+  data: PipeBombError
   status: 400
 }
 
 export type getAlbumEphemeralContentResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getAlbumEphemeralContentResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getAlbumEphemeralContentResponseSuccess = (getAlbumEphemeralContentResponse200) & {
   headers: Headers;
 };
-export type getAlbumEphemeralContentResponseError = (getAlbumEphemeralContentResponse400 | getAlbumEphemeralContentResponse404) & {
+export type getAlbumEphemeralContentResponseError = (getAlbumEphemeralContentResponse400 | getAlbumEphemeralContentResponse404 | getAlbumEphemeralContentResponse5xx) & {
   headers: Headers;
 };
 
@@ -7930,7 +8759,7 @@ export const getAlbumEphemeralContent = async (albumUuid: string,
 
 
 
-export const getGetAlbumEphemeralContentMutationOptions = <TError = void,
+export const getGetAlbumEphemeralContentMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContent>>, TError,{albumUuid: string;data: EphemeralSourceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContent>>, TError,{albumUuid: string;data: EphemeralSourceDto}, TContext> => {
 
@@ -7959,9 +8788,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type GetAlbumEphemeralContentMutationResult = NonNullable<Awaited<ReturnType<typeof getAlbumEphemeralContent>>>
     export type GetAlbumEphemeralContentMutationBody = EphemeralSourceDto
-    export type GetAlbumEphemeralContentMutationError = void
+    export type GetAlbumEphemeralContentMutationError = PipeBombError
 
-    export const useGetAlbumEphemeralContent = <TError = void,
+    export const useGetAlbumEphemeralContent = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContent>>, TError,{albumUuid: string;data: EphemeralSourceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof getAlbumEphemeralContent>>,
@@ -7977,12 +8806,19 @@ export type searchAlbumsResponse200 = {
   status: 200
 }
 
+export type searchAlbumsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type searchAlbumsResponseSuccess = (searchAlbumsResponse200) & {
   headers: Headers;
 };
-;
+export type searchAlbumsResponseError = (searchAlbumsResponse5xx) & {
+  headers: Headers;
+};
 
-export type searchAlbumsResponse = (searchAlbumsResponseSuccess)
+export type searchAlbumsResponse = (searchAlbumsResponseSuccess | searchAlbumsResponseError)
 
 export const getSearchAlbumsUrl = () => {
 
@@ -8006,7 +8842,7 @@ export const searchAlbums = async (albumsSearchDto: AlbumsSearchDto, options?: R
 
 
 
-export const getSearchAlbumsMutationOptions = <TError = unknown,
+export const getSearchAlbumsMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchAlbums>>, TError,{data: AlbumsSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof searchAlbums>>, TError,{data: AlbumsSearchDto}, TContext> => {
 
@@ -8035,9 +8871,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type SearchAlbumsMutationResult = NonNullable<Awaited<ReturnType<typeof searchAlbums>>>
     export type SearchAlbumsMutationBody = AlbumsSearchDto
-    export type SearchAlbumsMutationError = unknown
+    export type SearchAlbumsMutationError = PipeBombError
 
-    export const useSearchAlbums = <TError = unknown,
+    export const useSearchAlbums = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchAlbums>>, TError,{data: AlbumsSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof searchAlbums>>,
@@ -8054,14 +8890,19 @@ export type getAlbumExternalUrlsResponse200 = {
 }
 
 export type getAlbumExternalUrlsResponse404 = {
-  data: void
+  data: PipeBombError
   status: 404
+}
+
+export type getAlbumExternalUrlsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
 export type getAlbumExternalUrlsResponseSuccess = (getAlbumExternalUrlsResponse200) & {
   headers: Headers;
 };
-export type getAlbumExternalUrlsResponseError = (getAlbumExternalUrlsResponse404) & {
+export type getAlbumExternalUrlsResponseError = (getAlbumExternalUrlsResponse404 | getAlbumExternalUrlsResponse5xx) & {
   headers: Headers;
 };
 
@@ -8097,7 +8938,7 @@ export const getGetAlbumExternalUrlsQueryKey = (albumUuid: string,) => {
     }
 
 
-export const getGetAlbumExternalUrlsQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = void>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAlbumExternalUrlsQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
@@ -8116,10 +8957,10 @@ const {query: queryOptions, request: requestOptions} = options ?? {};
 }
 
 export type GetAlbumExternalUrlsQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbumExternalUrls>>>
-export type GetAlbumExternalUrlsQueryError = void
+export type GetAlbumExternalUrlsQueryError = PipeBombError
 
 
-export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = void>(
+export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
  albumUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAlbumExternalUrls>>,
@@ -8129,7 +8970,7 @@ export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlb
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = void>(
+export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
  albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof getAlbumExternalUrls>>,
@@ -8139,12 +8980,12 @@ export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlb
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = void>(
+export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
  albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = void>(
+export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
  albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
@@ -8167,12 +9008,19 @@ export type searchResponse200 = {
   status: 200
 }
 
+export type searchResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
 export type searchResponseSuccess = (searchResponse200) & {
   headers: Headers;
 };
-;
+export type searchResponseError = (searchResponse5xx) & {
+  headers: Headers;
+};
 
-export type searchResponse = (searchResponseSuccess)
+export type searchResponse = (searchResponseSuccess | searchResponseError)
 
 export const getSearchUrl = () => {
 
@@ -8196,7 +9044,7 @@ export const search = async (searchDto: SearchDto, options?: RequestInit): Promi
 
 
 
-export const getSearchMutationOptions = <TError = unknown,
+export const getSearchMutationOptions = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
 ): UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext> => {
 
@@ -8225,9 +9073,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
     export type SearchMutationResult = NonNullable<Awaited<ReturnType<typeof search>>>
     export type SearchMutationBody = SearchDto
-    export type SearchMutationError = unknown
+    export type SearchMutationError = PipeBombError
 
-    export const useSearch = <TError = unknown,
+    export const useSearch = <TError = PipeBombError,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof search>>,
@@ -8236,228 +9084,5 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getSearchMutationOptions(options), queryClient);
-    }
-
-export type getUserPrivilegesResponse200 = {
-  data: Privilege[]
-  status: 200
-}
-
-export type getUserPrivilegesResponse401 = {
-  data: void
-  status: 401
-}
-
-export type getUserPrivilegesResponse403 = {
-  data: void
-  status: 403
-}
-
-export type getUserPrivilegesResponseSuccess = (getUserPrivilegesResponse200) & {
-  headers: Headers;
-};
-export type getUserPrivilegesResponseError = (getUserPrivilegesResponse401 | getUserPrivilegesResponse403) & {
-  headers: Headers;
-};
-
-export type getUserPrivilegesResponse = (getUserPrivilegesResponseSuccess | getUserPrivilegesResponseError)
-
-export const getGetUserPrivilegesUrl = (userUuid: string,) => {
-
-
-
-
-  return `/privileges/${userUuid}`
-}
-
-export const getUserPrivileges = async (userUuid: string, options?: RequestInit): Promise<getUserPrivilegesResponse> => {
-
-  return customFetch<getUserPrivilegesResponse>(getGetUserPrivilegesUrl(userUuid),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetUserPrivilegesQueryKey = (userUuid: string,) => {
-    return [
-    `/privileges/${userUuid}`
-    ] as const;
-    }
-
-
-export const getGetUserPrivilegesQueryOptions = <TData = Awaited<ReturnType<typeof getUserPrivileges>>, TError = void>(userUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetUserPrivilegesQueryKey(userUuid);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getUserPrivileges>>> = ({ signal }) => getUserPrivileges(userUuid, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: userUuid !== null && userUuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetUserPrivilegesQueryResult = NonNullable<Awaited<ReturnType<typeof getUserPrivileges>>>
-export type GetUserPrivilegesQueryError = void
-
-
-export function useGetUserPrivileges<TData = Awaited<ReturnType<typeof getUserPrivileges>>, TError = void>(
- userUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getUserPrivileges>>,
-          TError,
-          Awaited<ReturnType<typeof getUserPrivileges>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetUserPrivileges<TData = Awaited<ReturnType<typeof getUserPrivileges>>, TError = void>(
- userUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getUserPrivileges>>,
-          TError,
-          Awaited<ReturnType<typeof getUserPrivileges>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetUserPrivileges<TData = Awaited<ReturnType<typeof getUserPrivileges>>, TError = void>(
- userUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetUserPrivileges<TData = Awaited<ReturnType<typeof getUserPrivileges>>, TError = void>(
- userUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getUserPrivileges>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetUserPrivilegesQueryOptions(userUuid,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type updateUserPrivilegesResponse200 = {
-  data: Privilege[]
-  status: 200
-}
-
-export type updateUserPrivilegesResponse400 = {
-  data: void
-  status: 400
-}
-
-export type updateUserPrivilegesResponse401 = {
-  data: void
-  status: 401
-}
-
-export type updateUserPrivilegesResponse403 = {
-  data: void
-  status: 403
-}
-
-export type updateUserPrivilegesResponse404 = {
-  data: void
-  status: 404
-}
-
-export type updateUserPrivilegesResponse409 = {
-  data: void
-  status: 409
-}
-
-export type updateUserPrivilegesResponseSuccess = (updateUserPrivilegesResponse200) & {
-  headers: Headers;
-};
-export type updateUserPrivilegesResponseError = (updateUserPrivilegesResponse400 | updateUserPrivilegesResponse401 | updateUserPrivilegesResponse403 | updateUserPrivilegesResponse404 | updateUserPrivilegesResponse409) & {
-  headers: Headers;
-};
-
-export type updateUserPrivilegesResponse = (updateUserPrivilegesResponseSuccess | updateUserPrivilegesResponseError)
-
-export const getUpdateUserPrivilegesUrl = (userUuid: string,) => {
-
-
-
-
-  return `/privileges/${userUuid}`
-}
-
-export const updateUserPrivileges = async (userUuid: string,
-    updatePrivilegesDto: UpdatePrivilegesDto, options?: RequestInit): Promise<updateUserPrivilegesResponse> => {
-
-  return customFetch<updateUserPrivilegesResponse>(getUpdateUserPrivilegesUrl(userUuid),
-  {
-    ...options,
-    method: 'PATCH',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(updatePrivilegesDto)
-  }
-);}
-
-
-
-
-export const getUpdateUserPrivilegesMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserPrivileges>>, TError,{userUuid: string;data: UpdatePrivilegesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof updateUserPrivileges>>, TError,{userUuid: string;data: UpdatePrivilegesDto}, TContext> => {
-
-const mutationKey = ['updateUserPrivileges'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateUserPrivileges>>, {userUuid: string;data: UpdatePrivilegesDto}> = (props) => {
-          const {userUuid,data} = props ?? {};
-
-          return  updateUserPrivileges(userUuid,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type UpdateUserPrivilegesMutationResult = NonNullable<Awaited<ReturnType<typeof updateUserPrivileges>>>
-    export type UpdateUserPrivilegesMutationBody = UpdatePrivilegesDto
-    export type UpdateUserPrivilegesMutationError = void
-
-    export const useUpdateUserPrivileges = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateUserPrivileges>>, TError,{userUuid: string;data: UpdatePrivilegesDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof updateUserPrivileges>>,
-        TError,
-        {userUuid: string;data: UpdatePrivilegesDto},
-        TContext
-      > => {
-      return useMutation(getUpdateUserPrivilegesMutationOptions(options), queryClient);
     }
 
