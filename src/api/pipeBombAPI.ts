@@ -57,6 +57,7 @@ import type {
   LoginDto,
   PipeBombError,
   Playlist,
+  PlaylistMember,
   PlaylistTrack,
   PlaylistTracksQuery,
   PlaylistVisibilityDto,
@@ -67,6 +68,7 @@ import type {
   Privilege,
   SearchDto,
   SearchResults,
+  SearchUsersParams,
   StartTaskDto,
   StreamInstance,
   SystemConfigKeysDto,
@@ -80,6 +82,7 @@ import type {
   UpdateSystemConfigOptionsDto,
   UpdateWorkflowStepOptionsDto,
   UploadAttributeBufferBody,
+  UpsertPlaylistMemberDto,
   User,
   UserConfigs,
   Workflow,
@@ -2182,6 +2185,132 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getLogoutUserMutationOptions(options), queryClient);
     }
+
+export type searchUsersResponse200 = {
+  data: User[]
+  status: 200
+}
+
+export type searchUsersResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type searchUsersResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type searchUsersResponseSuccess = (searchUsersResponse200) & {
+  headers: Headers;
+};
+export type searchUsersResponseError = (searchUsersResponse401 | searchUsersResponse5xx) & {
+  headers: Headers;
+};
+
+export type searchUsersResponse = (searchUsersResponseSuccess | searchUsersResponseError)
+
+export const getSearchUsersUrl = (params: SearchUsersParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/users/search?${stringifiedParams}` : `/users/search`
+}
+
+export const searchUsers = async (params: SearchUsersParams, options?: RequestInit): Promise<searchUsersResponse> => {
+
+  return customFetch<searchUsersResponse>(getSearchUsersUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getSearchUsersQueryKey = (params?: SearchUsersParams,) => {
+    return [
+    `/users/search`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getSearchUsersQueryOptions = <TData = Awaited<ReturnType<typeof searchUsers>>, TError = PipeBombError>(params: SearchUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchUsers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getSearchUsersQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof searchUsers>>> = ({ signal }) => searchUsers(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof searchUsers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type SearchUsersQueryResult = NonNullable<Awaited<ReturnType<typeof searchUsers>>>
+export type SearchUsersQueryError = PipeBombError
+
+
+export function useSearchUsers<TData = Awaited<ReturnType<typeof searchUsers>>, TError = PipeBombError>(
+ params: SearchUsersParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchUsers>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchUsers>>,
+          TError,
+          Awaited<ReturnType<typeof searchUsers>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchUsers<TData = Awaited<ReturnType<typeof searchUsers>>, TError = PipeBombError>(
+ params: SearchUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchUsers>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof searchUsers>>,
+          TError,
+          Awaited<ReturnType<typeof searchUsers>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useSearchUsers<TData = Awaited<ReturnType<typeof searchUsers>>, TError = PipeBombError>(
+ params: SearchUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchUsers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useSearchUsers<TData = Awaited<ReturnType<typeof searchUsers>>, TError = PipeBombError>(
+ params: SearchUsersParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof searchUsers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getSearchUsersQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
 
 export type getUserResponse200 = {
   data: User
@@ -6644,6 +6773,341 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getDeletePlaylistSmartFilterGroupMutationOptions(options), queryClient);
+    }
+
+export type getPlaylistMembersResponse200 = {
+  data: PlaylistMember[]
+  status: 200
+}
+
+export type getPlaylistMembersResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type getPlaylistMembersResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type getPlaylistMembersResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type getPlaylistMembersResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getPlaylistMembersResponseSuccess = (getPlaylistMembersResponse200) & {
+  headers: Headers;
+};
+export type getPlaylistMembersResponseError = (getPlaylistMembersResponse401 | getPlaylistMembersResponse403 | getPlaylistMembersResponse404 | getPlaylistMembersResponse5xx) & {
+  headers: Headers;
+};
+
+export type getPlaylistMembersResponse = (getPlaylistMembersResponseSuccess | getPlaylistMembersResponseError)
+
+export const getGetPlaylistMembersUrl = (uuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/members`
+}
+
+export const getPlaylistMembers = async (uuid: string, options?: RequestInit): Promise<getPlaylistMembersResponse> => {
+
+  return customFetch<getPlaylistMembersResponse>(getGetPlaylistMembersUrl(uuid),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPlaylistMembersQueryKey = (uuid: string,) => {
+    return [
+    `/playlists/${uuid}/members`
+    ] as const;
+    }
+
+
+export const getGetPlaylistMembersQueryOptions = <TData = Awaited<ReturnType<typeof getPlaylistMembers>>, TError = PipeBombError>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistMembers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPlaylistMembersQueryKey(uuid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlaylistMembers>>> = ({ signal }) => getPlaylistMembers(uuid, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: uuid !== null && uuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPlaylistMembers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPlaylistMembersQueryResult = NonNullable<Awaited<ReturnType<typeof getPlaylistMembers>>>
+export type GetPlaylistMembersQueryError = PipeBombError
+
+
+export function useGetPlaylistMembers<TData = Awaited<ReturnType<typeof getPlaylistMembers>>, TError = PipeBombError>(
+ uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistMembers>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlaylistMembers>>,
+          TError,
+          Awaited<ReturnType<typeof getPlaylistMembers>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlaylistMembers<TData = Awaited<ReturnType<typeof getPlaylistMembers>>, TError = PipeBombError>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistMembers>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlaylistMembers>>,
+          TError,
+          Awaited<ReturnType<typeof getPlaylistMembers>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPlaylistMembers<TData = Awaited<ReturnType<typeof getPlaylistMembers>>, TError = PipeBombError>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistMembers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetPlaylistMembers<TData = Awaited<ReturnType<typeof getPlaylistMembers>>, TError = PipeBombError>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlaylistMembers>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPlaylistMembersQueryOptions(uuid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type upsertPlaylistMemberResponse200 = {
+  data: PlaylistMember
+  status: 200
+}
+
+export type upsertPlaylistMemberResponse400 = {
+  data: PipeBombError
+  status: 400
+}
+
+export type upsertPlaylistMemberResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type upsertPlaylistMemberResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type upsertPlaylistMemberResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type upsertPlaylistMemberResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type upsertPlaylistMemberResponseSuccess = (upsertPlaylistMemberResponse200) & {
+  headers: Headers;
+};
+export type upsertPlaylistMemberResponseError = (upsertPlaylistMemberResponse400 | upsertPlaylistMemberResponse401 | upsertPlaylistMemberResponse403 | upsertPlaylistMemberResponse404 | upsertPlaylistMemberResponse5xx) & {
+  headers: Headers;
+};
+
+export type upsertPlaylistMemberResponse = (upsertPlaylistMemberResponseSuccess | upsertPlaylistMemberResponseError)
+
+export const getUpsertPlaylistMemberUrl = (uuid: string,
+    userUuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/members/${userUuid}`
+}
+
+export const upsertPlaylistMember = async (uuid: string,
+    userUuid: string,
+    upsertPlaylistMemberDto: UpsertPlaylistMemberDto, options?: RequestInit): Promise<upsertPlaylistMemberResponse> => {
+
+  return customFetch<upsertPlaylistMemberResponse>(getUpsertPlaylistMemberUrl(uuid,userUuid),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(upsertPlaylistMemberDto)
+  }
+);}
+
+
+
+
+export const getUpsertPlaylistMemberMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertPlaylistMember>>, TError,{uuid: string;userUuid: string;data: UpsertPlaylistMemberDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof upsertPlaylistMember>>, TError,{uuid: string;userUuid: string;data: UpsertPlaylistMemberDto}, TContext> => {
+
+const mutationKey = ['upsertPlaylistMember'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof upsertPlaylistMember>>, {uuid: string;userUuid: string;data: UpsertPlaylistMemberDto}> = (props) => {
+          const {uuid,userUuid,data} = props ?? {};
+
+          return  upsertPlaylistMember(uuid,userUuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpsertPlaylistMemberMutationResult = NonNullable<Awaited<ReturnType<typeof upsertPlaylistMember>>>
+    export type UpsertPlaylistMemberMutationBody = UpsertPlaylistMemberDto
+    export type UpsertPlaylistMemberMutationError = PipeBombError
+
+    export const useUpsertPlaylistMember = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof upsertPlaylistMember>>, TError,{uuid: string;userUuid: string;data: UpsertPlaylistMemberDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof upsertPlaylistMember>>,
+        TError,
+        {uuid: string;userUuid: string;data: UpsertPlaylistMemberDto},
+        TContext
+      > => {
+      return useMutation(getUpsertPlaylistMemberMutationOptions(options), queryClient);
+    }
+
+export type removePlaylistMemberResponse204 = {
+  data: void
+  status: 204
+}
+
+export type removePlaylistMemberResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type removePlaylistMemberResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type removePlaylistMemberResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type removePlaylistMemberResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type removePlaylistMemberResponseSuccess = (removePlaylistMemberResponse204) & {
+  headers: Headers;
+};
+export type removePlaylistMemberResponseError = (removePlaylistMemberResponse401 | removePlaylistMemberResponse403 | removePlaylistMemberResponse404 | removePlaylistMemberResponse5xx) & {
+  headers: Headers;
+};
+
+export type removePlaylistMemberResponse = (removePlaylistMemberResponseSuccess | removePlaylistMemberResponseError)
+
+export const getRemovePlaylistMemberUrl = (uuid: string,
+    userUuid: string,) => {
+
+
+
+
+  return `/playlists/${uuid}/members/${userUuid}`
+}
+
+export const removePlaylistMember = async (uuid: string,
+    userUuid: string, options?: RequestInit): Promise<removePlaylistMemberResponse> => {
+
+  return customFetch<removePlaylistMemberResponse>(getRemovePlaylistMemberUrl(uuid,userUuid),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getRemovePlaylistMemberMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removePlaylistMember>>, TError,{uuid: string;userUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof removePlaylistMember>>, TError,{uuid: string;userUuid: string}, TContext> => {
+
+const mutationKey = ['removePlaylistMember'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removePlaylistMember>>, {uuid: string;userUuid: string}> = (props) => {
+          const {uuid,userUuid} = props ?? {};
+
+          return  removePlaylistMember(uuid,userUuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemovePlaylistMemberMutationResult = NonNullable<Awaited<ReturnType<typeof removePlaylistMember>>>
+
+    export type RemovePlaylistMemberMutationError = PipeBombError
+
+    export const useRemovePlaylistMember = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removePlaylistMember>>, TError,{uuid: string;userUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof removePlaylistMember>>,
+        TError,
+        {uuid: string;userUuid: string},
+        TContext
+      > => {
+      return useMutation(getRemovePlaylistMemberMutationOptions(options), queryClient);
     }
 
 export type getTrackResponse200 = {
