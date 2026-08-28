@@ -5,6 +5,7 @@
  * OpenAPI spec version: 0.0.2
  */
 
+export * from './addMarketplaceDto';
 export * from './addPlaylistTracksDto';
 export * from './addWorkflowStepDto';
 export * from './album';
@@ -125,6 +126,8 @@ export * from './librarySearchDto';
 export * from './loadedAttribute';
 export * from './loadedPlugin';
 export * from './loginDto';
+export * from './marketplace';
+export * from './marketplacePlugin';
 export * from './newPlaylistAlbumDto';
 export * from './orderedAttributeSourceDto';
 export * from './paragraphConfigNode';

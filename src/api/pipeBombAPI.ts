@@ -24,6 +24,7 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AddMarketplaceDto,
   AddWorkflowStepDto,
   Album,
   AlbumEphemeralContent,
@@ -58,6 +59,8 @@ import type {
   LibrarySearchDto,
   LoadedPlugin,
   LoginDto,
+  Marketplace,
+  MarketplacePlugin,
   PipeBombError,
   Playlist,
   PlaylistMember,
@@ -9965,6 +9968,440 @@ export function useGetSetupStatus<TData = Awaited<ReturnType<typeof getSetupStat
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetSetupStatusQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type listMarketplacesResponse200 = {
+  data: Marketplace[]
+  status: 200
+}
+
+export type listMarketplacesResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type listMarketplacesResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type listMarketplacesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type listMarketplacesResponseSuccess = (listMarketplacesResponse200) & {
+  headers: Headers;
+};
+export type listMarketplacesResponseError = (listMarketplacesResponse401 | listMarketplacesResponse403 | listMarketplacesResponse5xx) & {
+  headers: Headers;
+};
+
+export type listMarketplacesResponse = (listMarketplacesResponseSuccess | listMarketplacesResponseError)
+
+export const getListMarketplacesUrl = () => {
+
+
+
+
+  return `/marketplaces`
+}
+
+export const listMarketplaces = async ( options?: RequestInit): Promise<listMarketplacesResponse> => {
+
+  return customFetch<listMarketplacesResponse>(getListMarketplacesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMarketplacesQueryKey = () => {
+    return [
+    `/marketplaces`
+    ] as const;
+    }
+
+
+export const getListMarketplacesQueryOptions = <TData = Awaited<ReturnType<typeof listMarketplaces>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMarketplaces>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMarketplacesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMarketplaces>>> = ({ signal }) => listMarketplaces({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMarketplaces>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListMarketplacesQueryResult = NonNullable<Awaited<ReturnType<typeof listMarketplaces>>>
+export type ListMarketplacesQueryError = PipeBombError
+
+
+export function useListMarketplaces<TData = Awaited<ReturnType<typeof listMarketplaces>>, TError = PipeBombError>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMarketplaces>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listMarketplaces>>,
+          TError,
+          Awaited<ReturnType<typeof listMarketplaces>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMarketplaces<TData = Awaited<ReturnType<typeof listMarketplaces>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMarketplaces>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listMarketplaces>>,
+          TError,
+          Awaited<ReturnType<typeof listMarketplaces>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMarketplaces<TData = Awaited<ReturnType<typeof listMarketplaces>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMarketplaces>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useListMarketplaces<TData = Awaited<ReturnType<typeof listMarketplaces>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMarketplaces>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListMarketplacesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type addMarketplaceResponse201 = {
+  data: Marketplace
+  status: 201
+}
+
+export type addMarketplaceResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type addMarketplaceResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type addMarketplaceResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type addMarketplaceResponseSuccess = (addMarketplaceResponse201) & {
+  headers: Headers;
+};
+export type addMarketplaceResponseError = (addMarketplaceResponse401 | addMarketplaceResponse403 | addMarketplaceResponse5xx) & {
+  headers: Headers;
+};
+
+export type addMarketplaceResponse = (addMarketplaceResponseSuccess | addMarketplaceResponseError)
+
+export const getAddMarketplaceUrl = () => {
+
+
+
+
+  return `/marketplaces`
+}
+
+export const addMarketplace = async (addMarketplaceDto: AddMarketplaceDto, options?: RequestInit): Promise<addMarketplaceResponse> => {
+
+  return customFetch<addMarketplaceResponse>(getAddMarketplaceUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(addMarketplaceDto)
+  }
+);}
+
+
+
+
+export const getAddMarketplaceMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addMarketplace>>, TError,{data: AddMarketplaceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof addMarketplace>>, TError,{data: AddMarketplaceDto}, TContext> => {
+
+const mutationKey = ['addMarketplace'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof addMarketplace>>, {data: AddMarketplaceDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  addMarketplace(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type AddMarketplaceMutationResult = NonNullable<Awaited<ReturnType<typeof addMarketplace>>>
+    export type AddMarketplaceMutationBody = AddMarketplaceDto
+    export type AddMarketplaceMutationError = PipeBombError
+
+    export const useAddMarketplace = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof addMarketplace>>, TError,{data: AddMarketplaceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof addMarketplace>>,
+        TError,
+        {data: AddMarketplaceDto},
+        TContext
+      > => {
+      return useMutation(getAddMarketplaceMutationOptions(options), queryClient);
+    }
+
+export type removeMarketplaceResponse204 = {
+  data: void
+  status: 204
+}
+
+export type removeMarketplaceResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type removeMarketplaceResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type removeMarketplaceResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type removeMarketplaceResponseSuccess = (removeMarketplaceResponse204) & {
+  headers: Headers;
+};
+export type removeMarketplaceResponseError = (removeMarketplaceResponse401 | removeMarketplaceResponse403 | removeMarketplaceResponse5xx) & {
+  headers: Headers;
+};
+
+export type removeMarketplaceResponse = (removeMarketplaceResponseSuccess | removeMarketplaceResponseError)
+
+export const getRemoveMarketplaceUrl = (uuid: string,) => {
+
+
+
+
+  return `/marketplaces/${uuid}`
+}
+
+export const removeMarketplace = async (uuid: string, options?: RequestInit): Promise<removeMarketplaceResponse> => {
+
+  return customFetch<removeMarketplaceResponse>(getRemoveMarketplaceUrl(uuid),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getRemoveMarketplaceMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeMarketplace>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof removeMarketplace>>, TError,{uuid: string}, TContext> => {
+
+const mutationKey = ['removeMarketplace'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof removeMarketplace>>, {uuid: string}> = (props) => {
+          const {uuid} = props ?? {};
+
+          return  removeMarketplace(uuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RemoveMarketplaceMutationResult = NonNullable<Awaited<ReturnType<typeof removeMarketplace>>>
+
+    export type RemoveMarketplaceMutationError = PipeBombError
+
+    export const useRemoveMarketplace = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removeMarketplace>>, TError,{uuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof removeMarketplace>>,
+        TError,
+        {uuid: string},
+        TContext
+      > => {
+      return useMutation(getRemoveMarketplaceMutationOptions(options), queryClient);
+    }
+
+export type listMarketplacePluginsResponse200 = {
+  data: MarketplacePlugin[]
+  status: 200
+}
+
+export type listMarketplacePluginsResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type listMarketplacePluginsResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type listMarketplacePluginsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type listMarketplacePluginsResponseSuccess = (listMarketplacePluginsResponse200) & {
+  headers: Headers;
+};
+export type listMarketplacePluginsResponseError = (listMarketplacePluginsResponse401 | listMarketplacePluginsResponse403 | listMarketplacePluginsResponse5xx) & {
+  headers: Headers;
+};
+
+export type listMarketplacePluginsResponse = (listMarketplacePluginsResponseSuccess | listMarketplacePluginsResponseError)
+
+export const getListMarketplacePluginsUrl = () => {
+
+
+
+
+  return `/marketplaces/plugins`
+}
+
+export const listMarketplacePlugins = async ( options?: RequestInit): Promise<listMarketplacePluginsResponse> => {
+
+  return customFetch<listMarketplacePluginsResponse>(getListMarketplacePluginsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListMarketplacePluginsQueryKey = () => {
+    return [
+    `/marketplaces/plugins`
+    ] as const;
+    }
+
+
+export const getListMarketplacePluginsQueryOptions = <TData = Awaited<ReturnType<typeof listMarketplacePlugins>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMarketplacePlugins>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListMarketplacePluginsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listMarketplacePlugins>>> = ({ signal }) => listMarketplacePlugins({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listMarketplacePlugins>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ListMarketplacePluginsQueryResult = NonNullable<Awaited<ReturnType<typeof listMarketplacePlugins>>>
+export type ListMarketplacePluginsQueryError = PipeBombError
+
+
+export function useListMarketplacePlugins<TData = Awaited<ReturnType<typeof listMarketplacePlugins>>, TError = PipeBombError>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMarketplacePlugins>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listMarketplacePlugins>>,
+          TError,
+          Awaited<ReturnType<typeof listMarketplacePlugins>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMarketplacePlugins<TData = Awaited<ReturnType<typeof listMarketplacePlugins>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMarketplacePlugins>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listMarketplacePlugins>>,
+          TError,
+          Awaited<ReturnType<typeof listMarketplacePlugins>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useListMarketplacePlugins<TData = Awaited<ReturnType<typeof listMarketplacePlugins>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMarketplacePlugins>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useListMarketplacePlugins<TData = Awaited<ReturnType<typeof listMarketplacePlugins>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof listMarketplacePlugins>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getListMarketplacePluginsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
