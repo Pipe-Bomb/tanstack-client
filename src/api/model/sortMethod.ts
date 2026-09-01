@@ -4,9 +4,10 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.0.2
  */
-import type { Track } from './track';
 
-export interface LibraryFindResponse {
-  tracks: Track[];
-  totalPages?: number;
+export interface SortMethod {
+  key: string;
+  label?: string | null;
+  ascending: boolean;
+  descending: boolean;
 }

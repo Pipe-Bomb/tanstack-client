@@ -4,6 +4,7 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.0.2
  */
+import type { SearchSortDto } from './searchSortDto';
 
 export interface AlbumsSearchDto {
   /**
@@ -13,4 +14,5 @@ export interface AlbumsSearchDto {
   pageSize: number;
   /** @minimum 1 */
   page: number;
+  sort?: SearchSortDto;
 }

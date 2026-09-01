@@ -8,6 +8,7 @@ import type { BooleanSearchAttributeDto } from './booleanSearchAttributeDto';
 import type { BufferSearchAttributeDto } from './bufferSearchAttributeDto';
 import type { DecimalSearchAttributeDto } from './decimalSearchAttributeDto';
 import type { IntegerSearchAttributeDto } from './integerSearchAttributeDto';
+import type { SearchSortDto } from './searchSortDto';
 import type { StringSearchAttributeDto } from './stringSearchAttributeDto';
 
 export interface SearchDto {
@@ -15,4 +16,6 @@ export interface SearchDto {
   withAlbums: boolean;
   withArtists: boolean;
   attributes: (StringSearchAttributeDto | BooleanSearchAttributeDto | IntegerSearchAttributeDto | DecimalSearchAttributeDto | BufferSearchAttributeDto)[] | null;
+  query?: string;
+  sort?: SearchSortDto;
 }

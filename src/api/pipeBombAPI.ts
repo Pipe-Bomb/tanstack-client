@@ -50,6 +50,7 @@ import type {
   GetAttributeBufferParams,
   GetParams,
   GetPlaylistParams,
+  GetSearchSourceParams,
   GetSetupStatus200,
   Identifier,
   Identity,
@@ -74,6 +75,9 @@ import type {
   Privilege,
   SearchDto,
   SearchResults,
+  SearchSource,
+  SearchSourceDto,
+  SearchSourceSummary,
   SearchUsersParams,
   StartTaskDto,
   StreamInstance,
@@ -4380,6 +4384,490 @@ export function useGetHLSSegment<TData = Awaited<ReturnType<typeof getHLSSegment
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetHLSSegmentQueryOptions(id,segmentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type searchResponse200 = {
+  data: SearchResults
+  status: 200
+}
+
+export type searchResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type searchResponseSuccess = (searchResponse200) & {
+  headers: Headers;
+};
+export type searchResponseError = (searchResponse5xx) & {
+  headers: Headers;
+};
+
+export type searchResponse = (searchResponseSuccess | searchResponseError)
+
+export const getSearchUrl = () => {
+
+
+
+
+  return `/search`
+}
+
+export const search = async (searchDto: SearchDto, options?: RequestInit): Promise<searchResponse> => {
+
+  return customFetch<searchResponse>(getSearchUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(searchDto)
+  }
+);}
+
+
+
+
+export const getSearchMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext> => {
+
+const mutationKey = ['search'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof search>>, {data: SearchDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  search(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SearchMutationResult = NonNullable<Awaited<ReturnType<typeof search>>>
+    export type SearchMutationBody = SearchDto
+    export type SearchMutationError = PipeBombError
+
+    export const useSearch = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof search>>,
+        TError,
+        {data: SearchDto},
+        TContext
+      > => {
+      return useMutation(getSearchMutationOptions(options), queryClient);
+    }
+
+export type getSearchSourcesResponse200 = {
+  data: SearchSourceSummary[]
+  status: 200
+}
+
+export type getSearchSourcesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getSearchSourcesResponseSuccess = (getSearchSourcesResponse200) & {
+  headers: Headers;
+};
+export type getSearchSourcesResponseError = (getSearchSourcesResponse5xx) & {
+  headers: Headers;
+};
+
+export type getSearchSourcesResponse = (getSearchSourcesResponseSuccess | getSearchSourcesResponseError)
+
+export const getGetSearchSourcesUrl = () => {
+
+
+
+
+  return `/search/sources`
+}
+
+export const getSearchSources = async ( options?: RequestInit): Promise<getSearchSourcesResponse> => {
+
+  return customFetch<getSearchSourcesResponse>(getGetSearchSourcesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSearchSourcesQueryKey = () => {
+    return [
+    `/search/sources`
+    ] as const;
+    }
+
+
+export const getGetSearchSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getSearchSources>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSearchSourcesQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSearchSources>>> = ({ signal }) => getSearchSources({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSearchSources>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSearchSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof getSearchSources>>>
+export type GetSearchSourcesQueryError = PipeBombError
+
+
+export function useGetSearchSources<TData = Awaited<ReturnType<typeof getSearchSources>>, TError = PipeBombError>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSources>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSearchSources>>,
+          TError,
+          Awaited<ReturnType<typeof getSearchSources>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSearchSources<TData = Awaited<ReturnType<typeof getSearchSources>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSources>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSearchSources>>,
+          TError,
+          Awaited<ReturnType<typeof getSearchSources>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSearchSources<TData = Awaited<ReturnType<typeof getSearchSources>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetSearchSources<TData = Awaited<ReturnType<typeof getSearchSources>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSearchSourcesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type setActiveSearchSourceResponse200 = {
+  data: void
+  status: 200
+}
+
+export type setActiveSearchSourceResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type setActiveSearchSourceResponseSuccess = (setActiveSearchSourceResponse200) & {
+  headers: Headers;
+};
+export type setActiveSearchSourceResponseError = (setActiveSearchSourceResponse5xx) & {
+  headers: Headers;
+};
+
+export type setActiveSearchSourceResponse = (setActiveSearchSourceResponseSuccess | setActiveSearchSourceResponseError)
+
+export const getSetActiveSearchSourceUrl = () => {
+
+
+
+
+  return `/search/source`
+}
+
+export const setActiveSearchSource = async (searchSourceDto: SearchSourceDto, options?: RequestInit): Promise<setActiveSearchSourceResponse> => {
+
+  return customFetch<setActiveSearchSourceResponse>(getSetActiveSearchSourceUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(searchSourceDto)
+  }
+);}
+
+
+
+
+export const getSetActiveSearchSourceMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setActiveSearchSource>>, TError,{data: SearchSourceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof setActiveSearchSource>>, TError,{data: SearchSourceDto}, TContext> => {
+
+const mutationKey = ['setActiveSearchSource'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof setActiveSearchSource>>, {data: SearchSourceDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  setActiveSearchSource(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SetActiveSearchSourceMutationResult = NonNullable<Awaited<ReturnType<typeof setActiveSearchSource>>>
+    export type SetActiveSearchSourceMutationBody = SearchSourceDto
+    export type SetActiveSearchSourceMutationError = PipeBombError
+
+    export const useSetActiveSearchSource = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof setActiveSearchSource>>, TError,{data: SearchSourceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof setActiveSearchSource>>,
+        TError,
+        {data: SearchSourceDto},
+        TContext
+      > => {
+      return useMutation(getSetActiveSearchSourceMutationOptions(options), queryClient);
+    }
+
+export type clearActiveSearchSourceResponse200 = {
+  data: void
+  status: 200
+}
+
+export type clearActiveSearchSourceResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type clearActiveSearchSourceResponseSuccess = (clearActiveSearchSourceResponse200) & {
+  headers: Headers;
+};
+export type clearActiveSearchSourceResponseError = (clearActiveSearchSourceResponse5xx) & {
+  headers: Headers;
+};
+
+export type clearActiveSearchSourceResponse = (clearActiveSearchSourceResponseSuccess | clearActiveSearchSourceResponseError)
+
+export const getClearActiveSearchSourceUrl = () => {
+
+
+
+
+  return `/search/source`
+}
+
+export const clearActiveSearchSource = async ( options?: RequestInit): Promise<clearActiveSearchSourceResponse> => {
+
+  return customFetch<clearActiveSearchSourceResponse>(getClearActiveSearchSourceUrl(),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getClearActiveSearchSourceMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof clearActiveSearchSource>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof clearActiveSearchSource>>, TError,void, TContext> => {
+
+const mutationKey = ['clearActiveSearchSource'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof clearActiveSearchSource>>, void> = () => {
+
+
+          return  clearActiveSearchSource(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ClearActiveSearchSourceMutationResult = NonNullable<Awaited<ReturnType<typeof clearActiveSearchSource>>>
+
+    export type ClearActiveSearchSourceMutationError = PipeBombError
+
+    export const useClearActiveSearchSource = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof clearActiveSearchSource>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof clearActiveSearchSource>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getClearActiveSearchSourceMutationOptions(options), queryClient);
+    }
+
+export type getSearchSourceResponse200 = {
+  data: SearchSource
+  status: 200
+}
+
+export type getSearchSourceResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getSearchSourceResponseSuccess = (getSearchSourceResponse200) & {
+  headers: Headers;
+};
+export type getSearchSourceResponseError = (getSearchSourceResponse5xx) & {
+  headers: Headers;
+};
+
+export type getSearchSourceResponse = (getSearchSourceResponseSuccess | getSearchSourceResponseError)
+
+export const getGetSearchSourceUrl = (params?: GetSearchSourceParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/search/source?${stringifiedParams}` : `/search/source`
+}
+
+export const getSearchSource = async (params?: GetSearchSourceParams, options?: RequestInit): Promise<getSearchSourceResponse> => {
+
+  return customFetch<getSearchSourceResponse>(getGetSearchSourceUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetSearchSourceQueryKey = (params?: GetSearchSourceParams,) => {
+    return [
+    `/search/source`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetSearchSourceQueryOptions = <TData = Awaited<ReturnType<typeof getSearchSource>>, TError = PipeBombError>(params?: GetSearchSourceParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSource>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSearchSourceQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSearchSource>>> = ({ signal }) => getSearchSource(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSearchSource>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSearchSourceQueryResult = NonNullable<Awaited<ReturnType<typeof getSearchSource>>>
+export type GetSearchSourceQueryError = PipeBombError
+
+
+export function useGetSearchSource<TData = Awaited<ReturnType<typeof getSearchSource>>, TError = PipeBombError>(
+ params: undefined |  GetSearchSourceParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSource>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSearchSource>>,
+          TError,
+          Awaited<ReturnType<typeof getSearchSource>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSearchSource<TData = Awaited<ReturnType<typeof getSearchSource>>, TError = PipeBombError>(
+ params?: GetSearchSourceParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSource>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSearchSource>>,
+          TError,
+          Awaited<ReturnType<typeof getSearchSource>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSearchSource<TData = Awaited<ReturnType<typeof getSearchSource>>, TError = PipeBombError>(
+ params?: GetSearchSourceParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSource>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetSearchSource<TData = Awaited<ReturnType<typeof getSearchSource>>, TError = PipeBombError>(
+ params?: GetSearchSourceParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSearchSource>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSearchSourceQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -9782,89 +10270,6 @@ export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlb
 
 
 
-
-export type searchResponse200 = {
-  data: SearchResults
-  status: 200
-}
-
-export type searchResponse5xx = {
-  data: PipeBombError
-  status: HTTPStatusCode5xx
-}
-
-export type searchResponseSuccess = (searchResponse200) & {
-  headers: Headers;
-};
-export type searchResponseError = (searchResponse5xx) & {
-  headers: Headers;
-};
-
-export type searchResponse = (searchResponseSuccess | searchResponseError)
-
-export const getSearchUrl = () => {
-
-
-
-
-  return `/search`
-}
-
-export const search = async (searchDto: SearchDto, options?: RequestInit): Promise<searchResponse> => {
-
-  return customFetch<searchResponse>(getSearchUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(searchDto)
-  }
-);}
-
-
-
-
-export const getSearchMutationOptions = <TError = PipeBombError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext> => {
-
-const mutationKey = ['search'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof search>>, {data: SearchDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  search(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SearchMutationResult = NonNullable<Awaited<ReturnType<typeof search>>>
-    export type SearchMutationBody = SearchDto
-    export type SearchMutationError = PipeBombError
-
-    export const useSearch = <TError = PipeBombError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof search>>, TError,{data: SearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof search>>,
-        TError,
-        {data: SearchDto},
-        TContext
-      > => {
-      return useMutation(getSearchMutationOptions(options), queryClient);
-    }
 
 export type getSetupStatusResponse200 = {
   data: GetSetupStatus200

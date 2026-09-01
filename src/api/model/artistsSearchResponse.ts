@@ -8,4 +8,5 @@ import type { Artist } from './artist';
 
 export interface ArtistsSearchResponse {
   artists: Artist[];
+  totalPages: number | null;
 }

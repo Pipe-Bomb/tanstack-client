@@ -8,4 +8,5 @@ import type { Album } from './album';
 
 export interface AlbumsSearchResponse {
   albums: Album[];
+  totalPages: number | null;
 }
