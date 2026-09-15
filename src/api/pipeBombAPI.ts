@@ -86,6 +86,7 @@ import type {
   Track,
   TrackCreationSession,
   TrackIdsDto,
+  UpdateIdentifiersDto,
   UpdatePlaylistAttributesDto,
   UpdatePlaylistTracksDto,
   UpdatePrivilegesDto,
@@ -4030,6 +4031,104 @@ export function useGetAllIdentifiers<TData = Awaited<ReturnType<typeof getAllIde
 
 
 
+
+export type updateIdentifiersResponse200 = {
+  data: Identifier[]
+  status: 200
+}
+
+export type updateIdentifiersResponse400 = {
+  data: PipeBombError
+  status: 400
+}
+
+export type updateIdentifiersResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type updateIdentifiersResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type updateIdentifiersResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type updateIdentifiersResponseSuccess = (updateIdentifiersResponse200) & {
+  headers: Headers;
+};
+export type updateIdentifiersResponseError = (updateIdentifiersResponse400 | updateIdentifiersResponse401 | updateIdentifiersResponse403 | updateIdentifiersResponse5xx) & {
+  headers: Headers;
+};
+
+export type updateIdentifiersResponse = (updateIdentifiersResponseSuccess | updateIdentifiersResponseError)
+
+export const getUpdateIdentifiersUrl = () => {
+
+
+
+
+  return `/identifiers`
+}
+
+export const updateIdentifiers = async (updateIdentifiersDto: UpdateIdentifiersDto, options?: RequestInit): Promise<updateIdentifiersResponse> => {
+
+  return customFetch<updateIdentifiersResponse>(getUpdateIdentifiersUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(updateIdentifiersDto)
+  }
+);}
+
+
+
+
+export const getUpdateIdentifiersMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateIdentifiers>>, TError,{data: UpdateIdentifiersDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateIdentifiers>>, TError,{data: UpdateIdentifiersDto}, TContext> => {
+
+const mutationKey = ['updateIdentifiers'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateIdentifiers>>, {data: UpdateIdentifiersDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  updateIdentifiers(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateIdentifiersMutationResult = NonNullable<Awaited<ReturnType<typeof updateIdentifiers>>>
+    export type UpdateIdentifiersMutationBody = UpdateIdentifiersDto
+    export type UpdateIdentifiersMutationError = PipeBombError
+
+    export const useUpdateIdentifiers = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateIdentifiers>>, TError,{data: UpdateIdentifiersDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateIdentifiers>>,
+        TError,
+        {data: UpdateIdentifiersDto},
+        TContext
+      > => {
+      return useMutation(getUpdateIdentifiersMutationOptions(options), queryClient);
+    }
 
 export type getStreamResponse200 = {
   data: Blob

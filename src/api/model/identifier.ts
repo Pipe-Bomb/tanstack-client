@@ -5,10 +5,15 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { IdentifierDependency } from './identifierDependency';
+import type { IdentifierTarget } from './identifierTarget';
+import type { IdentifierType } from './identifierType';
 
 export interface Identifier {
   pluginId: string;
   identifierId: string;
+  type: IdentifierType;
+  target: IdentifierTarget | null;
   dependencies: IdentifierDependency[];
   softDependencies: IdentifierDependency[];
+  disabled: boolean;
 }
