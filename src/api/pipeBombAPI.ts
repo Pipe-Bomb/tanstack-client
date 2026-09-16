@@ -48,6 +48,7 @@ import type {
   EphemeralSourceDto,
   ExternalUrl,
   GetAttributeBufferParams,
+  GetOwnPlaybackHistoryParams,
   GetParams,
   GetPlaylistParams,
   GetSearchSourceParams,
@@ -63,6 +64,7 @@ import type {
   Marketplace,
   MarketplacePlugin,
   PipeBombError,
+  PlaybackHistoryPage,
   Playlist,
   PlaylistMember,
   PlaylistTrack,
@@ -73,6 +75,7 @@ import type {
   PluginConfigs,
   PluginLibrary,
   Privilege,
+  ReportPlaybackDto,
   SearchDto,
   SearchResults,
   SearchSource,
@@ -8011,6 +8014,225 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getRemovePlaylistMemberMutationOptions(options), queryClient);
+    }
+
+export type getOwnPlaybackHistoryResponse200 = {
+  data: PlaybackHistoryPage
+  status: 200
+}
+
+export type getOwnPlaybackHistoryResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type getOwnPlaybackHistoryResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getOwnPlaybackHistoryResponseSuccess = (getOwnPlaybackHistoryResponse200) & {
+  headers: Headers;
+};
+export type getOwnPlaybackHistoryResponseError = (getOwnPlaybackHistoryResponse401 | getOwnPlaybackHistoryResponse5xx) & {
+  headers: Headers;
+};
+
+export type getOwnPlaybackHistoryResponse = (getOwnPlaybackHistoryResponseSuccess | getOwnPlaybackHistoryResponseError)
+
+export const getGetOwnPlaybackHistoryUrl = (params: GetOwnPlaybackHistoryParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/playback-history/me?${stringifiedParams}` : `/playback-history/me`
+}
+
+export const getOwnPlaybackHistory = async (params: GetOwnPlaybackHistoryParams, options?: RequestInit): Promise<getOwnPlaybackHistoryResponse> => {
+
+  return customFetch<getOwnPlaybackHistoryResponse>(getGetOwnPlaybackHistoryUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetOwnPlaybackHistoryQueryKey = (params?: GetOwnPlaybackHistoryParams,) => {
+    return [
+    `/playback-history/me`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getGetOwnPlaybackHistoryQueryOptions = <TData = Awaited<ReturnType<typeof getOwnPlaybackHistory>>, TError = PipeBombError>(params: GetOwnPlaybackHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaybackHistory>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetOwnPlaybackHistoryQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getOwnPlaybackHistory>>> = ({ signal }) => getOwnPlaybackHistory(params, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaybackHistory>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetOwnPlaybackHistoryQueryResult = NonNullable<Awaited<ReturnType<typeof getOwnPlaybackHistory>>>
+export type GetOwnPlaybackHistoryQueryError = PipeBombError
+
+
+export function useGetOwnPlaybackHistory<TData = Awaited<ReturnType<typeof getOwnPlaybackHistory>>, TError = PipeBombError>(
+ params: GetOwnPlaybackHistoryParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaybackHistory>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnPlaybackHistory>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnPlaybackHistory>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetOwnPlaybackHistory<TData = Awaited<ReturnType<typeof getOwnPlaybackHistory>>, TError = PipeBombError>(
+ params: GetOwnPlaybackHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaybackHistory>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getOwnPlaybackHistory>>,
+          TError,
+          Awaited<ReturnType<typeof getOwnPlaybackHistory>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetOwnPlaybackHistory<TData = Awaited<ReturnType<typeof getOwnPlaybackHistory>>, TError = PipeBombError>(
+ params: GetOwnPlaybackHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaybackHistory>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetOwnPlaybackHistory<TData = Awaited<ReturnType<typeof getOwnPlaybackHistory>>, TError = PipeBombError>(
+ params: GetOwnPlaybackHistoryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getOwnPlaybackHistory>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetOwnPlaybackHistoryQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type reportPlaybackResponse204 = {
+  data: void
+  status: 204
+}
+
+export type reportPlaybackResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type reportPlaybackResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type reportPlaybackResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type reportPlaybackResponseSuccess = (reportPlaybackResponse204) & {
+  headers: Headers;
+};
+export type reportPlaybackResponseError = (reportPlaybackResponse401 | reportPlaybackResponse404 | reportPlaybackResponse5xx) & {
+  headers: Headers;
+};
+
+export type reportPlaybackResponse = (reportPlaybackResponseSuccess | reportPlaybackResponseError)
+
+export const getReportPlaybackUrl = () => {
+
+
+
+
+  return `/playback-history/me`
+}
+
+export const reportPlayback = async (reportPlaybackDto: ReportPlaybackDto, options?: RequestInit): Promise<reportPlaybackResponse> => {
+
+  return customFetch<reportPlaybackResponse>(getReportPlaybackUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(reportPlaybackDto)
+  }
+);}
+
+
+
+
+export const getReportPlaybackMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportPlayback>>, TError,{data: ReportPlaybackDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof reportPlayback>>, TError,{data: ReportPlaybackDto}, TContext> => {
+
+const mutationKey = ['reportPlayback'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportPlayback>>, {data: ReportPlaybackDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  reportPlayback(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ReportPlaybackMutationResult = NonNullable<Awaited<ReturnType<typeof reportPlayback>>>
+    export type ReportPlaybackMutationBody = ReportPlaybackDto
+    export type ReportPlaybackMutationError = PipeBombError
+
+    export const useReportPlayback = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportPlayback>>, TError,{data: ReportPlaybackDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof reportPlayback>>,
+        TError,
+        {data: ReportPlaybackDto},
+        TContext
+      > => {
+      return useMutation(getReportPlaybackMutationOptions(options), queryClient);
     }
 
 export type getTrackResponse200 = {
