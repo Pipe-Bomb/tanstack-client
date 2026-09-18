@@ -74,6 +74,7 @@ import type {
   PluginConfigUpdateDto,
   PluginConfigs,
   PluginLibrary,
+  PluginUpdate,
   Privilege,
   ReportPlaybackDto,
   SearchDto,
@@ -470,6 +471,223 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getInstallPluginMutationOptions(options), queryClient);
+    }
+
+export type checkPluginUpdatesResponse200 = {
+  data: PluginUpdate
+  status: 200
+}
+
+export type checkPluginUpdatesResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type checkPluginUpdatesResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type checkPluginUpdatesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type checkPluginUpdatesResponseSuccess = (checkPluginUpdatesResponse200) & {
+  headers: Headers;
+};
+export type checkPluginUpdatesResponseError = (checkPluginUpdatesResponse401 | checkPluginUpdatesResponse403 | checkPluginUpdatesResponse5xx) & {
+  headers: Headers;
+};
+
+export type checkPluginUpdatesResponse = (checkPluginUpdatesResponseSuccess | checkPluginUpdatesResponseError)
+
+export const getCheckPluginUpdatesUrl = (name: string,) => {
+
+
+
+
+  return `/plugins/${name}/check-updates`
+}
+
+export const checkPluginUpdates = async (name: string, options?: RequestInit): Promise<checkPluginUpdatesResponse> => {
+
+  return customFetch<checkPluginUpdatesResponse>(getCheckPluginUpdatesUrl(name),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getCheckPluginUpdatesQueryKey = (name: string,) => {
+    return [
+    `/plugins/${name}/check-updates`
+    ] as const;
+    }
+
+
+export const getCheckPluginUpdatesQueryOptions = <TData = Awaited<ReturnType<typeof checkPluginUpdates>>, TError = PipeBombError>(name: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof checkPluginUpdates>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCheckPluginUpdatesQueryKey(name);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof checkPluginUpdates>>> = ({ signal }) => checkPluginUpdates(name, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: name !== null && name !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof checkPluginUpdates>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CheckPluginUpdatesQueryResult = NonNullable<Awaited<ReturnType<typeof checkPluginUpdates>>>
+export type CheckPluginUpdatesQueryError = PipeBombError
+
+
+export function useCheckPluginUpdates<TData = Awaited<ReturnType<typeof checkPluginUpdates>>, TError = PipeBombError>(
+ name: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof checkPluginUpdates>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof checkPluginUpdates>>,
+          TError,
+          Awaited<ReturnType<typeof checkPluginUpdates>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCheckPluginUpdates<TData = Awaited<ReturnType<typeof checkPluginUpdates>>, TError = PipeBombError>(
+ name: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof checkPluginUpdates>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof checkPluginUpdates>>,
+          TError,
+          Awaited<ReturnType<typeof checkPluginUpdates>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCheckPluginUpdates<TData = Awaited<ReturnType<typeof checkPluginUpdates>>, TError = PipeBombError>(
+ name: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof checkPluginUpdates>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useCheckPluginUpdates<TData = Awaited<ReturnType<typeof checkPluginUpdates>>, TError = PipeBombError>(
+ name: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof checkPluginUpdates>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCheckPluginUpdatesQueryOptions(name,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type updatePluginResponse200 = {
+  data: LoadedPlugin[]
+  status: 200
+}
+
+export type updatePluginResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type updatePluginResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type updatePluginResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type updatePluginResponseSuccess = (updatePluginResponse200) & {
+  headers: Headers;
+};
+export type updatePluginResponseError = (updatePluginResponse401 | updatePluginResponse403 | updatePluginResponse5xx) & {
+  headers: Headers;
+};
+
+export type updatePluginResponse = (updatePluginResponseSuccess | updatePluginResponseError)
+
+export const getUpdatePluginUrl = (name: string,) => {
+
+
+
+
+  return `/plugins/${name}/update`
+}
+
+export const updatePlugin = async (name: string, options?: RequestInit): Promise<updatePluginResponse> => {
+
+  return customFetch<updatePluginResponse>(getUpdatePluginUrl(name),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getUpdatePluginMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlugin>>, TError,{name: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updatePlugin>>, TError,{name: string}, TContext> => {
+
+const mutationKey = ['updatePlugin'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updatePlugin>>, {name: string}> = (props) => {
+          const {name} = props ?? {};
+
+          return  updatePlugin(name,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdatePluginMutationResult = NonNullable<Awaited<ReturnType<typeof updatePlugin>>>
+
+    export type UpdatePluginMutationError = PipeBombError
+
+    export const useUpdatePlugin = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updatePlugin>>, TError,{name: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updatePlugin>>,
+        TError,
+        {name: string},
+        TContext
+      > => {
+      return useMutation(getUpdatePluginMutationOptions(options), queryClient);
     }
 
 export type removePluginResponse200 = {

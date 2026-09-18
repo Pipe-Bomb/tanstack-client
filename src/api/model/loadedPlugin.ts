@@ -4,9 +4,11 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.1.0
  */
+import type { LoadedPluginUpdateStatus } from './loadedPluginUpdateStatus';
 
 export interface LoadedPlugin {
   name: string;
   version: string;
   description: string | null;
+  updateStatus: LoadedPluginUpdateStatus;
 }
