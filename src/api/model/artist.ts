@@ -15,4 +15,5 @@ export interface Artist {
   identities: Identity[] | null;
   tracks: Track[] | null;
   albums: Album[] | null;
+  bookmarked: boolean | null;
 }

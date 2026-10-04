@@ -10,6 +10,7 @@ import type { Identity } from './identity';
 import type { TrackArtist } from './trackArtist';
 
 export interface Track {
+  uuid: string;
   trackId: string;
   pluginId: string;
   libraryId: string;
@@ -19,4 +20,5 @@ export interface Track {
   albums: Album[] | null;
   attributes: AttributeMap | null;
   identities: Identity[] | null;
+  bookmarked: boolean | null;
 }

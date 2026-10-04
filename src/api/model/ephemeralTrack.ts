@@ -8,10 +8,12 @@ import type { AttributeMap } from './attributeMap';
 import type { TrackArtist } from './trackArtist';
 
 export interface EphemeralTrack {
+  uuid: string | null;
   trackId: string;
   pluginId: string;
   libraryId: string;
   title: string;
   attributes: AttributeMap | null;
   artists: TrackArtist[] | null;
+  bookmarked: boolean | null;
 }

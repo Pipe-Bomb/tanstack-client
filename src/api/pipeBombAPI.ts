@@ -51,6 +51,9 @@ import type {
   GetOwnPlaybackHistoryParams,
   GetParams,
   GetPlaylistParams,
+  GetSavedAlbumsParams,
+  GetSavedArtistsParams,
+  GetSavedTracksParams,
   GetSearchSourceParams,
   GetSetupStatus200,
   Identifier,
@@ -8453,45 +8456,48 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       return useMutation(getReportPlaybackMutationOptions(options), queryClient);
     }
 
-export type getTrackResponse200 = {
-  data: Track
+export type getSavedAlbumsResponse200 = {
+  data: void
   status: 200
 }
 
-export type getTrackResponse404 = {
+export type getSavedAlbumsResponse401 = {
   data: PipeBombError
-  status: 404
+  status: 401
 }
 
-export type getTrackResponse5xx = {
+export type getSavedAlbumsResponse5xx = {
   data: PipeBombError
   status: HTTPStatusCode5xx
 }
 
-export type getTrackResponseSuccess = (getTrackResponse200) & {
+export type getSavedAlbumsResponseSuccess = (getSavedAlbumsResponse200) & {
   headers: Headers;
 };
-export type getTrackResponseError = (getTrackResponse404 | getTrackResponse5xx) & {
+export type getSavedAlbumsResponseError = (getSavedAlbumsResponse401 | getSavedAlbumsResponse5xx) & {
   headers: Headers;
 };
 
-export type getTrackResponse = (getTrackResponseSuccess | getTrackResponseError)
+export type getSavedAlbumsResponse = (getSavedAlbumsResponseSuccess | getSavedAlbumsResponseError)
 
-export const getGetTrackUrl = (pluginId: string,
-    libraryId: string,
-    trackId: string,) => {
+export const getGetSavedAlbumsUrl = (params: GetSavedAlbumsParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/tracks/${pluginId}/${libraryId}/${trackId}`
+  return stringifiedParams.length > 0 ? `/albums/saved?${stringifiedParams}` : `/albums/saved`
 }
 
-export const getTrack = async (pluginId: string,
-    libraryId: string,
-    trackId: string, options?: RequestInit): Promise<getTrackResponse> => {
+export const getSavedAlbums = async (params: GetSavedAlbumsParams, options?: RequestInit): Promise<getSavedAlbumsResponse> => {
 
-  return customFetch<getTrackResponse>(getGetTrackUrl(pluginId,libraryId,trackId),
+  return customFetch<getSavedAlbumsResponse>(getGetSavedAlbumsUrl(params),
   {
     ...options,
     method: 'GET'
@@ -8504,78 +8510,66 @@ export const getTrack = async (pluginId: string,
 
 
 
-export const getGetTrackQueryKey = (pluginId: string,
-    libraryId: string,
-    trackId: string,) => {
+export const getGetSavedAlbumsQueryKey = (params?: GetSavedAlbumsParams,) => {
     return [
-    `/tracks/${pluginId}/${libraryId}/${trackId}`
+    `/albums/saved`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetTrackQueryOptions = <TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetSavedAlbumsQueryOptions = <TData = Awaited<ReturnType<typeof getSavedAlbums>>, TError = PipeBombError>(params: GetSavedAlbumsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbums>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetTrackQueryKey(pluginId,libraryId,trackId);
+  const queryKey =  queryOptions?.queryKey ?? getGetSavedAlbumsQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrack>>> = ({ signal }) => getTrack(pluginId,libraryId,trackId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSavedAlbums>>> = ({ signal }) => getSavedAlbums(params, { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && libraryId !== null && libraryId !== undefined && trackId !== null && trackId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbums>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetTrackQueryResult = NonNullable<Awaited<ReturnType<typeof getTrack>>>
-export type GetTrackQueryError = PipeBombError
+export type GetSavedAlbumsQueryResult = NonNullable<Awaited<ReturnType<typeof getSavedAlbums>>>
+export type GetSavedAlbumsQueryError = PipeBombError
 
 
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>> & Pick<
+export function useGetSavedAlbums<TData = Awaited<ReturnType<typeof getSavedAlbums>>, TError = PipeBombError>(
+ params: GetSavedAlbumsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbums>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTrack>>,
+          Awaited<ReturnType<typeof getSavedAlbums>>,
           TError,
-          Awaited<ReturnType<typeof getTrack>>
+          Awaited<ReturnType<typeof getSavedAlbums>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>> & Pick<
+export function useGetSavedAlbums<TData = Awaited<ReturnType<typeof getSavedAlbums>>, TError = PipeBombError>(
+ params: GetSavedAlbumsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbums>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTrack>>,
+          Awaited<ReturnType<typeof getSavedAlbums>>,
           TError,
-          Awaited<ReturnType<typeof getTrack>>
+          Awaited<ReturnType<typeof getSavedAlbums>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetSavedAlbums<TData = Awaited<ReturnType<typeof getSavedAlbums>>, TError = PipeBombError>(
+ params: GetSavedAlbumsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbums>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetSavedAlbums<TData = Awaited<ReturnType<typeof getSavedAlbums>>, TError = PipeBombError>(
+ params: GetSavedAlbumsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbums>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetTrackQueryOptions(pluginId,libraryId,trackId,options)
+  const queryOptions = getGetSavedAlbumsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -8588,52 +8582,434 @@ export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError
 
 
 
-export type getTracksResponse200 = {
-  data: Track[]
+export type getSavedAlbumsPendingResponse200 = {
+  data: TrackCreationSession[]
   status: 200
 }
 
-export type getTracksResponse5xx = {
+export type getSavedAlbumsPendingResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type getSavedAlbumsPendingResponse5xx = {
   data: PipeBombError
   status: HTTPStatusCode5xx
 }
 
-export type getTracksResponseSuccess = (getTracksResponse200) & {
+export type getSavedAlbumsPendingResponseSuccess = (getSavedAlbumsPendingResponse200) & {
   headers: Headers;
 };
-export type getTracksResponseError = (getTracksResponse5xx) & {
+export type getSavedAlbumsPendingResponseError = (getSavedAlbumsPendingResponse401 | getSavedAlbumsPendingResponse5xx) & {
   headers: Headers;
 };
 
-export type getTracksResponse = (getTracksResponseSuccess | getTracksResponseError)
+export type getSavedAlbumsPendingResponse = (getSavedAlbumsPendingResponseSuccess | getSavedAlbumsPendingResponseError)
 
-export const getGetTracksUrl = () => {
-
-
+export const getGetSavedAlbumsPendingUrl = () => {
 
 
-  return `/tracks`
+
+
+  return `/albums/saved/pending`
 }
 
-export const getTracks = async (trackIdsDto: TrackIdsDto, options?: RequestInit): Promise<getTracksResponse> => {
+export const getSavedAlbumsPending = async ( options?: RequestInit): Promise<getSavedAlbumsPendingResponse> => {
 
-  return customFetch<getTracksResponse>(getGetTracksUrl(),
+  return customFetch<getSavedAlbumsPendingResponse>(getGetSavedAlbumsPendingUrl(),
   {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(trackIdsDto)
+    method: 'GET'
+
+
   }
 );}
 
 
 
 
-export const getGetTracksMutationOptions = <TError = PipeBombError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getTracks>>, TError,{data: TrackIdsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof getTracks>>, TError,{data: TrackIdsDto}, TContext> => {
 
-const mutationKey = ['getTracks'];
+export const getGetSavedAlbumsPendingQueryKey = () => {
+    return [
+    `/albums/saved/pending`
+    ] as const;
+    }
+
+
+export const getGetSavedAlbumsPendingQueryOptions = <TData = Awaited<ReturnType<typeof getSavedAlbumsPending>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbumsPending>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetSavedAlbumsPendingQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSavedAlbumsPending>>> = ({ signal }) => getSavedAlbumsPending({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbumsPending>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetSavedAlbumsPendingQueryResult = NonNullable<Awaited<ReturnType<typeof getSavedAlbumsPending>>>
+export type GetSavedAlbumsPendingQueryError = PipeBombError
+
+
+export function useGetSavedAlbumsPending<TData = Awaited<ReturnType<typeof getSavedAlbumsPending>>, TError = PipeBombError>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbumsPending>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSavedAlbumsPending>>,
+          TError,
+          Awaited<ReturnType<typeof getSavedAlbumsPending>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSavedAlbumsPending<TData = Awaited<ReturnType<typeof getSavedAlbumsPending>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbumsPending>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSavedAlbumsPending>>,
+          TError,
+          Awaited<ReturnType<typeof getSavedAlbumsPending>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetSavedAlbumsPending<TData = Awaited<ReturnType<typeof getSavedAlbumsPending>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbumsPending>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetSavedAlbumsPending<TData = Awaited<ReturnType<typeof getSavedAlbumsPending>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedAlbumsPending>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetSavedAlbumsPendingQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getAlbumResponse200 = {
+  data: Album
+  status: 200
+}
+
+export type getAlbumResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type getAlbumResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getAlbumResponseSuccess = (getAlbumResponse200) & {
+  headers: Headers;
+};
+export type getAlbumResponseError = (getAlbumResponse404 | getAlbumResponse5xx) & {
+  headers: Headers;
+};
+
+export type getAlbumResponse = (getAlbumResponseSuccess | getAlbumResponseError)
+
+export const getGetAlbumUrl = (albumUuid: string,) => {
+
+
+
+
+  return `/albums/${albumUuid}`
+}
+
+export const getAlbum = async (albumUuid: string, options?: RequestInit): Promise<getAlbumResponse> => {
+
+  return customFetch<getAlbumResponse>(getGetAlbumUrl(albumUuid),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAlbumQueryKey = (albumUuid: string,) => {
+    return [
+    `/albums/${albumUuid}`
+    ] as const;
+    }
+
+
+export const getGetAlbumQueryOptions = <TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAlbumQueryKey(albumUuid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAlbum>>> = ({ signal }) => getAlbum(albumUuid, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: albumUuid !== null && albumUuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAlbumQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbum>>>
+export type GetAlbumQueryError = PipeBombError
+
+
+export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
+ albumUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAlbum>>,
+          TError,
+          Awaited<ReturnType<typeof getAlbum>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
+ albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAlbum>>,
+          TError,
+          Awaited<ReturnType<typeof getAlbum>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
+ albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
+ albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAlbumQueryOptions(albumUuid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getAlbumByIdentityResponse200 = {
+  data: Album
+  status: 200
+}
+
+export type getAlbumByIdentityResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type getAlbumByIdentityResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getAlbumByIdentityResponseSuccess = (getAlbumByIdentityResponse200) & {
+  headers: Headers;
+};
+export type getAlbumByIdentityResponseError = (getAlbumByIdentityResponse404 | getAlbumByIdentityResponse5xx) & {
+  headers: Headers;
+};
+
+export type getAlbumByIdentityResponse = (getAlbumByIdentityResponseSuccess | getAlbumByIdentityResponseError)
+
+export const getGetAlbumByIdentityUrl = (pluginId: string,
+    identifierId: string,
+    identity: string,) => {
+
+
+
+
+  return `/albums/${pluginId}/${identifierId}/${identity}`
+}
+
+export const getAlbumByIdentity = async (pluginId: string,
+    identifierId: string,
+    identity: string, options?: RequestInit): Promise<getAlbumByIdentityResponse> => {
+
+  return customFetch<getAlbumByIdentityResponse>(getGetAlbumByIdentityUrl(pluginId,identifierId,identity),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAlbumByIdentityQueryKey = (pluginId: string,
+    identifierId: string,
+    identity: string,) => {
+    return [
+    `/albums/${pluginId}/${identifierId}/${identity}`
+    ] as const;
+    }
+
+
+export const getGetAlbumByIdentityQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(pluginId: string,
+    identifierId: string,
+    identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAlbumByIdentityQueryKey(pluginId,identifierId,identity);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAlbumByIdentity>>> = ({ signal }) => getAlbumByIdentity(pluginId,identifierId,identity, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && identifierId !== null && identifierId !== undefined && identity !== null && identity !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetAlbumByIdentityQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbumByIdentity>>>
+export type GetAlbumByIdentityQueryError = PipeBombError
+
+
+export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
+ pluginId: string,
+    identifierId: string,
+    identity: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAlbumByIdentity>>,
+          TError,
+          Awaited<ReturnType<typeof getAlbumByIdentity>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
+ pluginId: string,
+    identifierId: string,
+    identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAlbumByIdentity>>,
+          TError,
+          Awaited<ReturnType<typeof getAlbumByIdentity>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
+ pluginId: string,
+    identifierId: string,
+    identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
+ pluginId: string,
+    identifierId: string,
+    identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetAlbumByIdentityQueryOptions(pluginId,identifierId,identity,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getAlbumEphemeralContentByIdentityResponse200 = {
+  data: AlbumEphemeralContent
+  status: 200
+}
+
+export type getAlbumEphemeralContentByIdentityResponse400 = {
+  data: PipeBombError
+  status: 400
+}
+
+export type getAlbumEphemeralContentByIdentityResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getAlbumEphemeralContentByIdentityResponseSuccess = (getAlbumEphemeralContentByIdentityResponse200) & {
+  headers: Headers;
+};
+export type getAlbumEphemeralContentByIdentityResponseError = (getAlbumEphemeralContentByIdentityResponse400 | getAlbumEphemeralContentByIdentityResponse5xx) & {
+  headers: Headers;
+};
+
+export type getAlbumEphemeralContentByIdentityResponse = (getAlbumEphemeralContentByIdentityResponseSuccess | getAlbumEphemeralContentByIdentityResponseError)
+
+export const getGetAlbumEphemeralContentByIdentityUrl = (pluginId: string,
+    identifierId: string,
+    identity: string,) => {
+
+
+
+
+  return `/albums/${pluginId}/${identifierId}/${identity}`
+}
+
+export const getAlbumEphemeralContentByIdentity = async (pluginId: string,
+    identifierId: string,
+    identity: string, options?: RequestInit): Promise<getAlbumEphemeralContentByIdentityResponse> => {
+
+  return customFetch<getAlbumEphemeralContentByIdentityResponse>(getGetAlbumEphemeralContentByIdentityUrl(pluginId,identifierId,identity),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+export const getGetAlbumEphemeralContentByIdentityMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext> => {
+
+const mutationKey = ['getAlbumEphemeralContentByIdentity'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -8643,10 +9019,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getTracks>>, {data: TrackIdsDto}> = (props) => {
-          const {data} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>, {pluginId: string;identifierId: string;identity: string}> = (props) => {
+          const {pluginId,identifierId,identity} = props ?? {};
 
-          return  getTracks(data,requestOptions)
+          return  getAlbumEphemeralContentByIdentity(pluginId,identifierId,identity,requestOptions)
         }
 
 
@@ -8656,60 +9032,56 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type GetTracksMutationResult = NonNullable<Awaited<ReturnType<typeof getTracks>>>
-    export type GetTracksMutationBody = TrackIdsDto
-    export type GetTracksMutationError = PipeBombError
+    export type GetAlbumEphemeralContentByIdentityMutationResult = NonNullable<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>>
 
-    export const useGetTracks = <TError = PipeBombError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getTracks>>, TError,{data: TrackIdsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+    export type GetAlbumEphemeralContentByIdentityMutationError = PipeBombError
+
+    export const useGetAlbumEphemeralContentByIdentity = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof getTracks>>,
+        Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>,
         TError,
-        {data: TrackIdsDto},
+        {pluginId: string;identifierId: string;identity: string},
         TContext
       > => {
-      return useMutation(getGetTracksMutationOptions(options), queryClient);
+      return useMutation(getGetAlbumEphemeralContentByIdentityMutationOptions(options), queryClient);
     }
 
-export type getTrackIdentitiesResponse200 = {
-  data: Identity[]
+export type getAlbumEphemeralSourcesResponse200 = {
+  data: EphemeralSource[]
   status: 200
 }
 
-export type getTrackIdentitiesResponse404 = {
+export type getAlbumEphemeralSourcesResponse404 = {
   data: PipeBombError
   status: 404
 }
 
-export type getTrackIdentitiesResponse5xx = {
+export type getAlbumEphemeralSourcesResponse5xx = {
   data: PipeBombError
   status: HTTPStatusCode5xx
 }
 
-export type getTrackIdentitiesResponseSuccess = (getTrackIdentitiesResponse200) & {
+export type getAlbumEphemeralSourcesResponseSuccess = (getAlbumEphemeralSourcesResponse200) & {
   headers: Headers;
 };
-export type getTrackIdentitiesResponseError = (getTrackIdentitiesResponse404 | getTrackIdentitiesResponse5xx) & {
+export type getAlbumEphemeralSourcesResponseError = (getAlbumEphemeralSourcesResponse404 | getAlbumEphemeralSourcesResponse5xx) & {
   headers: Headers;
 };
 
-export type getTrackIdentitiesResponse = (getTrackIdentitiesResponseSuccess | getTrackIdentitiesResponseError)
+export type getAlbumEphemeralSourcesResponse = (getAlbumEphemeralSourcesResponseSuccess | getAlbumEphemeralSourcesResponseError)
 
-export const getGetTrackIdentitiesUrl = (pluginId: string,
-    libraryId: string,
-    trackId: string,) => {
+export const getGetAlbumEphemeralSourcesUrl = (albumUuid: string,) => {
 
 
 
 
-  return `/tracks/${pluginId}/${libraryId}/${trackId}/identities`
+  return `/albums/${albumUuid}/ephemeral`
 }
 
-export const getTrackIdentities = async (pluginId: string,
-    libraryId: string,
-    trackId: string, options?: RequestInit): Promise<getTrackIdentitiesResponse> => {
+export const getAlbumEphemeralSources = async (albumUuid: string, options?: RequestInit): Promise<getAlbumEphemeralSourcesResponse> => {
 
-  return customFetch<getTrackIdentitiesResponse>(getGetTrackIdentitiesUrl(pluginId,libraryId,trackId),
+  return customFetch<getAlbumEphemeralSourcesResponse>(getGetAlbumEphemeralSourcesUrl(albumUuid),
   {
     ...options,
     method: 'GET'
@@ -8722,78 +9094,66 @@ export const getTrackIdentities = async (pluginId: string,
 
 
 
-export const getGetTrackIdentitiesQueryKey = (pluginId: string,
-    libraryId: string,
-    trackId: string,) => {
+export const getGetAlbumEphemeralSourcesQueryKey = (albumUuid: string,) => {
     return [
-    `/tracks/${pluginId}/${libraryId}/${trackId}/identities`
+    `/albums/${albumUuid}/ephemeral`
     ] as const;
     }
 
 
-export const getGetTrackIdentitiesQueryOptions = <TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAlbumEphemeralSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetTrackIdentitiesQueryKey(pluginId,libraryId,trackId);
+  const queryKey =  queryOptions?.queryKey ?? getGetAlbumEphemeralSourcesQueryKey(albumUuid);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrackIdentities>>> = ({ signal }) => getTrackIdentities(pluginId,libraryId,trackId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAlbumEphemeralSources>>> = ({ signal }) => getAlbumEphemeralSources(albumUuid, { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && libraryId !== null && libraryId !== undefined && trackId !== null && trackId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: albumUuid !== null && albumUuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetTrackIdentitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getTrackIdentities>>>
-export type GetTrackIdentitiesQueryError = PipeBombError
+export type GetAlbumEphemeralSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbumEphemeralSources>>>
+export type GetAlbumEphemeralSourcesQueryError = PipeBombError
 
 
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>> & Pick<
+export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
+ albumUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTrackIdentities>>,
+          Awaited<ReturnType<typeof getAlbumEphemeralSources>>,
           TError,
-          Awaited<ReturnType<typeof getTrackIdentities>>
+          Awaited<ReturnType<typeof getAlbumEphemeralSources>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>> & Pick<
+export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
+ albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTrackIdentities>>,
+          Awaited<ReturnType<typeof getAlbumEphemeralSources>>,
           TError,
-          Awaited<ReturnType<typeof getTrackIdentities>>
+          Awaited<ReturnType<typeof getAlbumEphemeralSources>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
+ albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
+ albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetTrackIdentitiesQueryOptions(pluginId,libraryId,trackId,options)
+  const queryOptions = getGetAlbumEphemeralSourcesQueryOptions(albumUuid,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -8806,190 +9166,218 @@ export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrack
 
 
 
-export type createTrackAudioSessionResponse200 = {
-  data: StreamInstance
+export type getAlbumEphemeralContentResponse200 = {
+  data: AlbumEphemeralContent
   status: 200
 }
 
-export type createTrackAudioSessionResponse401 = {
+export type getAlbumEphemeralContentResponse400 = {
   data: PipeBombError
-  status: 401
+  status: 400
 }
 
-export type createTrackAudioSessionResponse403 = {
-  data: PipeBombError
-  status: 403
-}
-
-export type createTrackAudioSessionResponse404 = {
+export type getAlbumEphemeralContentResponse404 = {
   data: PipeBombError
   status: 404
 }
 
-export type createTrackAudioSessionResponse5xx = {
+export type getAlbumEphemeralContentResponse5xx = {
   data: PipeBombError
   status: HTTPStatusCode5xx
 }
 
-export type createTrackAudioSessionResponseSuccess = (createTrackAudioSessionResponse200) & {
+export type getAlbumEphemeralContentResponseSuccess = (getAlbumEphemeralContentResponse200) & {
   headers: Headers;
 };
-export type createTrackAudioSessionResponseError = (createTrackAudioSessionResponse401 | createTrackAudioSessionResponse403 | createTrackAudioSessionResponse404 | createTrackAudioSessionResponse5xx) & {
+export type getAlbumEphemeralContentResponseError = (getAlbumEphemeralContentResponse400 | getAlbumEphemeralContentResponse404 | getAlbumEphemeralContentResponse5xx) & {
   headers: Headers;
 };
 
-export type createTrackAudioSessionResponse = (createTrackAudioSessionResponseSuccess | createTrackAudioSessionResponseError)
+export type getAlbumEphemeralContentResponse = (getAlbumEphemeralContentResponseSuccess | getAlbumEphemeralContentResponseError)
 
-export const getCreateTrackAudioSessionUrl = (pluginId: string,
-    libraryId: string,
-    trackId: string,) => {
+export const getGetAlbumEphemeralContentUrl = (albumUuid: string,) => {
 
 
 
 
-  return `/tracks/${pluginId}/${libraryId}/${trackId}/audio`
+  return `/albums/${albumUuid}/ephemeral`
 }
 
-export const createTrackAudioSession = async (pluginId: string,
-    libraryId: string,
-    trackId: string, options?: RequestInit): Promise<createTrackAudioSessionResponse> => {
+export const getAlbumEphemeralContent = async (albumUuid: string,
+    ephemeralSourceDto: EphemeralSourceDto, options?: RequestInit): Promise<getAlbumEphemeralContentResponse> => {
 
-  return customFetch<createTrackAudioSessionResponse>(getCreateTrackAudioSessionUrl(pluginId,libraryId,trackId),
+  return customFetch<getAlbumEphemeralContentResponse>(getGetAlbumEphemeralContentUrl(albumUuid),
   {
     ...options,
-    method: 'GET'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(ephemeralSourceDto)
   }
 );}
 
 
 
 
+export const getGetAlbumEphemeralContentMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContent>>, TError,{albumUuid: string;data: EphemeralSourceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContent>>, TError,{albumUuid: string;data: EphemeralSourceDto}, TContext> => {
 
-export const getCreateTrackAudioSessionQueryKey = (pluginId: string,
-    libraryId: string,
-    trackId: string,) => {
-    return [
-    `/tracks/${pluginId}/${libraryId}/${trackId}/audio`
-    ] as const;
+const mutationKey = ['getAlbumEphemeralContent'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getAlbumEphemeralContent>>, {albumUuid: string;data: EphemeralSourceDto}> = (props) => {
+          const {albumUuid,data} = props ?? {};
+
+          return  getAlbumEphemeralContent(albumUuid,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GetAlbumEphemeralContentMutationResult = NonNullable<Awaited<ReturnType<typeof getAlbumEphemeralContent>>>
+    export type GetAlbumEphemeralContentMutationBody = EphemeralSourceDto
+    export type GetAlbumEphemeralContentMutationError = PipeBombError
+
+    export const useGetAlbumEphemeralContent = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContent>>, TError,{albumUuid: string;data: EphemeralSourceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof getAlbumEphemeralContent>>,
+        TError,
+        {albumUuid: string;data: EphemeralSourceDto},
+        TContext
+      > => {
+      return useMutation(getGetAlbumEphemeralContentMutationOptions(options), queryClient);
     }
 
-
-export const getCreateTrackAudioSessionQueryOptions = <TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getCreateTrackAudioSessionQueryKey(pluginId,libraryId,trackId);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof createTrackAudioSession>>> = ({ signal }) => createTrackAudioSession(pluginId,libraryId,trackId, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && libraryId !== null && libraryId !== undefined && trackId !== null && trackId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+export type searchAlbumsResponse200 = {
+  data: AlbumsSearchResponse
+  status: 200
 }
 
-export type CreateTrackAudioSessionQueryResult = NonNullable<Awaited<ReturnType<typeof createTrackAudioSession>>>
-export type CreateTrackAudioSessionQueryError = PipeBombError
-
-
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof createTrackAudioSession>>,
-          TError,
-          Awaited<ReturnType<typeof createTrackAudioSession>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof createTrackAudioSession>>,
-          TError,
-          Awaited<ReturnType<typeof createTrackAudioSession>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getCreateTrackAudioSessionQueryOptions(pluginId,libraryId,trackId,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
+export type searchAlbumsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
 }
 
+export type searchAlbumsResponseSuccess = (searchAlbumsResponse200) & {
+  headers: Headers;
+};
+export type searchAlbumsResponseError = (searchAlbumsResponse5xx) & {
+  headers: Headers;
+};
+
+export type searchAlbumsResponse = (searchAlbumsResponseSuccess | searchAlbumsResponseError)
+
+export const getSearchAlbumsUrl = () => {
+
+
+
+
+  return `/albums`
+}
+
+export const searchAlbums = async (albumsSearchDto: AlbumsSearchDto, options?: RequestInit): Promise<searchAlbumsResponse> => {
+
+  return customFetch<searchAlbumsResponse>(getSearchAlbumsUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(albumsSearchDto)
+  }
+);}
+
+
+
+
+export const getSearchAlbumsMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchAlbums>>, TError,{data: AlbumsSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof searchAlbums>>, TError,{data: AlbumsSearchDto}, TContext> => {
+
+const mutationKey = ['searchAlbums'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof searchAlbums>>, {data: AlbumsSearchDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  searchAlbums(data,requestOptions)
+        }
 
 
 
 
 
 
-export type getTrackExternalUrlsResponse200 = {
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SearchAlbumsMutationResult = NonNullable<Awaited<ReturnType<typeof searchAlbums>>>
+    export type SearchAlbumsMutationBody = AlbumsSearchDto
+    export type SearchAlbumsMutationError = PipeBombError
+
+    export const useSearchAlbums = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchAlbums>>, TError,{data: AlbumsSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof searchAlbums>>,
+        TError,
+        {data: AlbumsSearchDto},
+        TContext
+      > => {
+      return useMutation(getSearchAlbumsMutationOptions(options), queryClient);
+    }
+
+export type getAlbumExternalUrlsResponse200 = {
   data: ExternalUrl[]
   status: 200
 }
 
-export type getTrackExternalUrlsResponse404 = {
+export type getAlbumExternalUrlsResponse404 = {
   data: PipeBombError
   status: 404
 }
 
-export type getTrackExternalUrlsResponse5xx = {
+export type getAlbumExternalUrlsResponse5xx = {
   data: PipeBombError
   status: HTTPStatusCode5xx
 }
 
-export type getTrackExternalUrlsResponseSuccess = (getTrackExternalUrlsResponse200) & {
+export type getAlbumExternalUrlsResponseSuccess = (getAlbumExternalUrlsResponse200) & {
   headers: Headers;
 };
-export type getTrackExternalUrlsResponseError = (getTrackExternalUrlsResponse404 | getTrackExternalUrlsResponse5xx) & {
+export type getAlbumExternalUrlsResponseError = (getAlbumExternalUrlsResponse404 | getAlbumExternalUrlsResponse5xx) & {
   headers: Headers;
 };
 
-export type getTrackExternalUrlsResponse = (getTrackExternalUrlsResponseSuccess | getTrackExternalUrlsResponseError)
+export type getAlbumExternalUrlsResponse = (getAlbumExternalUrlsResponseSuccess | getAlbumExternalUrlsResponseError)
 
-export const getGetTrackExternalUrlsUrl = (pluginId: string,
-    libraryId: string,
-    trackId: string,) => {
+export const getGetAlbumExternalUrlsUrl = (albumUuid: string,) => {
 
 
 
 
-  return `/tracks/${pluginId}/${libraryId}/${trackId}/urls`
+  return `/albums/${albumUuid}/urls`
 }
 
-export const getTrackExternalUrls = async (pluginId: string,
-    libraryId: string,
-    trackId: string, options?: RequestInit): Promise<getTrackExternalUrlsResponse> => {
+export const getAlbumExternalUrls = async (albumUuid: string, options?: RequestInit): Promise<getAlbumExternalUrlsResponse> => {
 
-  return customFetch<getTrackExternalUrlsResponse>(getGetTrackExternalUrlsUrl(pluginId,libraryId,trackId),
+  return customFetch<getAlbumExternalUrlsResponse>(getGetAlbumExternalUrlsUrl(albumUuid),
   {
     ...options,
     method: 'GET'
@@ -9002,78 +9390,66 @@ export const getTrackExternalUrls = async (pluginId: string,
 
 
 
-export const getGetTrackExternalUrlsQueryKey = (pluginId: string,
-    libraryId: string,
-    trackId: string,) => {
+export const getGetAlbumExternalUrlsQueryKey = (albumUuid: string,) => {
     return [
-    `/tracks/${pluginId}/${libraryId}/${trackId}/urls`
+    `/albums/${albumUuid}/urls`
     ] as const;
     }
 
 
-export const getGetTrackExternalUrlsQueryOptions = <TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetAlbumExternalUrlsQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetTrackExternalUrlsQueryKey(pluginId,libraryId,trackId);
+  const queryKey =  queryOptions?.queryKey ?? getGetAlbumExternalUrlsQueryKey(albumUuid);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrackExternalUrls>>> = ({ signal }) => getTrackExternalUrls(pluginId,libraryId,trackId, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAlbumExternalUrls>>> = ({ signal }) => getAlbumExternalUrls(albumUuid, { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && libraryId !== null && libraryId !== undefined && trackId !== null && trackId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, enabled: albumUuid !== null && albumUuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetTrackExternalUrlsQueryResult = NonNullable<Awaited<ReturnType<typeof getTrackExternalUrls>>>
-export type GetTrackExternalUrlsQueryError = PipeBombError
+export type GetAlbumExternalUrlsQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbumExternalUrls>>>
+export type GetAlbumExternalUrlsQueryError = PipeBombError
 
 
-export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>> & Pick<
+export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
+ albumUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTrackExternalUrls>>,
+          Awaited<ReturnType<typeof getAlbumExternalUrls>>,
           TError,
-          Awaited<ReturnType<typeof getTrackExternalUrls>>
+          Awaited<ReturnType<typeof getAlbumExternalUrls>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>> & Pick<
+export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
+ albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getTrackExternalUrls>>,
+          Awaited<ReturnType<typeof getAlbumExternalUrls>>,
           TError,
-          Awaited<ReturnType<typeof getTrackExternalUrls>>
+          Awaited<ReturnType<typeof getAlbumExternalUrls>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
+ albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
- pluginId: string,
-    libraryId: string,
-    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
+ albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetTrackExternalUrlsQueryOptions(pluginId,libraryId,trackId,options)
+  const queryOptions = getGetAlbumExternalUrlsQueryOptions(albumUuid,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -9086,36 +9462,336 @@ export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTra
 
 
 
-export type getJsonResponse200 = {
+export type saveAlbumResponse204 = {
   data: void
-  status: 200
+  status: 204
 }
 
-export type getJsonResponse5xx = {
+export type saveAlbumResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type saveAlbumResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type saveAlbumResponse5xx = {
   data: PipeBombError
   status: HTTPStatusCode5xx
 }
 
-export type getJsonResponseSuccess = (getJsonResponse200) & {
+export type saveAlbumResponseSuccess = (saveAlbumResponse204) & {
   headers: Headers;
 };
-export type getJsonResponseError = (getJsonResponse5xx) & {
+export type saveAlbumResponseError = (saveAlbumResponse401 | saveAlbumResponse404 | saveAlbumResponse5xx) & {
   headers: Headers;
 };
 
-export type getJsonResponse = (getJsonResponseSuccess | getJsonResponseError)
+export type saveAlbumResponse = (saveAlbumResponseSuccess | saveAlbumResponseError)
 
-export const getGetJsonUrl = () => {
-
-
+export const getSaveAlbumUrl = (albumUuid: string,) => {
 
 
-  return `/docs/json`
+
+
+  return `/albums/${albumUuid}/save`
 }
 
-export const getJson = async ( options?: RequestInit): Promise<getJsonResponse> => {
+export const saveAlbum = async (albumUuid: string, options?: RequestInit): Promise<saveAlbumResponse> => {
 
-  return customFetch<getJsonResponse>(getGetJsonUrl(),
+  return customFetch<saveAlbumResponse>(getSaveAlbumUrl(albumUuid),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+export const getSaveAlbumMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveAlbum>>, TError,{albumUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveAlbum>>, TError,{albumUuid: string}, TContext> => {
+
+const mutationKey = ['saveAlbum'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveAlbum>>, {albumUuid: string}> = (props) => {
+          const {albumUuid} = props ?? {};
+
+          return  saveAlbum(albumUuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveAlbumMutationResult = NonNullable<Awaited<ReturnType<typeof saveAlbum>>>
+
+    export type SaveAlbumMutationError = PipeBombError
+
+    export const useSaveAlbum = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveAlbum>>, TError,{albumUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveAlbum>>,
+        TError,
+        {albumUuid: string},
+        TContext
+      > => {
+      return useMutation(getSaveAlbumMutationOptions(options), queryClient);
+    }
+
+export type unsaveAlbumResponse204 = {
+  data: void
+  status: 204
+}
+
+export type unsaveAlbumResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type unsaveAlbumResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type unsaveAlbumResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type unsaveAlbumResponseSuccess = (unsaveAlbumResponse204) & {
+  headers: Headers;
+};
+export type unsaveAlbumResponseError = (unsaveAlbumResponse401 | unsaveAlbumResponse404 | unsaveAlbumResponse5xx) & {
+  headers: Headers;
+};
+
+export type unsaveAlbumResponse = (unsaveAlbumResponseSuccess | unsaveAlbumResponseError)
+
+export const getUnsaveAlbumUrl = (albumUuid: string,) => {
+
+
+
+
+  return `/albums/${albumUuid}/save`
+}
+
+export const unsaveAlbum = async (albumUuid: string, options?: RequestInit): Promise<unsaveAlbumResponse> => {
+
+  return customFetch<unsaveAlbumResponse>(getUnsaveAlbumUrl(albumUuid),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getUnsaveAlbumMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsaveAlbum>>, TError,{albumUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof unsaveAlbum>>, TError,{albumUuid: string}, TContext> => {
+
+const mutationKey = ['unsaveAlbum'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unsaveAlbum>>, {albumUuid: string}> = (props) => {
+          const {albumUuid} = props ?? {};
+
+          return  unsaveAlbum(albumUuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnsaveAlbumMutationResult = NonNullable<Awaited<ReturnType<typeof unsaveAlbum>>>
+
+    export type UnsaveAlbumMutationError = PipeBombError
+
+    export const useUnsaveAlbum = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsaveAlbum>>, TError,{albumUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof unsaveAlbum>>,
+        TError,
+        {albumUuid: string},
+        TContext
+      > => {
+      return useMutation(getUnsaveAlbumMutationOptions(options), queryClient);
+    }
+
+export type saveEphemeralAlbumResponse200 = {
+  data: void
+  status: 200
+}
+
+export type saveEphemeralAlbumResponse204 = {
+  data: void
+  status: 204
+}
+
+export type saveEphemeralAlbumResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type saveEphemeralAlbumResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type saveEphemeralAlbumResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type saveEphemeralAlbumResponseSuccess = (saveEphemeralAlbumResponse200 | saveEphemeralAlbumResponse204) & {
+  headers: Headers;
+};
+export type saveEphemeralAlbumResponseError = (saveEphemeralAlbumResponse401 | saveEphemeralAlbumResponse404 | saveEphemeralAlbumResponse5xx) & {
+  headers: Headers;
+};
+
+export type saveEphemeralAlbumResponse = (saveEphemeralAlbumResponseSuccess | saveEphemeralAlbumResponseError)
+
+export const getSaveEphemeralAlbumUrl = (pluginId: string,
+    identifierId: string,
+    identity: string,) => {
+
+
+
+
+  return `/albums/${pluginId}/${identifierId}/${identity}/save`
+}
+
+export const saveEphemeralAlbum = async (pluginId: string,
+    identifierId: string,
+    identity: string, options?: RequestInit): Promise<saveEphemeralAlbumResponse> => {
+
+  return customFetch<saveEphemeralAlbumResponse>(getSaveEphemeralAlbumUrl(pluginId,identifierId,identity),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+export const getSaveEphemeralAlbumMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveEphemeralAlbum>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveEphemeralAlbum>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext> => {
+
+const mutationKey = ['saveEphemeralAlbum'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveEphemeralAlbum>>, {pluginId: string;identifierId: string;identity: string}> = (props) => {
+          const {pluginId,identifierId,identity} = props ?? {};
+
+          return  saveEphemeralAlbum(pluginId,identifierId,identity,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveEphemeralAlbumMutationResult = NonNullable<Awaited<ReturnType<typeof saveEphemeralAlbum>>>
+
+    export type SaveEphemeralAlbumMutationError = PipeBombError
+
+    export const useSaveEphemeralAlbum = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveEphemeralAlbum>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveEphemeralAlbum>>,
+        TError,
+        {pluginId: string;identifierId: string;identity: string},
+        TContext
+      > => {
+      return useMutation(getSaveEphemeralAlbumMutationOptions(options), queryClient);
+    }
+
+export type getSavedArtistsResponse200 = {
+  data: void
+  status: 200
+}
+
+export type getSavedArtistsResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type getSavedArtistsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getSavedArtistsResponseSuccess = (getSavedArtistsResponse200) & {
+  headers: Headers;
+};
+export type getSavedArtistsResponseError = (getSavedArtistsResponse401 | getSavedArtistsResponse5xx) & {
+  headers: Headers;
+};
+
+export type getSavedArtistsResponse = (getSavedArtistsResponseSuccess | getSavedArtistsResponseError)
+
+export const getGetSavedArtistsUrl = (params: GetSavedArtistsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/artists/saved?${stringifiedParams}` : `/artists/saved`
+}
+
+export const getSavedArtists = async (params: GetSavedArtistsParams, options?: RequestInit): Promise<getSavedArtistsResponse> => {
+
+  return customFetch<getSavedArtistsResponse>(getGetSavedArtistsUrl(params),
   {
     ...options,
     method: 'GET'
@@ -9128,66 +9804,66 @@ export const getJson = async ( options?: RequestInit): Promise<getJsonResponse> 
 
 
 
-export const getGetJsonQueryKey = () => {
+export const getGetSavedArtistsQueryKey = (params?: GetSavedArtistsParams,) => {
     return [
-    `/docs/json`
+    `/artists/saved`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetJsonQueryOptions = <TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetSavedArtistsQueryOptions = <TData = Awaited<ReturnType<typeof getSavedArtists>>, TError = PipeBombError>(params: GetSavedArtistsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedArtists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetJsonQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getGetSavedArtistsQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getJson>>> = ({ signal }) => getJson({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSavedArtists>>> = ({ signal }) => getSavedArtists(params, { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSavedArtists>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetJsonQueryResult = NonNullable<Awaited<ReturnType<typeof getJson>>>
-export type GetJsonQueryError = PipeBombError
+export type GetSavedArtistsQueryResult = NonNullable<Awaited<ReturnType<typeof getSavedArtists>>>
+export type GetSavedArtistsQueryError = PipeBombError
 
 
-export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>> & Pick<
+export function useGetSavedArtists<TData = Awaited<ReturnType<typeof getSavedArtists>>, TError = PipeBombError>(
+ params: GetSavedArtistsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedArtists>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getJson>>,
+          Awaited<ReturnType<typeof getSavedArtists>>,
           TError,
-          Awaited<ReturnType<typeof getJson>>
+          Awaited<ReturnType<typeof getSavedArtists>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>> & Pick<
+export function useGetSavedArtists<TData = Awaited<ReturnType<typeof getSavedArtists>>, TError = PipeBombError>(
+ params: GetSavedArtistsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedArtists>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getJson>>,
+          Awaited<ReturnType<typeof getSavedArtists>>,
           TError,
-          Awaited<ReturnType<typeof getJson>>
+          Awaited<ReturnType<typeof getSavedArtists>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetSavedArtists<TData = Awaited<ReturnType<typeof getSavedArtists>>, TError = PipeBombError>(
+ params: GetSavedArtistsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedArtists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetSavedArtists<TData = Awaited<ReturnType<typeof getSavedArtists>>, TError = PipeBombError>(
+ params: GetSavedArtistsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedArtists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetJsonQueryOptions(options)
+  const queryOptions = getGetSavedArtistsQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -10049,44 +10725,49 @@ export function useGetArtistExternalUrls<TData = Awaited<ReturnType<typeof getAr
 
 
 
-export type getAlbumResponse200 = {
-  data: Album
-  status: 200
+export type saveArtistResponse204 = {
+  data: void
+  status: 204
 }
 
-export type getAlbumResponse404 = {
+export type saveArtistResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type saveArtistResponse404 = {
   data: PipeBombError
   status: 404
 }
 
-export type getAlbumResponse5xx = {
+export type saveArtistResponse5xx = {
   data: PipeBombError
   status: HTTPStatusCode5xx
 }
 
-export type getAlbumResponseSuccess = (getAlbumResponse200) & {
+export type saveArtistResponseSuccess = (saveArtistResponse204) & {
   headers: Headers;
 };
-export type getAlbumResponseError = (getAlbumResponse404 | getAlbumResponse5xx) & {
+export type saveArtistResponseError = (saveArtistResponse401 | saveArtistResponse404 | saveArtistResponse5xx) & {
   headers: Headers;
 };
 
-export type getAlbumResponse = (getAlbumResponseSuccess | getAlbumResponseError)
+export type saveArtistResponse = (saveArtistResponseSuccess | saveArtistResponseError)
 
-export const getGetAlbumUrl = (albumUuid: string,) => {
-
-
+export const getSaveArtistUrl = (artistUuid: string,) => {
 
 
-  return `/albums/${albumUuid}`
+
+
+  return `/artists/${artistUuid}/save`
 }
 
-export const getAlbum = async (albumUuid: string, options?: RequestInit): Promise<getAlbumResponse> => {
+export const saveArtist = async (artistUuid: string, options?: RequestInit): Promise<saveArtistResponse> => {
 
-  return customFetch<getAlbumResponse>(getGetAlbumUrl(albumUuid),
+  return customFetch<saveArtistResponse>(getSaveArtistUrl(artistUuid),
   {
     ...options,
-    method: 'GET'
+    method: 'PUT'
 
 
   }
@@ -10095,269 +10776,11 @@ export const getAlbum = async (albumUuid: string, options?: RequestInit): Promis
 
 
 
-
-export const getGetAlbumQueryKey = (albumUuid: string,) => {
-    return [
-    `/albums/${albumUuid}`
-    ] as const;
-    }
-
-
-export const getGetAlbumQueryOptions = <TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetAlbumQueryKey(albumUuid);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAlbum>>> = ({ signal }) => getAlbum(albumUuid, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: albumUuid !== null && albumUuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetAlbumQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbum>>>
-export type GetAlbumQueryError = PipeBombError
-
-
-export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
- albumUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAlbum>>,
-          TError,
-          Awaited<ReturnType<typeof getAlbum>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
- albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAlbum>>,
-          TError,
-          Awaited<ReturnType<typeof getAlbum>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
- albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetAlbum<TData = Awaited<ReturnType<typeof getAlbum>>, TError = PipeBombError>(
- albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbum>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetAlbumQueryOptions(albumUuid,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type getAlbumByIdentityResponse200 = {
-  data: Album
-  status: 200
-}
-
-export type getAlbumByIdentityResponse404 = {
-  data: PipeBombError
-  status: 404
-}
-
-export type getAlbumByIdentityResponse5xx = {
-  data: PipeBombError
-  status: HTTPStatusCode5xx
-}
-
-export type getAlbumByIdentityResponseSuccess = (getAlbumByIdentityResponse200) & {
-  headers: Headers;
-};
-export type getAlbumByIdentityResponseError = (getAlbumByIdentityResponse404 | getAlbumByIdentityResponse5xx) & {
-  headers: Headers;
-};
-
-export type getAlbumByIdentityResponse = (getAlbumByIdentityResponseSuccess | getAlbumByIdentityResponseError)
-
-export const getGetAlbumByIdentityUrl = (pluginId: string,
-    identifierId: string,
-    identity: string,) => {
-
-
-
-
-  return `/albums/${pluginId}/${identifierId}/${identity}`
-}
-
-export const getAlbumByIdentity = async (pluginId: string,
-    identifierId: string,
-    identity: string, options?: RequestInit): Promise<getAlbumByIdentityResponse> => {
-
-  return customFetch<getAlbumByIdentityResponse>(getGetAlbumByIdentityUrl(pluginId,identifierId,identity),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-
-
-
-export const getGetAlbumByIdentityQueryKey = (pluginId: string,
-    identifierId: string,
-    identity: string,) => {
-    return [
-    `/albums/${pluginId}/${identifierId}/${identity}`
-    ] as const;
-    }
-
-
-export const getGetAlbumByIdentityQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(pluginId: string,
-    identifierId: string,
-    identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getGetAlbumByIdentityQueryKey(pluginId,identifierId,identity);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAlbumByIdentity>>> = ({ signal }) => getAlbumByIdentity(pluginId,identifierId,identity, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && identifierId !== null && identifierId !== undefined && identity !== null && identity !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type GetAlbumByIdentityQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbumByIdentity>>>
-export type GetAlbumByIdentityQueryError = PipeBombError
-
-
-export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
- pluginId: string,
-    identifierId: string,
-    identity: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAlbumByIdentity>>,
-          TError,
-          Awaited<ReturnType<typeof getAlbumByIdentity>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
- pluginId: string,
-    identifierId: string,
-    identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAlbumByIdentity>>,
-          TError,
-          Awaited<ReturnType<typeof getAlbumByIdentity>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
- pluginId: string,
-    identifierId: string,
-    identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
-export function useGetAlbumByIdentity<TData = Awaited<ReturnType<typeof getAlbumByIdentity>>, TError = PipeBombError>(
- pluginId: string,
-    identifierId: string,
-    identity: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumByIdentity>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getGetAlbumByIdentityQueryOptions(pluginId,identifierId,identity,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-
-export type getAlbumEphemeralContentByIdentityResponse200 = {
-  data: AlbumEphemeralContent
-  status: 200
-}
-
-export type getAlbumEphemeralContentByIdentityResponse400 = {
-  data: PipeBombError
-  status: 400
-}
-
-export type getAlbumEphemeralContentByIdentityResponse5xx = {
-  data: PipeBombError
-  status: HTTPStatusCode5xx
-}
-
-export type getAlbumEphemeralContentByIdentityResponseSuccess = (getAlbumEphemeralContentByIdentityResponse200) & {
-  headers: Headers;
-};
-export type getAlbumEphemeralContentByIdentityResponseError = (getAlbumEphemeralContentByIdentityResponse400 | getAlbumEphemeralContentByIdentityResponse5xx) & {
-  headers: Headers;
-};
-
-export type getAlbumEphemeralContentByIdentityResponse = (getAlbumEphemeralContentByIdentityResponseSuccess | getAlbumEphemeralContentByIdentityResponseError)
-
-export const getGetAlbumEphemeralContentByIdentityUrl = (pluginId: string,
-    identifierId: string,
-    identity: string,) => {
-
-
-
-
-  return `/albums/${pluginId}/${identifierId}/${identity}`
-}
-
-export const getAlbumEphemeralContentByIdentity = async (pluginId: string,
-    identifierId: string,
-    identity: string, options?: RequestInit): Promise<getAlbumEphemeralContentByIdentityResponse> => {
-
-  return customFetch<getAlbumEphemeralContentByIdentityResponse>(getGetAlbumEphemeralContentByIdentityUrl(pluginId,identifierId,identity),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-
-
-export const getGetAlbumEphemeralContentByIdentityMutationOptions = <TError = PipeBombError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext> => {
-
-const mutationKey = ['getAlbumEphemeralContentByIdentity'];
+export const getSaveArtistMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveArtist>>, TError,{artistUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveArtist>>, TError,{artistUuid: string}, TContext> => {
+
+const mutationKey = ['saveArtist'];
 const {mutation: mutationOptions, request: requestOptions} = options ?
       options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
       options
@@ -10367,10 +10790,10 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>, {pluginId: string;identifierId: string;identity: string}> = (props) => {
-          const {pluginId,identifierId,identity} = props ?? {};
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveArtist>>, {artistUuid: string}> = (props) => {
+          const {artistUuid} = props ?? {};
 
-          return  getAlbumEphemeralContentByIdentity(pluginId,identifierId,identity,requestOptions)
+          return  saveArtist(artistUuid,requestOptions)
         }
 
 
@@ -10380,56 +10803,253 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
   return  { mutationFn, ...mutationOptions }}
 
-    export type GetAlbumEphemeralContentByIdentityMutationResult = NonNullable<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>>
+    export type SaveArtistMutationResult = NonNullable<Awaited<ReturnType<typeof saveArtist>>>
 
-    export type GetAlbumEphemeralContentByIdentityMutationError = PipeBombError
+    export type SaveArtistMutationError = PipeBombError
 
-    export const useGetAlbumEphemeralContentByIdentity = <TError = PipeBombError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+    export const useSaveArtist = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveArtist>>, TError,{artistUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof getAlbumEphemeralContentByIdentity>>,
+        Awaited<ReturnType<typeof saveArtist>>,
+        TError,
+        {artistUuid: string},
+        TContext
+      > => {
+      return useMutation(getSaveArtistMutationOptions(options), queryClient);
+    }
+
+export type unsaveArtistResponse204 = {
+  data: void
+  status: 204
+}
+
+export type unsaveArtistResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type unsaveArtistResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type unsaveArtistResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type unsaveArtistResponseSuccess = (unsaveArtistResponse204) & {
+  headers: Headers;
+};
+export type unsaveArtistResponseError = (unsaveArtistResponse401 | unsaveArtistResponse404 | unsaveArtistResponse5xx) & {
+  headers: Headers;
+};
+
+export type unsaveArtistResponse = (unsaveArtistResponseSuccess | unsaveArtistResponseError)
+
+export const getUnsaveArtistUrl = (artistUuid: string,) => {
+
+
+
+
+  return `/artists/${artistUuid}/save`
+}
+
+export const unsaveArtist = async (artistUuid: string, options?: RequestInit): Promise<unsaveArtistResponse> => {
+
+  return customFetch<unsaveArtistResponse>(getUnsaveArtistUrl(artistUuid),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getUnsaveArtistMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsaveArtist>>, TError,{artistUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof unsaveArtist>>, TError,{artistUuid: string}, TContext> => {
+
+const mutationKey = ['unsaveArtist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unsaveArtist>>, {artistUuid: string}> = (props) => {
+          const {artistUuid} = props ?? {};
+
+          return  unsaveArtist(artistUuid,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnsaveArtistMutationResult = NonNullable<Awaited<ReturnType<typeof unsaveArtist>>>
+
+    export type UnsaveArtistMutationError = PipeBombError
+
+    export const useUnsaveArtist = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsaveArtist>>, TError,{artistUuid: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof unsaveArtist>>,
+        TError,
+        {artistUuid: string},
+        TContext
+      > => {
+      return useMutation(getUnsaveArtistMutationOptions(options), queryClient);
+    }
+
+export type saveEphemeralArtistResponse204 = {
+  data: void
+  status: 204
+}
+
+export type saveEphemeralArtistResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type saveEphemeralArtistResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type saveEphemeralArtistResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type saveEphemeralArtistResponseSuccess = (saveEphemeralArtistResponse204) & {
+  headers: Headers;
+};
+export type saveEphemeralArtistResponseError = (saveEphemeralArtistResponse401 | saveEphemeralArtistResponse404 | saveEphemeralArtistResponse5xx) & {
+  headers: Headers;
+};
+
+export type saveEphemeralArtistResponse = (saveEphemeralArtistResponseSuccess | saveEphemeralArtistResponseError)
+
+export const getSaveEphemeralArtistUrl = (pluginId: string,
+    identifierId: string,
+    identity: string,) => {
+
+
+
+
+  return `/artists/${pluginId}/${identifierId}/${identity}/save`
+}
+
+export const saveEphemeralArtist = async (pluginId: string,
+    identifierId: string,
+    identity: string, options?: RequestInit): Promise<saveEphemeralArtistResponse> => {
+
+  return customFetch<saveEphemeralArtistResponse>(getSaveEphemeralArtistUrl(pluginId,identifierId,identity),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+export const getSaveEphemeralArtistMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveEphemeralArtist>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveEphemeralArtist>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext> => {
+
+const mutationKey = ['saveEphemeralArtist'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveEphemeralArtist>>, {pluginId: string;identifierId: string;identity: string}> = (props) => {
+          const {pluginId,identifierId,identity} = props ?? {};
+
+          return  saveEphemeralArtist(pluginId,identifierId,identity,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveEphemeralArtistMutationResult = NonNullable<Awaited<ReturnType<typeof saveEphemeralArtist>>>
+
+    export type SaveEphemeralArtistMutationError = PipeBombError
+
+    export const useSaveEphemeralArtist = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveEphemeralArtist>>, TError,{pluginId: string;identifierId: string;identity: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveEphemeralArtist>>,
         TError,
         {pluginId: string;identifierId: string;identity: string},
         TContext
       > => {
-      return useMutation(getGetAlbumEphemeralContentByIdentityMutationOptions(options), queryClient);
+      return useMutation(getSaveEphemeralArtistMutationOptions(options), queryClient);
     }
 
-export type getAlbumEphemeralSourcesResponse200 = {
-  data: EphemeralSource[]
+export type getSavedTracksResponse200 = {
+  data: void
   status: 200
 }
 
-export type getAlbumEphemeralSourcesResponse404 = {
+export type getSavedTracksResponse401 = {
   data: PipeBombError
-  status: 404
+  status: 401
 }
 
-export type getAlbumEphemeralSourcesResponse5xx = {
+export type getSavedTracksResponse5xx = {
   data: PipeBombError
   status: HTTPStatusCode5xx
 }
 
-export type getAlbumEphemeralSourcesResponseSuccess = (getAlbumEphemeralSourcesResponse200) & {
+export type getSavedTracksResponseSuccess = (getSavedTracksResponse200) & {
   headers: Headers;
 };
-export type getAlbumEphemeralSourcesResponseError = (getAlbumEphemeralSourcesResponse404 | getAlbumEphemeralSourcesResponse5xx) & {
+export type getSavedTracksResponseError = (getSavedTracksResponse401 | getSavedTracksResponse5xx) & {
   headers: Headers;
 };
 
-export type getAlbumEphemeralSourcesResponse = (getAlbumEphemeralSourcesResponseSuccess | getAlbumEphemeralSourcesResponseError)
+export type getSavedTracksResponse = (getSavedTracksResponseSuccess | getSavedTracksResponseError)
 
-export const getGetAlbumEphemeralSourcesUrl = (albumUuid: string,) => {
+export const getGetSavedTracksUrl = (params: GetSavedTracksParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : value.toString())
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/albums/${albumUuid}/ephemeral`
+  return stringifiedParams.length > 0 ? `/tracks/saved?${stringifiedParams}` : `/tracks/saved`
 }
 
-export const getAlbumEphemeralSources = async (albumUuid: string, options?: RequestInit): Promise<getAlbumEphemeralSourcesResponse> => {
+export const getSavedTracks = async (params: GetSavedTracksParams, options?: RequestInit): Promise<getSavedTracksResponse> => {
 
-  return customFetch<getAlbumEphemeralSourcesResponse>(getGetAlbumEphemeralSourcesUrl(albumUuid),
+  return customFetch<getSavedTracksResponse>(getGetSavedTracksUrl(params),
   {
     ...options,
     method: 'GET'
@@ -10442,66 +11062,66 @@ export const getAlbumEphemeralSources = async (albumUuid: string, options?: Requ
 
 
 
-export const getGetAlbumEphemeralSourcesQueryKey = (albumUuid: string,) => {
+export const getGetSavedTracksQueryKey = (params?: GetSavedTracksParams,) => {
     return [
-    `/albums/${albumUuid}/ephemeral`
+    `/tracks/saved`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getGetAlbumEphemeralSourcesQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetSavedTracksQueryOptions = <TData = Awaited<ReturnType<typeof getSavedTracks>>, TError = PipeBombError>(params: GetSavedTracksParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedTracks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetAlbumEphemeralSourcesQueryKey(albumUuid);
+  const queryKey =  queryOptions?.queryKey ?? getGetSavedTracksQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAlbumEphemeralSources>>> = ({ signal }) => getAlbumEphemeralSources(albumUuid, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSavedTracks>>> = ({ signal }) => getSavedTracks(params, { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: albumUuid !== null && albumUuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSavedTracks>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetAlbumEphemeralSourcesQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbumEphemeralSources>>>
-export type GetAlbumEphemeralSourcesQueryError = PipeBombError
+export type GetSavedTracksQueryResult = NonNullable<Awaited<ReturnType<typeof getSavedTracks>>>
+export type GetSavedTracksQueryError = PipeBombError
 
 
-export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
- albumUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>> & Pick<
+export function useGetSavedTracks<TData = Awaited<ReturnType<typeof getSavedTracks>>, TError = PipeBombError>(
+ params: GetSavedTracksParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedTracks>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAlbumEphemeralSources>>,
+          Awaited<ReturnType<typeof getSavedTracks>>,
           TError,
-          Awaited<ReturnType<typeof getAlbumEphemeralSources>>
+          Awaited<ReturnType<typeof getSavedTracks>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
- albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>> & Pick<
+export function useGetSavedTracks<TData = Awaited<ReturnType<typeof getSavedTracks>>, TError = PipeBombError>(
+ params: GetSavedTracksParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedTracks>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAlbumEphemeralSources>>,
+          Awaited<ReturnType<typeof getSavedTracks>>,
           TError,
-          Awaited<ReturnType<typeof getAlbumEphemeralSources>>
+          Awaited<ReturnType<typeof getSavedTracks>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
- albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetSavedTracks<TData = Awaited<ReturnType<typeof getSavedTracks>>, TError = PipeBombError>(
+ params: GetSavedTracksParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedTracks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError = PipeBombError>(
- albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumEphemeralSources>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetSavedTracks<TData = Awaited<ReturnType<typeof getSavedTracks>>, TError = PipeBombError>(
+ params: GetSavedTracksParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedTracks>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetAlbumEphemeralSourcesQueryOptions(albumUuid,options)
+  const queryOptions = getGetSavedTracksQueryOptions(params,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
@@ -10514,218 +11134,41 @@ export function useGetAlbumEphemeralSources<TData = Awaited<ReturnType<typeof ge
 
 
 
-export type getAlbumEphemeralContentResponse200 = {
-  data: AlbumEphemeralContent
+export type getSavedTracksPendingResponse200 = {
+  data: TrackCreationSession[]
   status: 200
 }
 
-export type getAlbumEphemeralContentResponse400 = {
+export type getSavedTracksPendingResponse401 = {
   data: PipeBombError
-  status: 400
+  status: 401
 }
 
-export type getAlbumEphemeralContentResponse404 = {
-  data: PipeBombError
-  status: 404
-}
-
-export type getAlbumEphemeralContentResponse5xx = {
+export type getSavedTracksPendingResponse5xx = {
   data: PipeBombError
   status: HTTPStatusCode5xx
 }
 
-export type getAlbumEphemeralContentResponseSuccess = (getAlbumEphemeralContentResponse200) & {
+export type getSavedTracksPendingResponseSuccess = (getSavedTracksPendingResponse200) & {
   headers: Headers;
 };
-export type getAlbumEphemeralContentResponseError = (getAlbumEphemeralContentResponse400 | getAlbumEphemeralContentResponse404 | getAlbumEphemeralContentResponse5xx) & {
-  headers: Headers;
-};
-
-export type getAlbumEphemeralContentResponse = (getAlbumEphemeralContentResponseSuccess | getAlbumEphemeralContentResponseError)
-
-export const getGetAlbumEphemeralContentUrl = (albumUuid: string,) => {
-
-
-
-
-  return `/albums/${albumUuid}/ephemeral`
-}
-
-export const getAlbumEphemeralContent = async (albumUuid: string,
-    ephemeralSourceDto: EphemeralSourceDto, options?: RequestInit): Promise<getAlbumEphemeralContentResponse> => {
-
-  return customFetch<getAlbumEphemeralContentResponse>(getGetAlbumEphemeralContentUrl(albumUuid),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(ephemeralSourceDto)
-  }
-);}
-
-
-
-
-export const getGetAlbumEphemeralContentMutationOptions = <TError = PipeBombError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContent>>, TError,{albumUuid: string;data: EphemeralSourceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContent>>, TError,{albumUuid: string;data: EphemeralSourceDto}, TContext> => {
-
-const mutationKey = ['getAlbumEphemeralContent'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getAlbumEphemeralContent>>, {albumUuid: string;data: EphemeralSourceDto}> = (props) => {
-          const {albumUuid,data} = props ?? {};
-
-          return  getAlbumEphemeralContent(albumUuid,data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type GetAlbumEphemeralContentMutationResult = NonNullable<Awaited<ReturnType<typeof getAlbumEphemeralContent>>>
-    export type GetAlbumEphemeralContentMutationBody = EphemeralSourceDto
-    export type GetAlbumEphemeralContentMutationError = PipeBombError
-
-    export const useGetAlbumEphemeralContent = <TError = PipeBombError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getAlbumEphemeralContent>>, TError,{albumUuid: string;data: EphemeralSourceDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof getAlbumEphemeralContent>>,
-        TError,
-        {albumUuid: string;data: EphemeralSourceDto},
-        TContext
-      > => {
-      return useMutation(getGetAlbumEphemeralContentMutationOptions(options), queryClient);
-    }
-
-export type searchAlbumsResponse200 = {
-  data: AlbumsSearchResponse
-  status: 200
-}
-
-export type searchAlbumsResponse5xx = {
-  data: PipeBombError
-  status: HTTPStatusCode5xx
-}
-
-export type searchAlbumsResponseSuccess = (searchAlbumsResponse200) & {
-  headers: Headers;
-};
-export type searchAlbumsResponseError = (searchAlbumsResponse5xx) & {
+export type getSavedTracksPendingResponseError = (getSavedTracksPendingResponse401 | getSavedTracksPendingResponse5xx) & {
   headers: Headers;
 };
 
-export type searchAlbumsResponse = (searchAlbumsResponseSuccess | searchAlbumsResponseError)
+export type getSavedTracksPendingResponse = (getSavedTracksPendingResponseSuccess | getSavedTracksPendingResponseError)
 
-export const getSearchAlbumsUrl = () => {
-
-
+export const getGetSavedTracksPendingUrl = () => {
 
 
-  return `/albums`
+
+
+  return `/tracks/saved/pending`
 }
 
-export const searchAlbums = async (albumsSearchDto: AlbumsSearchDto, options?: RequestInit): Promise<searchAlbumsResponse> => {
+export const getSavedTracksPending = async ( options?: RequestInit): Promise<getSavedTracksPendingResponse> => {
 
-  return customFetch<searchAlbumsResponse>(getSearchAlbumsUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(albumsSearchDto)
-  }
-);}
-
-
-
-
-export const getSearchAlbumsMutationOptions = <TError = PipeBombError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchAlbums>>, TError,{data: AlbumsSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
-): UseMutationOptions<Awaited<ReturnType<typeof searchAlbums>>, TError,{data: AlbumsSearchDto}, TContext> => {
-
-const mutationKey = ['searchAlbums'];
-const {mutation: mutationOptions, request: requestOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }, request: undefined};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof searchAlbums>>, {data: AlbumsSearchDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  searchAlbums(data,requestOptions)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SearchAlbumsMutationResult = NonNullable<Awaited<ReturnType<typeof searchAlbums>>>
-    export type SearchAlbumsMutationBody = AlbumsSearchDto
-    export type SearchAlbumsMutationError = PipeBombError
-
-    export const useSearchAlbums = <TError = PipeBombError,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof searchAlbums>>, TError,{data: AlbumsSearchDto}, TContext>, request?: SecondParameter<typeof customFetch>}
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof searchAlbums>>,
-        TError,
-        {data: AlbumsSearchDto},
-        TContext
-      > => {
-      return useMutation(getSearchAlbumsMutationOptions(options), queryClient);
-    }
-
-export type getAlbumExternalUrlsResponse200 = {
-  data: ExternalUrl[]
-  status: 200
-}
-
-export type getAlbumExternalUrlsResponse404 = {
-  data: PipeBombError
-  status: 404
-}
-
-export type getAlbumExternalUrlsResponse5xx = {
-  data: PipeBombError
-  status: HTTPStatusCode5xx
-}
-
-export type getAlbumExternalUrlsResponseSuccess = (getAlbumExternalUrlsResponse200) & {
-  headers: Headers;
-};
-export type getAlbumExternalUrlsResponseError = (getAlbumExternalUrlsResponse404 | getAlbumExternalUrlsResponse5xx) & {
-  headers: Headers;
-};
-
-export type getAlbumExternalUrlsResponse = (getAlbumExternalUrlsResponseSuccess | getAlbumExternalUrlsResponseError)
-
-export const getGetAlbumExternalUrlsUrl = (albumUuid: string,) => {
-
-
-
-
-  return `/albums/${albumUuid}/urls`
-}
-
-export const getAlbumExternalUrls = async (albumUuid: string, options?: RequestInit): Promise<getAlbumExternalUrlsResponse> => {
-
-  return customFetch<getAlbumExternalUrlsResponse>(getGetAlbumExternalUrlsUrl(albumUuid),
+  return customFetch<getSavedTracksPendingResponse>(getGetSavedTracksPendingUrl(),
   {
     ...options,
     method: 'GET'
@@ -10738,66 +11181,1012 @@ export const getAlbumExternalUrls = async (albumUuid: string, options?: RequestI
 
 
 
-export const getGetAlbumExternalUrlsQueryKey = (albumUuid: string,) => {
+export const getGetSavedTracksPendingQueryKey = () => {
     return [
-    `/albums/${albumUuid}/urls`
+    `/tracks/saved/pending`
     ] as const;
     }
 
 
-export const getGetAlbumExternalUrlsQueryOptions = <TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export const getGetSavedTracksPendingQueryOptions = <TData = Awaited<ReturnType<typeof getSavedTracksPending>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedTracksPending>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getGetAlbumExternalUrlsQueryKey(albumUuid);
+  const queryKey =  queryOptions?.queryKey ?? getGetSavedTracksPendingQueryKey();
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAlbumExternalUrls>>> = ({ signal }) => getAlbumExternalUrls(albumUuid, { signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getSavedTracksPending>>> = ({ signal }) => getSavedTracksPending({ signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, enabled: albumUuid !== null && albumUuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getSavedTracksPending>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type GetAlbumExternalUrlsQueryResult = NonNullable<Awaited<ReturnType<typeof getAlbumExternalUrls>>>
-export type GetAlbumExternalUrlsQueryError = PipeBombError
+export type GetSavedTracksPendingQueryResult = NonNullable<Awaited<ReturnType<typeof getSavedTracksPending>>>
+export type GetSavedTracksPendingQueryError = PipeBombError
 
 
-export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
- albumUuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>> & Pick<
+export function useGetSavedTracksPending<TData = Awaited<ReturnType<typeof getSavedTracksPending>>, TError = PipeBombError>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedTracksPending>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAlbumExternalUrls>>,
+          Awaited<ReturnType<typeof getSavedTracksPending>>,
           TError,
-          Awaited<ReturnType<typeof getAlbumExternalUrls>>
+          Awaited<ReturnType<typeof getSavedTracksPending>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
- albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>> & Pick<
+export function useGetSavedTracksPending<TData = Awaited<ReturnType<typeof getSavedTracksPending>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedTracksPending>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof getAlbumExternalUrls>>,
+          Awaited<ReturnType<typeof getSavedTracksPending>>,
           TError,
-          Awaited<ReturnType<typeof getAlbumExternalUrls>>
+          Awaited<ReturnType<typeof getSavedTracksPending>>
         > , 'initialData'
       >, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
- albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetSavedTracksPending<TData = Awaited<ReturnType<typeof getSavedTracksPending>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedTracksPending>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
 
-export function useGetAlbumExternalUrls<TData = Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError = PipeBombError>(
- albumUuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getAlbumExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+export function useGetSavedTracksPending<TData = Awaited<ReturnType<typeof getSavedTracksPending>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSavedTracksPending>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getGetAlbumExternalUrlsQueryOptions(albumUuid,options)
+  const queryOptions = getGetSavedTracksPendingQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getTrackResponse200 = {
+  data: Track
+  status: 200
+}
+
+export type getTrackResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type getTrackResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getTrackResponseSuccess = (getTrackResponse200) & {
+  headers: Headers;
+};
+export type getTrackResponseError = (getTrackResponse404 | getTrackResponse5xx) & {
+  headers: Headers;
+};
+
+export type getTrackResponse = (getTrackResponseSuccess | getTrackResponseError)
+
+export const getGetTrackUrl = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+
+
+
+
+  return `/tracks/${pluginId}/${libraryId}/${trackId}`
+}
+
+export const getTrack = async (pluginId: string,
+    libraryId: string,
+    trackId: string, options?: RequestInit): Promise<getTrackResponse> => {
+
+  return customFetch<getTrackResponse>(getGetTrackUrl(pluginId,libraryId,trackId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrackQueryKey = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+    return [
+    `/tracks/${pluginId}/${libraryId}/${trackId}`
+    ] as const;
+    }
+
+
+export const getGetTrackQueryOptions = <TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrackQueryKey(pluginId,libraryId,trackId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrack>>> = ({ signal }) => getTrack(pluginId,libraryId,trackId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && libraryId !== null && libraryId !== undefined && trackId !== null && trackId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrackQueryResult = NonNullable<Awaited<ReturnType<typeof getTrack>>>
+export type GetTrackQueryError = PipeBombError
+
+
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrack>>,
+          TError,
+          Awaited<ReturnType<typeof getTrack>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrack>>,
+          TError,
+          Awaited<ReturnType<typeof getTrack>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetTrack<TData = Awaited<ReturnType<typeof getTrack>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrack>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrackQueryOptions(pluginId,libraryId,trackId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getTracksResponse200 = {
+  data: Track[]
+  status: 200
+}
+
+export type getTracksResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getTracksResponseSuccess = (getTracksResponse200) & {
+  headers: Headers;
+};
+export type getTracksResponseError = (getTracksResponse5xx) & {
+  headers: Headers;
+};
+
+export type getTracksResponse = (getTracksResponseSuccess | getTracksResponseError)
+
+export const getGetTracksUrl = () => {
+
+
+
+
+  return `/tracks`
+}
+
+export const getTracks = async (trackIdsDto: TrackIdsDto, options?: RequestInit): Promise<getTracksResponse> => {
+
+  return customFetch<getTracksResponse>(getGetTracksUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(trackIdsDto)
+  }
+);}
+
+
+
+
+export const getGetTracksMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getTracks>>, TError,{data: TrackIdsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof getTracks>>, TError,{data: TrackIdsDto}, TContext> => {
+
+const mutationKey = ['getTracks'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof getTracks>>, {data: TrackIdsDto}> = (props) => {
+          const {data} = props ?? {};
+
+          return  getTracks(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type GetTracksMutationResult = NonNullable<Awaited<ReturnType<typeof getTracks>>>
+    export type GetTracksMutationBody = TrackIdsDto
+    export type GetTracksMutationError = PipeBombError
+
+    export const useGetTracks = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof getTracks>>, TError,{data: TrackIdsDto}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof getTracks>>,
+        TError,
+        {data: TrackIdsDto},
+        TContext
+      > => {
+      return useMutation(getGetTracksMutationOptions(options), queryClient);
+    }
+
+export type getTrackIdentitiesResponse200 = {
+  data: Identity[]
+  status: 200
+}
+
+export type getTrackIdentitiesResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type getTrackIdentitiesResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getTrackIdentitiesResponseSuccess = (getTrackIdentitiesResponse200) & {
+  headers: Headers;
+};
+export type getTrackIdentitiesResponseError = (getTrackIdentitiesResponse404 | getTrackIdentitiesResponse5xx) & {
+  headers: Headers;
+};
+
+export type getTrackIdentitiesResponse = (getTrackIdentitiesResponseSuccess | getTrackIdentitiesResponseError)
+
+export const getGetTrackIdentitiesUrl = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+
+
+
+
+  return `/tracks/${pluginId}/${libraryId}/${trackId}/identities`
+}
+
+export const getTrackIdentities = async (pluginId: string,
+    libraryId: string,
+    trackId: string, options?: RequestInit): Promise<getTrackIdentitiesResponse> => {
+
+  return customFetch<getTrackIdentitiesResponse>(getGetTrackIdentitiesUrl(pluginId,libraryId,trackId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrackIdentitiesQueryKey = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+    return [
+    `/tracks/${pluginId}/${libraryId}/${trackId}/identities`
+    ] as const;
+    }
+
+
+export const getGetTrackIdentitiesQueryOptions = <TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrackIdentitiesQueryKey(pluginId,libraryId,trackId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrackIdentities>>> = ({ signal }) => getTrackIdentities(pluginId,libraryId,trackId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && libraryId !== null && libraryId !== undefined && trackId !== null && trackId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrackIdentitiesQueryResult = NonNullable<Awaited<ReturnType<typeof getTrackIdentities>>>
+export type GetTrackIdentitiesQueryError = PipeBombError
+
+
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrackIdentities>>,
+          TError,
+          Awaited<ReturnType<typeof getTrackIdentities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrackIdentities>>,
+          TError,
+          Awaited<ReturnType<typeof getTrackIdentities>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetTrackIdentities<TData = Awaited<ReturnType<typeof getTrackIdentities>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackIdentities>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrackIdentitiesQueryOptions(pluginId,libraryId,trackId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type createTrackAudioSessionResponse200 = {
+  data: StreamInstance
+  status: 200
+}
+
+export type createTrackAudioSessionResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type createTrackAudioSessionResponse403 = {
+  data: PipeBombError
+  status: 403
+}
+
+export type createTrackAudioSessionResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type createTrackAudioSessionResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type createTrackAudioSessionResponseSuccess = (createTrackAudioSessionResponse200) & {
+  headers: Headers;
+};
+export type createTrackAudioSessionResponseError = (createTrackAudioSessionResponse401 | createTrackAudioSessionResponse403 | createTrackAudioSessionResponse404 | createTrackAudioSessionResponse5xx) & {
+  headers: Headers;
+};
+
+export type createTrackAudioSessionResponse = (createTrackAudioSessionResponseSuccess | createTrackAudioSessionResponseError)
+
+export const getCreateTrackAudioSessionUrl = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+
+
+
+
+  return `/tracks/${pluginId}/${libraryId}/${trackId}/audio`
+}
+
+export const createTrackAudioSession = async (pluginId: string,
+    libraryId: string,
+    trackId: string, options?: RequestInit): Promise<createTrackAudioSessionResponse> => {
+
+  return customFetch<createTrackAudioSessionResponse>(getCreateTrackAudioSessionUrl(pluginId,libraryId,trackId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getCreateTrackAudioSessionQueryKey = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+    return [
+    `/tracks/${pluginId}/${libraryId}/${trackId}/audio`
+    ] as const;
+    }
+
+
+export const getCreateTrackAudioSessionQueryOptions = <TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getCreateTrackAudioSessionQueryKey(pluginId,libraryId,trackId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof createTrackAudioSession>>> = ({ signal }) => createTrackAudioSession(pluginId,libraryId,trackId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && libraryId !== null && libraryId !== undefined && trackId !== null && trackId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type CreateTrackAudioSessionQueryResult = NonNullable<Awaited<ReturnType<typeof createTrackAudioSession>>>
+export type CreateTrackAudioSessionQueryError = PipeBombError
+
+
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof createTrackAudioSession>>,
+          TError,
+          Awaited<ReturnType<typeof createTrackAudioSession>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof createTrackAudioSession>>,
+          TError,
+          Awaited<ReturnType<typeof createTrackAudioSession>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useCreateTrackAudioSession<TData = Awaited<ReturnType<typeof createTrackAudioSession>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof createTrackAudioSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getCreateTrackAudioSessionQueryOptions(pluginId,libraryId,trackId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type getTrackExternalUrlsResponse200 = {
+  data: ExternalUrl[]
+  status: 200
+}
+
+export type getTrackExternalUrlsResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type getTrackExternalUrlsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getTrackExternalUrlsResponseSuccess = (getTrackExternalUrlsResponse200) & {
+  headers: Headers;
+};
+export type getTrackExternalUrlsResponseError = (getTrackExternalUrlsResponse404 | getTrackExternalUrlsResponse5xx) & {
+  headers: Headers;
+};
+
+export type getTrackExternalUrlsResponse = (getTrackExternalUrlsResponseSuccess | getTrackExternalUrlsResponseError)
+
+export const getGetTrackExternalUrlsUrl = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+
+
+
+
+  return `/tracks/${pluginId}/${libraryId}/${trackId}/urls`
+}
+
+export const getTrackExternalUrls = async (pluginId: string,
+    libraryId: string,
+    trackId: string, options?: RequestInit): Promise<getTrackExternalUrlsResponse> => {
+
+  return customFetch<getTrackExternalUrlsResponse>(getGetTrackExternalUrlsUrl(pluginId,libraryId,trackId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetTrackExternalUrlsQueryKey = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+    return [
+    `/tracks/${pluginId}/${libraryId}/${trackId}/urls`
+    ] as const;
+    }
+
+
+export const getGetTrackExternalUrlsQueryOptions = <TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetTrackExternalUrlsQueryKey(pluginId,libraryId,trackId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getTrackExternalUrls>>> = ({ signal }) => getTrackExternalUrls(pluginId,libraryId,trackId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: pluginId !== null && pluginId !== undefined && libraryId !== null && libraryId !== undefined && trackId !== null && trackId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetTrackExternalUrlsQueryResult = NonNullable<Awaited<ReturnType<typeof getTrackExternalUrls>>>
+export type GetTrackExternalUrlsQueryError = PipeBombError
+
+
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrackExternalUrls>>,
+          TError,
+          Awaited<ReturnType<typeof getTrackExternalUrls>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTrackExternalUrls>>,
+          TError,
+          Awaited<ReturnType<typeof getTrackExternalUrls>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTrackExternalUrls>>, TError = PipeBombError>(
+ pluginId: string,
+    libraryId: string,
+    trackId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getTrackExternalUrls>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetTrackExternalUrlsQueryOptions(pluginId,libraryId,trackId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
+export type saveTrackResponse200 = {
+  data: void
+  status: 200
+}
+
+export type saveTrackResponse204 = {
+  data: void
+  status: 204
+}
+
+export type saveTrackResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type saveTrackResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type saveTrackResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type saveTrackResponseSuccess = (saveTrackResponse200 | saveTrackResponse204) & {
+  headers: Headers;
+};
+export type saveTrackResponseError = (saveTrackResponse401 | saveTrackResponse404 | saveTrackResponse5xx) & {
+  headers: Headers;
+};
+
+export type saveTrackResponse = (saveTrackResponseSuccess | saveTrackResponseError)
+
+export const getSaveTrackUrl = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+
+
+
+
+  return `/tracks/${pluginId}/${libraryId}/${trackId}/save`
+}
+
+export const saveTrack = async (pluginId: string,
+    libraryId: string,
+    trackId: string, options?: RequestInit): Promise<saveTrackResponse> => {
+
+  return customFetch<saveTrackResponse>(getSaveTrackUrl(pluginId,libraryId,trackId),
+  {
+    ...options,
+    method: 'PUT'
+
+
+  }
+);}
+
+
+
+
+export const getSaveTrackMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveTrack>>, TError,{pluginId: string;libraryId: string;trackId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof saveTrack>>, TError,{pluginId: string;libraryId: string;trackId: string}, TContext> => {
+
+const mutationKey = ['saveTrack'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof saveTrack>>, {pluginId: string;libraryId: string;trackId: string}> = (props) => {
+          const {pluginId,libraryId,trackId} = props ?? {};
+
+          return  saveTrack(pluginId,libraryId,trackId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SaveTrackMutationResult = NonNullable<Awaited<ReturnType<typeof saveTrack>>>
+
+    export type SaveTrackMutationError = PipeBombError
+
+    export const useSaveTrack = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveTrack>>, TError,{pluginId: string;libraryId: string;trackId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof saveTrack>>,
+        TError,
+        {pluginId: string;libraryId: string;trackId: string},
+        TContext
+      > => {
+      return useMutation(getSaveTrackMutationOptions(options), queryClient);
+    }
+
+export type unsaveTrackResponse204 = {
+  data: void
+  status: 204
+}
+
+export type unsaveTrackResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type unsaveTrackResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type unsaveTrackResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type unsaveTrackResponseSuccess = (unsaveTrackResponse204) & {
+  headers: Headers;
+};
+export type unsaveTrackResponseError = (unsaveTrackResponse401 | unsaveTrackResponse404 | unsaveTrackResponse5xx) & {
+  headers: Headers;
+};
+
+export type unsaveTrackResponse = (unsaveTrackResponseSuccess | unsaveTrackResponseError)
+
+export const getUnsaveTrackUrl = (pluginId: string,
+    libraryId: string,
+    trackId: string,) => {
+
+
+
+
+  return `/tracks/${pluginId}/${libraryId}/${trackId}/save`
+}
+
+export const unsaveTrack = async (pluginId: string,
+    libraryId: string,
+    trackId: string, options?: RequestInit): Promise<unsaveTrackResponse> => {
+
+  return customFetch<unsaveTrackResponse>(getUnsaveTrackUrl(pluginId,libraryId,trackId),
+  {
+    ...options,
+    method: 'DELETE'
+
+
+  }
+);}
+
+
+
+
+export const getUnsaveTrackMutationOptions = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsaveTrack>>, TError,{pluginId: string;libraryId: string;trackId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof unsaveTrack>>, TError,{pluginId: string;libraryId: string;trackId: string}, TContext> => {
+
+const mutationKey = ['unsaveTrack'];
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof unsaveTrack>>, {pluginId: string;libraryId: string;trackId: string}> = (props) => {
+          const {pluginId,libraryId,trackId} = props ?? {};
+
+          return  unsaveTrack(pluginId,libraryId,trackId,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UnsaveTrackMutationResult = NonNullable<Awaited<ReturnType<typeof unsaveTrack>>>
+
+    export type UnsaveTrackMutationError = PipeBombError
+
+    export const useUnsaveTrack = <TError = PipeBombError,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof unsaveTrack>>, TError,{pluginId: string;libraryId: string;trackId: string}, TContext>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof unsaveTrack>>,
+        TError,
+        {pluginId: string;libraryId: string;trackId: string},
+        TContext
+      > => {
+      return useMutation(getUnsaveTrackMutationOptions(options), queryClient);
+    }
+
+export type getJsonResponse200 = {
+  data: void
+  status: 200
+}
+
+export type getJsonResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getJsonResponseSuccess = (getJsonResponse200) & {
+  headers: Headers;
+};
+export type getJsonResponseError = (getJsonResponse5xx) & {
+  headers: Headers;
+};
+
+export type getJsonResponse = (getJsonResponseSuccess | getJsonResponseError)
+
+export const getGetJsonUrl = () => {
+
+
+
+
+  return `/docs/json`
+}
+
+export const getJson = async ( options?: RequestInit): Promise<getJsonResponse> => {
+
+  return customFetch<getJsonResponse>(getGetJsonUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetJsonQueryKey = () => {
+    return [
+    `/docs/json`
+    ] as const;
+    }
+
+
+export const getGetJsonQueryOptions = <TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetJsonQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getJson>>> = ({ signal }) => getJson({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetJsonQueryResult = NonNullable<Awaited<ReturnType<typeof getJson>>>
+export type GetJsonQueryError = PipeBombError
+
+
+export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getJson>>,
+          TError,
+          Awaited<ReturnType<typeof getJson>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getJson>>,
+          TError,
+          Awaited<ReturnType<typeof getJson>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetJson<TData = Awaited<ReturnType<typeof getJson>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getJson>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetJsonQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

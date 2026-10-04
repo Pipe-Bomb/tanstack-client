@@ -6,7 +6,6 @@
  */
 import type { AttributeMap } from './attributeMap';
 import type { PlaylistMember } from './playlistMember';
-import type { PlaylistOwnerUuid } from './playlistOwnerUuid';
 import type { PlaylistTrack } from './playlistTrack';
 import type { PlaylistVisibility } from './playlistVisibility';
 import type { SmartPlaylistFilterGroup } from './smartPlaylistFilterGroup';
@@ -14,7 +13,7 @@ import type { User } from './user';
 
 export interface Playlist {
   uuid: string;
-  ownerUuid: PlaylistOwnerUuid;
+  ownerUuid: string | null;
   owner: User | null;
   dateCreated: Date;
   dateModified: Date;

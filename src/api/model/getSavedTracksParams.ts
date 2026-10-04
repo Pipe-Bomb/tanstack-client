@@ -5,4 +5,7 @@
  * OpenAPI spec version: 0.2.0
  */
 
-export type PlaylistOwnerUuid = { [key: string]: unknown } | null;
+export type GetSavedTracksParams = {
+pageSize: string;
+page: string;
+};
