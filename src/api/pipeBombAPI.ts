@@ -80,6 +80,9 @@ import type {
   PluginUpdate,
   Privilege,
   ReportPlaybackDto,
+  SavedAlbums,
+  SavedArtists,
+  SavedTracks,
   SearchDto,
   SearchResults,
   SearchSource,
@@ -8457,7 +8460,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     }
 
 export type getSavedAlbumsResponse200 = {
-  data: void
+  data: SavedAlbums
   status: 200
 }
 
@@ -9751,7 +9754,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     }
 
 export type getSavedArtistsResponse200 = {
-  data: void
+  data: SavedArtists
   status: 200
 }
 
@@ -11009,7 +11012,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     }
 
 export type getSavedTracksResponse200 = {
-  data: void
+  data: SavedTracks
   status: 200
 }
 
