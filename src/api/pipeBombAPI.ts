@@ -42,6 +42,7 @@ import type {
   CreatePlaylistDto,
   CreateSmartFilterGroupDto,
   CreateWorkflowDto,
+  CreationSession,
   EphemeralSearchDto,
   EphemeralSearchResults,
   EphemeralSource,
@@ -94,7 +95,6 @@ import type {
   SystemConfigKeysDto,
   SystemConfigOptions,
   Track,
-  TrackCreationSession,
   TrackIdsDto,
   UpdateIdentifiersDto,
   UpdatePlaylistAttributesDto,
@@ -6424,6 +6424,125 @@ export function useGetAttributeBuffer<TData = Awaited<ReturnType<typeof getAttri
 
 
 
+export type getCreationSessionResponse200 = {
+  data: CreationSession
+  status: 200
+}
+
+export type getCreationSessionResponse404 = {
+  data: PipeBombError
+  status: 404
+}
+
+export type getCreationSessionResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getCreationSessionResponseSuccess = (getCreationSessionResponse200) & {
+  headers: Headers;
+};
+export type getCreationSessionResponseError = (getCreationSessionResponse404 | getCreationSessionResponse5xx) & {
+  headers: Headers;
+};
+
+export type getCreationSessionResponse = (getCreationSessionResponseSuccess | getCreationSessionResponseError)
+
+export const getGetCreationSessionUrl = (uuid: string,) => {
+
+
+
+
+  return `/ephemeral/creation-session/${uuid}`
+}
+
+export const getCreationSession = async (uuid: string, options?: RequestInit): Promise<getCreationSessionResponse> => {
+
+  return customFetch<getCreationSessionResponse>(getGetCreationSessionUrl(uuid),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetCreationSessionQueryKey = (uuid: string,) => {
+    return [
+    `/ephemeral/creation-session/${uuid}`
+    ] as const;
+    }
+
+
+export const getGetCreationSessionQueryOptions = <TData = Awaited<ReturnType<typeof getCreationSession>>, TError = PipeBombError>(uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCreationSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetCreationSessionQueryKey(uuid);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getCreationSession>>> = ({ signal }) => getCreationSession(uuid, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: uuid !== null && uuid !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getCreationSession>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetCreationSessionQueryResult = NonNullable<Awaited<ReturnType<typeof getCreationSession>>>
+export type GetCreationSessionQueryError = PipeBombError
+
+
+export function useGetCreationSession<TData = Awaited<ReturnType<typeof getCreationSession>>, TError = PipeBombError>(
+ uuid: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCreationSession>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCreationSession>>,
+          TError,
+          Awaited<ReturnType<typeof getCreationSession>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCreationSession<TData = Awaited<ReturnType<typeof getCreationSession>>, TError = PipeBombError>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCreationSession>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCreationSession>>,
+          TError,
+          Awaited<ReturnType<typeof getCreationSession>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetCreationSession<TData = Awaited<ReturnType<typeof getCreationSession>>, TError = PipeBombError>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCreationSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetCreationSession<TData = Awaited<ReturnType<typeof getCreationSession>>, TError = PipeBombError>(
+ uuid: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCreationSession>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetCreationSessionQueryOptions(uuid,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export type createPlaylistResponse200 = {
   data: Playlist
   status: 200
@@ -7379,7 +7498,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     }
 
 export type getPlaylistUpdateProgressResponse200 = {
-  data: TrackCreationSession[]
+  data: CreationSession[]
   status: 200
 }
 
@@ -8586,7 +8705,7 @@ export function useGetSavedAlbums<TData = Awaited<ReturnType<typeof getSavedAlbu
 
 
 export type getSavedAlbumsPendingResponse200 = {
-  data: TrackCreationSession[]
+  data: CreationSession[]
   status: 200
 }
 
@@ -9652,7 +9771,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     }
 
 export type saveEphemeralAlbumResponse200 = {
-  data: void
+  data: CreationSession
   status: 200
 }
 
@@ -11138,7 +11257,7 @@ export function useGetSavedTracks<TData = Awaited<ReturnType<typeof getSavedTrac
 
 
 export type getSavedTracksPendingResponse200 = {
-  data: TrackCreationSession[]
+  data: CreationSession[]
   status: 200
 }
 
@@ -11890,7 +12009,7 @@ export function useGetTrackExternalUrls<TData = Awaited<ReturnType<typeof getTra
 
 
 export type saveTrackResponse200 = {
-  data: void
+  data: CreationSession
   status: 200
 }
 
