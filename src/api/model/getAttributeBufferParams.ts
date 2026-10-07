@@ -6,6 +6,8 @@
  */
 
 export type GetAttributeBufferParams = {
-width?: number;
-height?: number;
+plugin?: string;
+source?: string;
+entity?: string;
+key?: string;
 };

@@ -8,8 +8,10 @@ import type { StringAttributeType } from './stringAttributeType';
 
 export interface StringAttribute {
   type: StringAttributeType;
-  pluginId: string;
-  sourceId: string;
-  formatted: string[] | null;
+  pluginId: string | null;
+  sourceId: string | null;
+  formatterPluginId: string | null;
+  formatterSourceId: string | null;
   values: string[];
+  formatted: string[] | null;
 }

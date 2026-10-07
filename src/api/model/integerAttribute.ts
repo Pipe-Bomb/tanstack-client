@@ -8,8 +8,10 @@ import type { IntegerAttributeType } from './integerAttributeType';
 
 export interface IntegerAttribute {
   type: IntegerAttributeType;
-  pluginId: string;
-  sourceId: string;
-  formatted: string[] | null;
+  pluginId: string | null;
+  sourceId: string | null;
+  formatterPluginId: string | null;
+  formatterSourceId: string | null;
   values: number[];
+  formatted: string[] | null;
 }

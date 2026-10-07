@@ -8,8 +8,10 @@ import type { BooleanAttributeType } from './booleanAttributeType';
 
 export interface BooleanAttribute {
   type: BooleanAttributeType;
-  pluginId: string;
-  sourceId: string;
-  formatted: string[] | null;
+  pluginId: string | null;
+  sourceId: string | null;
+  formatterPluginId: string | null;
+  formatterSourceId: string | null;
   values: boolean[];
+  formatted: string[] | null;
 }

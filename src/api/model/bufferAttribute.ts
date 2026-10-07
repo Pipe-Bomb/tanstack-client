@@ -9,8 +9,10 @@ import type { Resource } from './resource';
 
 export interface BufferAttribute {
   type: BufferAttributeType;
-  pluginId: string;
-  sourceId: string;
-  formatted: string[] | null;
+  pluginId: string | null;
+  sourceId: string | null;
+  formatterPluginId: string | null;
+  formatterSourceId: string | null;
   values: Resource[];
+  formatted: Resource[] | null;
 }
