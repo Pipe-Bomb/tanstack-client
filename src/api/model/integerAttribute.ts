@@ -13,5 +13,5 @@ export interface IntegerAttribute {
   formatterPluginId: string | null;
   formatterSourceId: string | null;
   values: number[];
-  formatted: string[] | null;
+  formatted: string[];
 }

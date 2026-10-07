@@ -14,5 +14,5 @@ export interface BufferAttribute {
   formatterPluginId: string | null;
   formatterSourceId: string | null;
   values: Resource[];
-  formatted: Resource[] | null;
+  formatted: Resource[];
 }

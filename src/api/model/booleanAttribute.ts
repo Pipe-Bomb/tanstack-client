@@ -13,5 +13,5 @@ export interface BooleanAttribute {
   formatterPluginId: string | null;
   formatterSourceId: string | null;
   values: boolean[];
-  formatted: string[] | null;
+  formatted: string[];
 }

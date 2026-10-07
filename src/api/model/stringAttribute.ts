@@ -13,5 +13,5 @@ export interface StringAttribute {
   formatterPluginId: string | null;
   formatterSourceId: string | null;
   values: string[];
-  formatted: string[] | null;
+  formatted: string[];
 }
