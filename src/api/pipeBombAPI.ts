@@ -6750,6 +6750,125 @@ export function useGetOwnPlaylists<TData = Awaited<ReturnType<typeof getOwnPlayl
 
 
 
+export type getPublicPlaylistsResponse200 = {
+  data: Playlist[]
+  status: 200
+}
+
+export type getPublicPlaylistsResponse401 = {
+  data: PipeBombError
+  status: 401
+}
+
+export type getPublicPlaylistsResponse5xx = {
+  data: PipeBombError
+  status: HTTPStatusCode5xx
+}
+
+export type getPublicPlaylistsResponseSuccess = (getPublicPlaylistsResponse200) & {
+  headers: Headers;
+};
+export type getPublicPlaylistsResponseError = (getPublicPlaylistsResponse401 | getPublicPlaylistsResponse5xx) & {
+  headers: Headers;
+};
+
+export type getPublicPlaylistsResponse = (getPublicPlaylistsResponseSuccess | getPublicPlaylistsResponseError)
+
+export const getGetPublicPlaylistsUrl = () => {
+
+
+
+
+  return `/playlists/public`
+}
+
+export const getPublicPlaylists = async ( options?: RequestInit): Promise<getPublicPlaylistsResponse> => {
+
+  return customFetch<getPublicPlaylistsResponse>(getGetPublicPlaylistsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPublicPlaylistsQueryKey = () => {
+    return [
+    `/playlists/public`
+    ] as const;
+    }
+
+
+export const getGetPublicPlaylistsQueryOptions = <TData = Awaited<ReturnType<typeof getPublicPlaylists>>, TError = PipeBombError>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPublicPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPublicPlaylistsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPublicPlaylists>>> = ({ signal }) => getPublicPlaylists({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPublicPlaylists>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPublicPlaylistsQueryResult = NonNullable<Awaited<ReturnType<typeof getPublicPlaylists>>>
+export type GetPublicPlaylistsQueryError = PipeBombError
+
+
+export function useGetPublicPlaylists<TData = Awaited<ReturnType<typeof getPublicPlaylists>>, TError = PipeBombError>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPublicPlaylists>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPublicPlaylists>>,
+          TError,
+          Awaited<ReturnType<typeof getPublicPlaylists>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPublicPlaylists<TData = Awaited<ReturnType<typeof getPublicPlaylists>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPublicPlaylists>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPublicPlaylists>>,
+          TError,
+          Awaited<ReturnType<typeof getPublicPlaylists>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPublicPlaylists<TData = Awaited<ReturnType<typeof getPublicPlaylists>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPublicPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetPublicPlaylists<TData = Awaited<ReturnType<typeof getPublicPlaylists>>, TError = PipeBombError>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPublicPlaylists>>, TError, TData>>, request?: SecondParameter<typeof customFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPublicPlaylistsQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+
 export type getPlaylistResponse200 = {
   data: Playlist
   status: 200

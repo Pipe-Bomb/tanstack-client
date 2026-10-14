@@ -5,16 +5,17 @@
  * OpenAPI spec version: 0.2.0
  */
 import type { AttributeMap } from './attributeMap';
+import type { PlaylistBotCreator } from './playlistBotCreator';
 import type { PlaylistMember } from './playlistMember';
+import type { PlaylistSystemCreator } from './playlistSystemCreator';
 import type { PlaylistTrack } from './playlistTrack';
+import type { PlaylistUserCreator } from './playlistUserCreator';
 import type { PlaylistVisibility } from './playlistVisibility';
 import type { SmartPlaylistFilterGroup } from './smartPlaylistFilterGroup';
-import type { User } from './user';
 
 export interface Playlist {
   uuid: string;
-  ownerUuid: string | null;
-  owner: User | null;
+  owner: PlaylistUserCreator | PlaylistBotCreator | PlaylistSystemCreator;
   dateCreated: Date;
   dateModified: Date;
   visibility: PlaylistVisibility;

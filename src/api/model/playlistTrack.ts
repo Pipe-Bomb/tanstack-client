@@ -4,12 +4,13 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.2.0
  */
+import type { PlaylistBotCreator } from './playlistBotCreator';
+import type { PlaylistSystemCreator } from './playlistSystemCreator';
+import type { PlaylistUserCreator } from './playlistUserCreator';
 import type { Track } from './track';
-import type { User } from './user';
 
 export interface PlaylistTrack {
   track: Track;
   dateAdded: Date;
-  addedBySystem: boolean;
-  addedBy: User | null;
+  addedBy: PlaylistUserCreator | PlaylistBotCreator | PlaylistSystemCreator;
 }
