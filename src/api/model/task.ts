@@ -4,6 +4,7 @@
  * Pipe Bomb API
  * OpenAPI spec version: 0.2.0
  */
+import type { TaskHistory } from './taskHistory';
 import type { TaskStatus } from './taskStatus';
 
 export interface Task {
@@ -18,4 +19,5 @@ export interface Task {
      */
   percent: number | null;
   resumable: boolean;
+  lastRun: TaskHistory | null;
 }

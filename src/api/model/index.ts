@@ -209,6 +209,8 @@ export * from './stringWorkflowStepOptionValueType';
 export * from './systemConfigKeysDto';
 export * from './systemConfigOptions';
 export * from './task';
+export * from './taskHistory';
+export * from './taskHistoryResult';
 export * from './taskStatus';
 export * from './textConfigNode';
 export * from './textConfigNodeType';
