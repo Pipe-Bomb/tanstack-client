@@ -9,4 +9,5 @@ export interface AttributeSource {
   pluginId: string;
   sourceId: string;
   name: string;
+  enabled: boolean;
 }
